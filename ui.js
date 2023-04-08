@@ -139,6 +139,7 @@ var scenes = {
   otherLocationElement: document.getElementById("otherLocation"),
   current: "storefront",
   other: "kitchen",
+  themeName: document.getElementById("theme-name"),
   "storefront": {
     name: "STOREFRONT",
     element: document.getElementById("scene-storefront"),

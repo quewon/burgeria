@@ -8,8 +8,8 @@ var gamedata = {
   libraryIndex: 0,
   themes: {
     index: 1,
-    order: ["default", "soft"],
-    default: {
+    order: ["☼", "☁︎"],
+    "☼": {
       "burgeria": "red",
       "burgeria-bg": "pink",
       "newsgray": "#dcdcdc",
@@ -19,7 +19,7 @@ var gamedata = {
       "graph-negative": "var(--burgeria)",
       "graph-positive": "blue"
     },
-    soft: {
+    "☁︎": {
       "burgeria": "#E03616",
       "bg": "#FDF0D5",
       "lines": "#3A3335",
@@ -30,15 +30,18 @@ var gamedata = {
   workshop: "",
 };
 
-function toggleTheme() {
+function toggleTheme(button) {
   gamedata.themes.index++;
   if (gamedata.themes.index > gamedata.themes.order.length - 1) gamedata.themes.index = 0;
-  let theme = gamedata.themes[gamedata.themes.order[gamedata.themes.index]];
+  let name = gamedata.themes.order[gamedata.themes.index];
+  let theme = gamedata.themes[name];
 
   for (let key in theme) {
     let value = theme[key];
     document.documentElement.style.setProperty("--"+key, value);
   }
+
+  scenes.themeName.textContent = name;
 }
 
 var _objectTimeouts = [];
@@ -62,9 +65,6 @@ function _objectTimeoutUpdate() {
 }
 
 function init_gamedata() {
-  gamedata.themes.index--;
-  toggleTheme();
-
   gamedata.inventory = new collection();
 
   let abc = "abcdefghijklmnopqrstuvwxyz";

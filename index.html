@@ -449,7 +449,7 @@
     <header>
       <h1>BURGERIA!</h1>
       <h2 style="position: absolute; top:0; right:0; text-align: right;">이게 바로 버거야!<br>버거리아</h2>
-      <button onclick="toggleTheme();" style="border-color: var(--burgeria); border-bottom: none; position: absolute; bottom: 0; right: 0;">toggle theme</button>
+      <button onclick="toggleTheme();" title="toggle theme" style="height: 1.5rem; border-color: var(--burgeria); border-bottom: none; position: absolute; bottom: 0; right: 0;"><span id="theme-name"></span></button>
     </header>
 
     <!-- <div style="display: flex;">
@@ -604,6 +604,9 @@
   <script type="text/javascript" src="gamedata.js"></script>
   <script type="text/javascript" src="ui.js"></script>
   <script type="text/javascript">
+    gamedata.themes.index--;
+    toggleTheme();
+
     let x=0, y=0;
     function animate() {
       x += .2;
@@ -618,8 +621,8 @@
     // init game
     _objectTimeoutUpdate();
     animate();
-    init_workshop();
     init_gamedata();
+    init_workshop();
 
     new headline("SMALL BURGERS...", "... ARE IN!");
     new prices();
