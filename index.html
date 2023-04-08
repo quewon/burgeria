@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>BURGERIA!</title>
+    <style media="screen">
+      :root {
+        --line-height: 1.1rem;
+
+        --burgeria: red;
+        --burgeria-bg: pink;
+        --newsgray: #dcdcdc;
+        --lines: black;
+        --bg: white;
+        --graph-neutral: var(--lines);
+        --graph-negative: var(--burgeria);
+        --graph-positive: blue;
+      }
+
+      body {
+        margin: auto;
+        margin-top: 1rem;
+        max-width: calc(1000px + 1rem);
+
+        background-color: var(--bg);
+        background-image: radial-gradient(var(--burgeria-bg) 1px, transparent 0);
+        background-size: 20px 20px;
+
+        color: var(--lines);
+      }
+
+      header {
+        padding: 0;
+        border-bottom: 1px solid var(--burgeria);
+        margin-bottom: 1rem;
+        color: var(--burgeria);
+        position: relative;
+      }
+
+      h1, h2 {
+        pointer-events: none;
+      }
+
+      h1 {
+        font-size: 50px;
+        font-weight: bold;
+        transform: scaleY(1.7);
+        margin: 0;
+        line-height: 1.2em;
+        white-space: nowrap;
+      }
+
+      h2 {
+        margin: 0;
+        line-height: 1em;
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: .5rem;
+      }
+
+      .hidden {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        transform: scale(0, 0);
+      }
+
+      .block {
+        border: 1px solid var(--lines);
+        padding: .5rem;
+        margin-bottom: 1rem;
+        background: var(--bg);
+        position: relative;
+      }
+
+      .ministock {
+        position: absolute;
+        z-index: 10;
+      }
+
+      .news {
+        background: var(--newsgray);
+      }
+
+      #navbar {
+        border-color: var(--burgeria);
+        display: flex;
+        justify-content: space-between;
+        height: fit-content;
+      }
+      button.selected {
+        pointer-events: none;
+        color: var(--burgeria);
+      }
+
+      button.x {
+        border-top: none;
+        border-right: none;
+        position: absolute;
+        top:0;
+        right:0;
+      }
+
+      .tray {
+        border: 1px solid var(--lines);
+        width: 100%;
+        padding: 0;
+      }
+      .tray::after {
+        content: attr(name);
+        position: absolute;
+        line-height: 1px;
+        top: 0;
+        left: 0;
+        transform: translate(1rem, calc(-50% - .5px));
+        padding-left: .25rem;
+        padding-right: .25rem;
+        background: var(--bg);
+      }
+
+      .tray footer {
+        width: 100%;
+        border-top: 1px solid var(--lines);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+      .tray main {
+        display: flex;
+        box-sizing: border-box;
+        padding-bottom: 1.5rem;
+        width: 100%;
+        height: 100%;
+      }
+      .tray .container {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        padding: .5rem;
+        box-sizing: border-box;
+      }
+      .container:first-child {
+        padding-right: .25rem;
+      }
+      .container:last-child {
+        padding-left: .25rem;
+      }
+      button {
+        margin: 0;
+        border: 1px solid var(--lines);
+        font-family: inherit;
+        font-size: inherit;
+        background: var(--bg);
+        cursor: pointer;
+        color: inherit;
+      }
+      /* button:hover {
+        background: var(--burgeria);
+        color: var(--bg);
+      } */
+      button:active {
+        background: var(--burgeria);
+        color: var(--bg);
+        font-style: italic;
+      }
+      button.disabled {
+        pointer-events: none;
+        opacity: .2;
+      }
+      .tray button {
+        border-top: none;
+        border-bottom: none;
+        border-right: 1px solid var(--lines);
+      }
+
+      .slide-up {
+        animation: slide-up .5s;
+      }
+      @keyframes slide-up {
+        0% {
+          opacity: 0;
+          transform: translate(0, 50%);
+        }
+        100% {
+          opacity: 1;
+          transform: translate(0, 0);
+        }
+      }
+
+      .sending {
+        animation: send .5s;
+      }
+      @keyframes send {
+        0% {
+          transform: scale(1, 1);
+          max-height: 100vh;
+        }
+        100% {
+          transform: scale(1.2, 0);
+          max-height: 0;
+        }
+      }
+
+      .collection {
+        border: 1px dashed var(--lines);
+        border-radius: 1rem;
+        text-align: center;
+        box-sizing: border-box;
+        line-height: var(--line-height);
+        overflow: hidden;
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+      }
+      .collection:active {
+        border-color: var(--burgeria);
+      }
+      .collection:hover .item:first-child, .collection:active .item:first-child {
+        background: var(--burgeria);
+        color: var(--bg);
+      }
+      .collection.at-capacity:hover .item:first-child {
+        background: var(--bg);
+        color: var(--lines);
+      }
+      .collection:active .item:first-child {
+        font-style: italic;
+      }
+      .collection.empty {
+        color: var(--lines);
+        opacity: .5;
+        cursor: default;
+      }
+      .collection.empty:hover, .collection.empty:active {
+        border-color: var(--lines);
+      }
+      .collection.empty::after {
+        content: attr(placeholder);
+        font-style: italic;
+      }
+      .collection.draghover {
+        border-color: var(--burgeria);
+        opacity: 1;
+        cursor: default;
+      }
+      .collection.draghover::after {
+        content: "";
+      }
+      .collection.draghover .item:first-child {
+        background: var(--bg);
+        color: var(--lines);
+        font-style: italic;
+      }
+      .collection .item {
+        border: none;
+        max-width: 70%;
+        padding-left: .5rem;
+        padding-right: .5rem;
+      }
+
+      .draggable {
+        cursor: pointer;
+        cursor: grab;
+        user-select: none;
+      }
+      .draggable:hover {
+        background: var(--burgeria);
+        color: var(--bg);
+      }
+      .draggable.grabbing {
+        cursor: grabbing;
+        background: var(--burgeria);
+        color: var(--bg);
+        font-style: italic;
+      }
+      .dragghost {
+        position: absolute;
+        pointer-events: none;
+        opacity: .5;
+        z-index: 100;
+        transform: translate(-50%, -50%);
+      }
+      .dragghost li {
+        display: block;
+      }
+
+      canvas {
+        width: 10rem !important;
+        min-height: 10rem;
+        height: 100% !important;
+      }
+
+      ul.flex {
+        margin-bottom: 0;
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .flex li {
+        width: 30%;
+      }
+
+      .prices-graph {
+        display: grid;
+        width: 100%;
+        height: 10rem;
+        grid-template-columns: repeat(27, 1fr);
+        grid-template-rows: auto 1rem;
+        column-gap: 3px;
+      }
+
+      .graphvaluepoint {
+        position: absolute;
+        left: 0;
+        font-size: .8rem;
+        transform: translate(-.3rem, 50%);
+        background: var(--newsgray);
+        z-index: 1;
+      }
+      .graphline {
+        position: absolute;
+        border-top: 1px dashed gray;
+        height: 0;
+        width: 100%;
+        left: 0;
+        top: 0;
+        z-index: 0;
+        transform: translate(0, .4rem);
+      }
+
+      .graphbar {
+        align-self: end;
+        background: var(--graph-neutral);
+        z-index: 1;
+      }
+      .graphbar.past {
+        background: transparent !important;
+        border: 1px dashed var(--newsgray);
+        border-bottom: none;
+        z-index: 2;
+      }
+      .graphbar.positive {
+        background: var(--graph-positive);
+        border-left: none;
+        border-right: none;
+      }
+      .graphbar.negative {
+        background: var(--graph-negative);
+        border-color: var(--graph-negative);
+      }
+
+      .tooltip {
+        position: absolute;
+        border: 1px solid var(--lines);
+        background: var(--newsgray);
+        padding: .5rem;
+        padding-top: 0;
+        pointer-events: none;
+        display: none;
+        top: calc(100% - 1rem);
+        left: 50%;
+        transform: translate(-50%, 0);
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      input, textarea {
+        font-family: inherit;
+        font-size: inherit;
+        border: 1px solid var(--lines);
+        background: var(--bg);
+        padding: .5rem;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      textarea {
+        min-height: 5rem;
+      }
+      input::placeholder, textarea::placeholder {
+        font-style: italic;
+      }
+
+      .scene {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+      .scene > div {
+        width: 500px;
+      }
+
+      p.block {
+        margin: 0;
+        margin-left: -.5rem;
+        margin-right: -.5rem;
+        border-left: none;
+        border-right: none;
+        background: var(--newsgray);
+        text-align: justify;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .burgerpoints {
+        display: inline-block;
+        background: var(--lines);
+        color: var(--bg);
+        font-style: italic;
+        border-radius: 50%;
+        font-size: .6rem;
+        text-align: center;
+        line-height: 1rem;
+        width: 1rem;
+        height: 1rem;
+        box-sizing: border-box;
+        vertical-align: middle;
+      }
+
+      .gone {
+        display: none;
+      }
+
+      @media (max-width: calc(1000px + 1rem)) {
+        body {
+          max-width: 500px;
+        }
+        .scene {
+          display: block;
+        }
+        .scene > div {
+          width: inherit;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+    <header>
+      <h1>BURGERIA!</h1>
+      <h2 style="position: absolute; top:0; right:0; text-align: right;">이게 바로 버거야!<br>버거리아</h2>
+      <button onclick="toggleTheme();" style="border-color: var(--burgeria); border-bottom: none; position: absolute; bottom: 0; right: 0;">toggle theme</button>
+    </header>
+
+    <!-- <div style="display: flex;">
+      <div id="navbar" class="block" style="border-right: none; flex-grow: 1;">
+        <i>You are in the <b id="currentLocation">STOREFRONT</b></i>
+      </div>
+      <div class="block" style="padding: 0; border: none;">
+        <button onclick="scenes.switchLocation()" style="height: 100%; width: 100%;">go to the <b id="otherLocation">KITCHEN</b></button>
+      </div>
+    </div> -->
+
+    <div id="navbar" class="block">
+      <i>You are in the <b id="currentLocation">STOREFRONT</b></i>
+      <button onclick="scenes.switchLocation()">go to the <b id="otherLocation">KITCHEN</b></button>
+    </div>
+
+    <div id="scene-storefront" class="scene">
+      <div id="scene-storefront-news">
+        <div class="menu block">
+          <h1>MENU</h1>
+          <ul>
+            <li>Standard Burger (50 pins)</li>
+            <li>Custom Burger (100 pins)</li>
+          </ul>
+        </div>
+      </div>
+      <div id="scene-storefront-body">
+
+      </div>
+    </div>
+
+    <div id="scene-kitchen" class="scene hidden">
+      <div>
+        <div style="display: flex;">
+          <div class="block" style="font-weight: bold">
+            BurgerPoints
+          </div>
+          <div class="block" style="width: 100%; border-left: none;">
+            You have <span class="burgerpoints" title="BurgerPoints">BP</span> <b>120</b>.
+          </div>
+        </div>
+        <div class="block">
+          <h1>STOCK</h1>
+          <ul id="inventory-list" class="flex">
+          </ul>
+        </div>
+        <div class="block">
+          <h1>WORKSHOP</h1>
+        </div>
+        <div class="block" style="border-top: none; border-bottom: none; margin-top: -1rem;">
+          <b>LETTERSTOCK</b>
+          <ul id="letters-list" class="flex">
+          </ul>
+        </div>
+        <div style="margin-top: -1rem;">
+          <textarea id="workshop-textarea" placeholder="click here to start typing..."></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="block" style="border-style: dashed; border-bottom: none; margin-bottom: 0;">
+          <span id="ingredient-buttons" style="display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;">
+            <b style="margin-right: .5rem;">create ingredient</b>
+          </span>
+        </div>
+        <div class="block" style="margin-bottom: 0; border-bottom: none;">
+          <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
+        </div>
+
+        <div class="block" id="library-page-container" style="border-top: none; padding-bottom: 0;">
+          <nav id="library-nav" style="text-align: center; margin-bottom: 1rem;">
+            <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1)">←</button>
+            <span id="library-index"></span>/<span id="library-pages-total"></span>
+            <button class="disabled" title="go to next page" onclick="navigateLibrary(1)">→</button>
+          </nav>
+          <p id="library-page" class="block"></p>
+          <div style="text-align: right; margin-top: 0; margin-right: -.5rem; height: fit-content;">
+            <button onclick="gamedata.library[gamedata.libraryIndex].disintegrate();" style="border: none; border-left: 1px solid var(--lines)">disintegrate</button>
+          </div>
+        </div>
+        <div id="library-page-empty" class="gone block" style="border-top: none;">
+          <i>There are no words here.</i>
+        </div>
+
+        <div class="block">
+          <h1 style="margin-bottom: 1rem;">R&D</h1>
+          <div style="display: flex; gap: 1rem;">
+            <b>develop new ingredient</b>
+            <input type="text" name="" value="" placeholder="click here to start typing...">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <template id="template-tray">
+      <div style="display: flex;">
+        <div class="tray block" name="tray">
+          <main>
+            <div class="container">
+              <div class="collection empty" placeholder="burger" data-capacity="-1">
+              </div>
+            </div>
+            <div class="container">
+              <div class="collection empty" placeholder="drink" data-capacity="1">
+              </div>
+              <div class="collection empty" placeholder="side" data-capacity="1">
+              </div>
+            </div>
+          </main>
+          <footer style="display: flex; justify-content: space-between;">
+            <button style="border-left: none;">send off</button>
+            <button style="border-right: none;" name="stockbutton">stock ☰</button>
+          </footer>
+        </div>
+        <div>
+          <canvas width="300" height="300"></canvas>
+        </div>
+        <div class="ministock block gone">
+        </div>
+      </div>
+    </template>
+
+    <template id="template-news-headline">
+      <div class="news block">
+        <button class="x" title="close" onclick="this.parentNode.parentNode.remove()">x</button>
+        <div style="transform-origin: 0 50%;">
+          <h1 id="line1">BIG BURGERS...</h1>
+        </div>
+        <div style="margin-top: .5rem; display: flex; align-items: flex-start; justify-content: space-between; transform-origin: 0 50%;">
+          <div><i>The Journal</i></div>
+          <h1 id="line2" style="text-align: right;">... ARE IN!</h1>
+        </div>
+      </div>
+    </template>
+
+    <template id="template-news-prices">
+      <div class="news block">
+        <button class="x" title="close" onclick="this.parentNode.parentNode.remove()">x</button>
+        <div style="margin-bottom: .5rem;">
+          <b>Letter Prices</b>—<i>your daily ABC's</i>
+        </div>
+        <div class="prices-graph">
+          <div class="points-holder" style="position: relative;"></div>
+        </div>
+      </div>
+    </template>
+
+  </body>
+  <script type="text/javascript" src="three.min.js"></script>
+  <script type="text/javascript" src="dragdrop.js"></script>
+  <script type="text/javascript" src="items.js"></script>
+  <script type="text/javascript" src="workshop.js"></script>
+  <script type="text/javascript" src="gamedata.js"></script>
+  <script type="text/javascript" src="ui.js"></script>
+  <script type="text/javascript">
+    let x=0, y=0;
+    function animate() {
+      x += .2;
+      y += .2;
+
+      document.body.style.backgroundPosition = x+"px "+y+"px";
+
+      draw_trays();
+      requestAnimationFrame(animate);
+    }
+
+    // init game
+    _objectTimeoutUpdate();
+    animate();
+    init_workshop();
+    init_gamedata();
+
+    new headline("SMALL BURGERS...", "... ARE IN!");
+    new prices();
+
+    let t = new tray();
+    // let c = new collection();
+    // new item("bottom bun", c);
+    // new item("mayo", c);
+    // new item("lettuce", c);
+    // new item("patty", c);
+    // new item("cheese", c);
+    // new item("tomato", c);
+    // new item("top bun", c);
+    // t.addCollection(c);
+
+    // setTimeout(function() {
+    //   let t2 = new tray();
+    //   let c2 = new collection();
+    //   new item("top bun", c2);
+    //   new item("lettuce", c2);
+    //   new item("tomato", c2);
+    //   new item("cheese", c2);
+    //   new item("patty", c2);
+    //   new item("mayo", c2);
+    //   new item("bottom bun", c2);
+    //   t2.addCollection(c2);
+    // }, 1000);
+  </script>
+</html>
