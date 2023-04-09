@@ -74,11 +74,6 @@
         position: relative;
       }
 
-      .ministock {
-        position: absolute;
-        z-index: 10;
-      }
-
       .news {
         background: var(--newsgray);
       }
@@ -313,7 +308,7 @@
         width: 100%;
         flex-wrap: wrap;
       }
-      .flexbox li {
+      ul.flexbox > li {
         width: 30%;
       }
 
@@ -452,12 +447,12 @@
         display: none;
       }
 
-      .timer {
+      #burgeria-timer {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 50%;
+        height: 0%;
         background: var(--lines);
         opacity: .5;
       }
@@ -485,17 +480,30 @@
         right: 0;
         border-right: none;
       }
+      .left {
+        position: absolute;
+        left: 0;
+        border-left: none;
+      }
       .bottom {
         border-bottom: none;
         position: absolute;
         bottom: 0;
       }
 
+      .tray footer button {
+        border-left: none;
+      }
+      .tray footer button:last-child {
+        border-left: 1px solid;
+        border-right: none;
+      }
+
       .marginbelow {
         margin-bottom: 1rem;
       }
       .margintop {
-        margin-bottom: 1rem;
+        margin-top: 1rem;
       }
       .dashed {
         border-style: dashed;
@@ -515,6 +523,12 @@
       .flexbox {
         display: flex;
       }
+      .flexbox.wrap {
+        flex-wrap: wrap;
+      }
+      .flexbox.column {
+        flex-direction: column;
+      }
       .flexbox.gap {
         gap: .5rem;
       }
@@ -524,6 +538,33 @@
 
       .centeroriginY {
         transform-origin: 0 50%;
+      }
+
+      #guys-container {
+        column-gap: .5rem;
+      }
+      #guys-container > div {
+        width: calc(20% - .4rem);
+        position: relative;
+      }
+      .guy div[name="text"] {
+        margin: 0;
+        border-style: dashed;
+        border-top: none;
+        padding: 3px;
+      }
+      .guy div[name="number"] {
+        margin: 0;
+        border-style: dashed;
+        border-top: none;
+        padding: 3px;
+      }
+
+      em {
+        color: var(--burgeria);
+        /* font-style: italic; */
+        font-style: normal;
+        font-weight: normal;
       }
     </style>
   </head>
@@ -549,28 +590,21 @@
         </div>
       </div>
       <div id="scene-storefront-body" style="padding-bottom: 10rem;">
+        <div id="storefront-ministock" class="block gone" style="position: absolute; z-index: 10;"></div>
+
         <div class="flexbox">
           <div class="block attached-right">
-            <span>☾</span>
-            <div class="timer"></div>
+            <span id="burgeria-day-icon"> </span>
+            <div id="burgeria-timer"></div>
           </div>
           <div class="block flexbox gap" style="flex-grow: 1;">
             <div class="grow">
-              <i>The store is <b>CLOSED</b>.</i>
+              <i>The store is <b id="day-state"> </b>.</i>
             </div>
-            <button onclick="burgeria();">open store</button>
+            <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
           </div>
         </div>
-        <div class="block flexbox gap dashed attached-above" style="border-bottom-style: solid;">
-          <div class="block" style="margin-bottom: 0; transform: rotate(90deg);">
-            :-)
-          </div>
-          <div class="block" style="margin-bottom: 0; transform: rotate(90deg);">
-            :-)
-          </div>
-          <div class="block" style="margin-bottom: 0; transform: rotate(90deg);">
-            :-)
-          </div>
+        <div id="guys-container" class="flexbox wrap attached-above marginbelow">
         </div>
       </div>
     </div>
@@ -580,7 +614,7 @@
         <div class="flexbox">
           <div class="block attached-right"><b>BurgerPoints</b></div>
           <div class="block grow">
-            You have <span class="burgerpoints" title="BurgerPoints"></span><b id="points-counter">-</b>.
+            You have <span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span>.
           </div>
         </div>
         <div class="block">
@@ -602,7 +636,7 @@
       </div>
       <div>
         <div class="block dashed attached-below">
-          <span id="ingredient-buttons" class="flexbox gap" style="flex-wrap: wrap; align-items: center;">
+          <span id="ingredient-buttons" class="flexbox gap wrap" style="align-items: center;">
             <b style="margin-right: .5rem;">create ingredient</b>
           </span>
         </div>
@@ -618,7 +652,7 @@
           </nav>
           <p id="library-page" class="block"></p>
           <div style="text-align: right; margin-top: 0; margin-right: -.5rem; height: fit-content;">
-            <button class="bottom top right" onclick="gamedata.library[gamedata.libraryIndex].disintegrate(); sfx('click');" style="position: relative;">disintegrate</button>
+            <button class="bottom top right" onclick="playerdata.library[playerdata.libraryIndex].disintegrate(); sfx('click');" style="position: relative;">disintegrate</button>
           </div>
         </div>
         <div id="library-page-empty" class="gone block attached-above">
@@ -651,14 +685,14 @@
             </div>
           </main>
           <footer class="flexbox" style="justify-content: space-between;">
-            <button style="border-left: none;">send off</button>
-            <button style="border-right: none;" name="stockbutton">stock ☰</button>
+            <button name="send">send off</button>
+            <button name="clear">clear</button>
+            <div class="grow"></div>
+            <button name="stock">stock ☰</button>
           </footer>
         </div>
         <div>
           <canvas width="300" height="300"></canvas>
-        </div>
-        <div class="ministock block gone">
         </div>
       </div>
     </template>
@@ -688,6 +722,18 @@
       </div>
     </template>
 
+    <template id="template-guy">
+      <div class="guy flexbox column">
+        <div name="number" class="block top left">
+          99
+        </div>
+        <img src="img/cat.png" alt="cat" title="cat">
+        <div name="text" class="block attached-top">
+          hello
+        </div>
+      </div>
+    </template>
+
   </body>
   <script type="text/javascript">
     var _objectTimeouts = [];
@@ -709,6 +755,17 @@
       }
     }
     setInterval(_objectTimeoutUpdate, 1);
+
+    var _animateBG = {
+      x: 0, y:0,
+      update: function() {
+        this.x += .2;
+        this.y += .2;
+        document.body.style.backgroundPosition = _animateBG.x+"px "+_animateBG.y+"px";
+        requestAnimationFrame(_animateBG.update);
+      }
+    };
+    _animateBG.update();
   </script>
   <script type="text/javascript" src="js/howler.core.js"></script>
   <script type="text/javascript" src="js/three.min.js"></script>
@@ -716,41 +773,16 @@
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/items.js"></script>
   <script type="text/javascript" src="js/workshop.js"></script>
-  <script type="text/javascript" src="js/gamedata.js"></script>
   <script type="text/javascript" src="js/guy.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
+  <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
-    gamedata.themes.index--;
-    toggleTheme();
+    _game.config.init_playerdata();
 
-    let x=0, y=0;
-    function animate() {
-      x += .2;
-      y += .2;
-
-      document.body.style.backgroundPosition = x+"px "+y+"px";
-
-      draw_trays();
-      requestAnimationFrame(animate);
-    }
-
-    function burgeria() {
-      //☼
-      //timer
-      //close store early
-      new headline("SMALL BURGERS...", "... ARE IN!");
-      new prices();
-      new tray();
-    }
-
-    // init game
-    animate();
-    init_gamedata();
-    init_workshop();
-    init_3d();
+    _game.init();
 
     setTimeout(function() {
       console.clear();
-    }, 1);
+    }, 100);
   </script>
 </html>

@@ -1,22 +1,5 @@
-function divContainingTemplate(templateId) {
-  let div = document.createElement("div");
-  let template = document.getElementById(templateId);
-  let clone = template.content.cloneNode(true);
-  div.appendChild(clone);
-  return div;
-}
-
-function divContainingPerfectClone(element) {
-  let clone = document.createElement("div");
-  clone.innerHTML = element.outerHTML;
-
-  const rect = element.getBoundingClientRect();
-  clone.style.width = rect.width+"px";
-  clone.style.height = rect.height+"px";
-}
-
 function draw_trays() {
-  for (let tray of gamedata.trays) {
+  for (let tray of playerdata.trays) {
     if (!tray.disabled) tray.draw();
   }
 }
@@ -30,7 +13,7 @@ function init_3d() {
 
 class tray {
   constructor() {
-    this.id = gamedata.trays.length;
+    this.id = playerdata.trays.length;
 
     this.collections = {
       burger: null,
@@ -42,7 +25,7 @@ class tray {
 
     this.disabled = false;
 
-    gamedata.trays.push(this);
+    playerdata.trays.push(this);
   }
 
   init_tray() {
@@ -61,7 +44,7 @@ class tray {
       con.addEventListener("mouseenter", function(e) {
         let item = _dragdrop.itemInHand;
         if (!item) return;
-        let tray = gamedata.trays[this.dataset.trayId];
+        let tray = playerdata.trays[this.dataset.trayId];
         let col = tray.collections[this.dataset.side];
         if (col.capacity > -1 && col.capacity < 1) {
           this.classList.add("at-capacity");
@@ -72,16 +55,18 @@ class tray {
         this.prepend(item.element);
         item.dragGhost.classList.add("gone");
         tray.resize_3d();
+        tray.updateMinistockPosition();
       });
       con.addEventListener("mouseup", function(e) {
         this.classList.remove("draghover");
         this.classList.remove("at-capacity");
       });
       con.onclick = function() {
-        let tray = gamedata.trays[this.dataset.trayId];
+        let tray = playerdata.trays[this.dataset.trayId];
         let col = tray.collections[this.dataset.side];
         col.removeItemByIndex(col.items.length-1);
         tray.resize_3d();
+        tray.updateMinistockPosition();
       };
       con.addEventListener("mouseleave", function(e) {
         this.classList.remove("draghover");
@@ -97,49 +82,50 @@ class tray {
       });
     };
 
-    let sendbutton = this.element.querySelector("footer").firstElementChild;
+    let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
-    sendbutton.onclick = function() { gamedata.trays[this.dataset.id].send(); sfx("click"); }
+    sendbutton.onclick = function() { playerdata.trays[this.dataset.id].send(); sfx("click"); }
 
-    let stockbutton = this.element.querySelector("[name='stockbutton']");
+    let clearbutton = this.element.querySelector("[name='clear']");
+    clearbutton.dataset.id = this.id;
+    clearbutton.onclick = function() { playerdata.trays[this.dataset.id].clear(); sfx("click"); }
+
+    let stockbutton = this.element.querySelector("[name='stock']");
     stockbutton.dataset.id = this.id;
-    stockbutton.onclick = function() { gamedata.trays[this.dataset.id].toggleMinistockWindow(); sfx("click"); }
+    stockbutton.onclick = function() { playerdata.trays[this.dataset.id].toggleMinistockWindow(); sfx("click"); }
     this.stockbutton = stockbutton;
     this.element.dataset.id = this.id;
 
-    this.ministock = this.element.querySelector(".ministock");
-    this.ministock.dataset.id = this.id;
-  }
-
-  updateMinistockWindow() {
-    updateList(this.ministock, gamedata.inventory.list);
-    for (let li of this.ministock.children) {
-      li.classList.add("draggable");
-      li.addEventListener("mousedown", function(e) {
-        if (!this.name) return;
-
-        this.classList.add("grabbing");
-
-        let tray = gamedata.trays[this.parentNode.dataset.id];
-        let item = gamedata.inventory.getItemByName(this.name);
-        item.drag();
-      });
-    }
+    this.ministockOpenHere = false;
   }
 
   updateMinistockPosition() {
     let rect = this.stockbutton.getBoundingClientRect();
-    this.ministock.style.left = rect.left+"px";
-    this.ministock.style.top = (rect.bottom + window.scrollY)+"px";
+    const ministock = scenes.storefront.ministock;
+    ministock.style.left = rect.left+"px";
+    ministock.style.top = (rect.bottom + window.scrollY)+"px";
   }
 
   toggleMinistockWindow() {
-    this.updateMinistockWindow();
-
-    this.ministock.classList.toggle("gone");
-    if (!this.ministock.classList.contains("gone")) {
-      this.updateMinistockPosition();
+    if (!this.ministockOpenHere) {
+      this.openMinistockWindow();
+    } else {
+      const ministock = scenes.storefront.ministock;
+      ministock.classList.add("gone");
+      this.ministockOpenHere = false;
     }
+  }
+
+  openMinistockWindow() {
+    for (let tray of playerdata.trays) {
+      tray.ministockOpenHere = false;
+    }
+
+    this.ministockOpenHere = true;
+    updateMinistockWindow();
+    this.updateMinistockPosition();
+    const ministock = scenes.storefront.ministock;
+    ministock.classList.remove("gone");
   }
 
   resize_3d() {
@@ -153,8 +139,6 @@ class tray {
     this.camera.top = height/2;
     this.camera.bottom = -height/2;
     this.camera.updateProjectionMatrix();
-
-    this.updateMinistockPosition();
   }
 
   init_3d() {
@@ -242,15 +226,26 @@ class tray {
   }
 
   send() {
-    this.ministock.classList.add("gone");
+    if (this.ministockOpenHere) {
+      this.toggleMinistockWindow();
+    }
 
     let tray = this.element;
     tray.dataset.id = this.id;
     tray.classList.add("sending");
     tray.addEventListener("animationend", function(e) {
-      gamedata.trays[this.dataset.id].element.remove();
+      playerdata.trays[this.dataset.id].element.remove();
       this.disabled = true;
     });
+  }
+
+  clear() {
+    for (let side in this.collections) {
+      let col = this.collections[side];
+      col.clear(true);
+    }
+
+    this.openMinistockWindow();
   }
 }
 
@@ -278,11 +273,9 @@ class collection {
     if (this.element) this.element.prepend(item.element);
     this.items.push(item);
     this.addToList(item);
-    if (this == gamedata.inventory) {
-      updateList(scenes.kitchen.inventoryList, gamedata.inventory.list);
-      for (let tray of gamedata.trays) {
-        tray.updateMinistockWindow();
-      }
+    if (this == playerdata.inventory) {
+      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      updateMinistockWindow();
     }
 
     this.capacity--;
@@ -327,8 +320,8 @@ class collection {
 
     if (this.tray) this.tray.removeMesh(item, this);
     this.removeFromList(item);
-    if (this != gamedata.inventory) {
-      item.setCollection(gamedata.inventory, true);
+    if (this != playerdata.inventory) {
+      item.setCollection(playerdata.inventory, true);
     } else {
       item.setCollection(null, true);
     }
@@ -336,10 +329,30 @@ class collection {
     this.capacity++;
     if (this.element && this.element.children.length == 0) this.element.classList.add("empty");
 
-    if (this == gamedata.inventory) {
-      updateList(scenes.kitchen.inventoryList, gamedata.inventory.list);
-      for (let tray of gamedata.trays) {
-        tray.updateMinistockWindow();
+    if (this == playerdata.inventory) {
+      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      updateMinistockWindow();
+    }
+  }
+
+  clear(dontUpdateMinistock) {
+    for (let i=this.items.length-1; i>=0; i--) {
+      let item = this.items[i];
+      if (this.tray) this.tray.removeMesh(item, this);
+      this.removeFromList(item);
+      if (this != playerdata.inventory) {
+        item.setCollection(playerdata.inventory, true);
+      } else {
+        item.setCollection(null, true);
+      }
+      this.capacity++;
+      this.items.splice(i, 1);
+    }
+    this.element.classList.add("empty");
+    if (this == playerdata.inventory) {
+      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      if (!dontUpdateMinistock) {
+        updateMinistockWindow();
       }
     }
   }
@@ -462,7 +475,7 @@ class item {
     this.element.classList.remove("grabbing");
     if (this.element.isConnected) {
       let parent = this.element.parentNode;
-      let tray = gamedata.trays[parent.dataset.trayId];
+      let tray = playerdata.trays[parent.dataset.trayId];
       let col = tray.collections[parent.dataset.side];
 
       this.setCollection(col);

@@ -14,16 +14,19 @@ var _sounds = {
 function sfx(name, fadetime) {
   let sound = _sounds[name];
   if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
-  sound.play();
+  const id = sound.play();
   if (fadetime) sound.fade(0, 1, fadetime);
+
+  return id;
 }
 
-function sfx_stop(name, fadetime) {
+function sfx_stop(name, fadetime, id) {
   let sound = _sounds[name];
   if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
-  sound.stop();
   if (fadetime) {
-    sound.fade(1, 0, fadetime);
+    sound.fade(1, 0, fadetime, id);
     sound.once("fade", function(e) { this.stop() });
+  } else {
+    sound.stop(id);
   }
 }

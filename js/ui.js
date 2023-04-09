@@ -1,3 +1,241 @@
+var scenes = {
+  templates: {
+    "template-tray": document.getElementById("template-tray"),
+    "template-news-headline": document.getElementById("template-news-headline"),
+    "template-news-prices": document.getElementById("template-news-prices"),
+    "template-guy": document.getElementById("template-guy")
+  },
+  currentLocationElement: document.getElementById("currentLocation"),
+  otherLocationElement: document.getElementById("otherLocation"),
+  current: "storefront",
+  other: "kitchen",
+  themeName: document.getElementById("theme-name"),
+  "storefront": {
+    name: "STOREFRONT",
+    element: document.getElementById("scene-storefront"),
+    body: document.getElementById("scene-storefront-body"),
+    news: document.getElementById("scene-storefront-news"),
+    recipesList: document.getElementById("scene-recipes"),
+    ministock: document.getElementById("storefront-ministock"),
+    day: {
+      toggleButton: document.getElementById("day-toggle-button"),
+      state: document.getElementById("day-state"),
+      timer: document.getElementById("burgeria-timer"),
+      icon: document.getElementById("burgeria-day-icon"),
+      guysContainer: document.getElementById("guys-container")
+    },
+  },
+  "kitchen": {
+    name: "KITCHEN",
+    element: document.getElementById("scene-kitchen"),
+    ingredientButtons: document.getElementById("ingredient-buttons"),
+    library: {
+      page: document.getElementById("library-page"),
+      pagesTotal: document.getElementById("library-pages-total"),
+      index: document.getElementById("library-index"),
+      nav: document.getElementById("library-nav"),
+      pageContainer: document.getElementById("library-page-container"),
+      pageEmptyMessage: document.getElementById("library-page-empty")
+    },
+    inventoryList: document.getElementById("inventory-list"),
+    lettersList: document.getElementById("letters-list"),
+    workshop: document.getElementById("workshop-textarea"),
+    pointsCounter: document.getElementById("points-counter"),
+  },
+  switchLocation: function() {
+    let current = this.current;
+    this.current = this.other;
+    this.other = current;
+
+    this.currentLocationElement.textContent = this[this.current].name;
+    this.otherLocationElement.textContent = this[this.other].name;
+
+    this[this.current].element.classList.remove("hidden");
+    this[this.other].element.classList.add("hidden");
+
+    sfx("click");
+  }
+};
+
+// utility functions
+
+function divContainingTemplate(templateId) {
+  let div = document.createElement("div");
+  let template = scenes.templates[templateId];
+  let clone = template.content.cloneNode(true);
+  div.appendChild(clone);
+  return div;
+}
+
+function divContainingPerfectClone(element) {
+  let clone = document.createElement("div");
+  clone.innerHTML = element.outerHTML;
+
+  const rect = element.getBoundingClientRect();
+  clone.style.width = rect.width+"px";
+  clone.style.height = rect.height+"px";
+}
+
+// update functions
+
+function toggleTheme(button) {
+  playerdata.themes.index++;
+  if (playerdata.themes.index > playerdata.themes.order.length - 1) playerdata.themes.index = 0;
+  let name = playerdata.themes.order[playerdata.themes.index];
+  let theme = playerdata.themes[name];
+
+  for (let key in theme) {
+    let value = theme[key];
+    document.documentElement.style.setProperty("--"+key, value);
+  }
+
+  scenes.themeName.textContent = name;
+}
+
+function updateDayUI() {
+  let dtb = scenes.storefront.day.toggleButton;
+  let di = scenes.storefront.day.icon;
+  let timer = scenes.storefront.day.timer;
+  let state = scenes.storefront.day.state;
+  if (playerdata.daytime == -1) {
+    dtb.textContent = "open store";
+    di.textContent = "☾";
+    timer.style.height = "0%";
+    state.textContent = "CLOSED";
+  } else {
+    dtb.textContent = "close store early";
+    di.textContent = "☼";
+    state.textContent = "OPEN";
+    // timer.style.height = "0%";
+  }
+}
+
+function updatePoints() {
+  scenes.kitchen.pointsCounter.textContent = playerdata.points;
+}
+
+function updateRecipes() {
+  while (scenes.storefront.recipesList.lastElementChild) {
+    scenes.storefront.recipesList.lastElementChild.remove();
+  }
+
+  let singles = [];
+  let sets = [];
+
+  for (let recipe of playerdata.recipes) {
+    if (recipe.drink || recipe.side) {
+      sets.push(recipe);
+    } else {
+      singles.push(recipe);
+    }
+  }
+
+  if (singles.length > 0) {
+    let label = document.createElement("b");
+    label.textContent = "SINGLES";
+
+    let ul = document.createElement("ul");
+    for (let recipe of singles) {
+      ul.appendChild(recipe.element);
+    }
+    scenes.storefront.recipesList.appendChild(label);
+    scenes.storefront.recipesList.appendChild(ul);
+  }
+
+  if (sets.length > 0) {
+    let label = document.createElement("b");
+    label.textContent = "SETS";
+    if (singles.length > 0) {
+      label.classList.add("margintop");
+    }
+
+    let ul = document.createElement("ul");
+    for (let recipe of sets) {
+      ul.appendChild(recipe.element);
+    }
+    scenes.storefront.recipesList.appendChild(label);
+    scenes.storefront.recipesList.appendChild(ul);
+  }
+}
+
+function updateMinistockWindow() {
+  const ministock = scenes.storefront.ministock;
+  updateList(ministock, playerdata.inventory.list);
+  for (let li of ministock.children) {
+    li.classList.add("draggable");
+    li.addEventListener("mousedown", function(e) {
+      if (!this.name) return;
+
+      this.classList.add("grabbing");
+
+      let tray = playerdata.trays[this.parentNode.dataset.id];
+      let item = playerdata.inventory.getItemByName(this.name);
+      item.drag();
+    });
+  }
+}
+
+function updateLibrary() {
+  let page = playerdata.library[playerdata.libraryIndex];
+
+  if (page) {
+    scenes.kitchen.library.page.textContent = page.text;
+
+    scenes.kitchen.library.pageContainer.classList.remove("gone");
+    scenes.kitchen.library.pageEmptyMessage.classList.add("gone");
+  } else {
+    scenes.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
+
+    scenes.kitchen.library.pageContainer.classList.add("gone");
+    scenes.kitchen.library.pageEmptyMessage.classList.remove("gone");
+  }
+
+  scenes.kitchen.library.pagesTotal.textContent = playerdata.library.length;
+  scenes.kitchen.library.index.textContent = playerdata.libraryIndex + 1;
+
+  let buttons = scenes.kitchen.library.nav.querySelectorAll("button");
+  buttons[0].classList.add("disabled");
+  buttons[1].classList.add("disabled");
+  if (playerdata.library.length > 1) {
+    if (playerdata.libraryIndex > 0) {
+      buttons[0].classList.remove("disabled");
+    }
+    if (playerdata.libraryIndex < playerdata.library.length - 1) {
+      buttons[1].classList.remove("disabled");
+    }
+  }
+}
+
+function navigateLibrary(value) {
+  playerdata.libraryIndex += value;
+  if (playerdata.libraryIndex < 0) playerdata.libraryIndex = 0;
+  if (playerdata.libraryIndex >= playerdata.library.length) playerdata.libraryIndex = playerdata.library.length - 1;
+  updateLibrary();
+}
+
+function updateList(listElement, listObject) {
+  while (listElement.lastElementChild) {
+    listElement.lastElementChild.remove();
+  }
+
+  let inventoryOccupied = false;
+  for (let name in listObject) {
+    if (listObject[name] == 0) continue;
+
+    inventoryOccupied = true;
+    let li = document.createElement("li");
+    li.name = name;
+    li.textContent = name+" ("+listObject[name]+")";
+    listElement.appendChild(li);
+  }
+
+  if (!inventoryOccupied) {
+    let span = document.createElement("i");
+    span.textContent = "It's empty...";
+    listElement.appendChild(span);
+  }
+}
+
 // news
 
 class headline {
@@ -64,7 +302,7 @@ class prices {
       div.appendChild(line);
     }
 
-    let abcprices = gamedata.prices;
+    let abcprices = playerdata.prices;
     let abc = "abcdefghijklmnopqrstuvwxyz";
     for (let i=0; i<abc.length; i++) {
       let char = abc[i];
@@ -129,113 +367,5 @@ class prices {
 
       graph.appendChild(hoverarea);
     }
-  }
-}
-
-// kitchen stuff
-
-var scenes = {
-  currentLocationElement: document.getElementById("currentLocation"),
-  otherLocationElement: document.getElementById("otherLocation"),
-  current: "storefront",
-  other: "kitchen",
-  themeName: document.getElementById("theme-name"),
-  pointsCounter: document.getElementById("points-counter"),
-  "storefront": {
-    name: "STOREFRONT",
-    element: document.getElementById("scene-storefront"),
-    body: document.getElementById("scene-storefront-body"),
-    news: document.getElementById("scene-storefront-news"),
-    recipesList: document.getElementById("scene-recipes"),
-  },
-  "kitchen": {
-    name: "KITCHEN",
-    element: document.getElementById("scene-kitchen"),
-    ingredientButtons: document.getElementById("ingredient-buttons"),
-    library: {
-      page: document.getElementById("library-page"),
-      pagesTotal: document.getElementById("library-pages-total"),
-      index: document.getElementById("library-index"),
-      nav: document.getElementById("library-nav"),
-      pageContainer: document.getElementById("library-page-container"),
-      pageEmptyMessage: document.getElementById("library-page-empty")
-    },
-    inventoryList: document.getElementById("inventory-list"),
-    lettersList: document.getElementById("letters-list"),
-    workshop: document.getElementById("workshop-textarea"),
-  },
-  switchLocation: function() {
-    let current = this.current;
-    this.current = this.other;
-    this.other = current;
-
-    this.currentLocationElement.textContent = this[this.current].name;
-    this.otherLocationElement.textContent = this[this.other].name;
-
-    this[this.current].element.classList.remove("hidden");
-    this[this.other].element.classList.add("hidden");
-
-    sfx("click");
-  }
-};
-
-function updateLibrary() {
-  let page = gamedata.library[gamedata.libraryIndex];
-
-  if (page) {
-    scenes.kitchen.library.page.textContent = page.text;
-
-    scenes.kitchen.library.pageContainer.classList.remove("gone");
-    scenes.kitchen.library.pageEmptyMessage.classList.add("gone");
-  } else {
-    scenes.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
-
-    scenes.kitchen.library.pageContainer.classList.add("gone");
-    scenes.kitchen.library.pageEmptyMessage.classList.remove("gone");
-  }
-
-  scenes.kitchen.library.pagesTotal.textContent = gamedata.library.length;
-  scenes.kitchen.library.index.textContent = gamedata.libraryIndex + 1;
-
-  let buttons = scenes.kitchen.library.nav.querySelectorAll("button");
-  buttons[0].classList.add("disabled");
-  buttons[1].classList.add("disabled");
-  if (gamedata.library.length > 1) {
-    if (gamedata.libraryIndex > 0) {
-      buttons[0].classList.remove("disabled");
-    }
-    if (gamedata.libraryIndex < gamedata.library.length - 1) {
-      buttons[1].classList.remove("disabled");
-    }
-  }
-}
-
-function navigateLibrary(value) {
-  gamedata.libraryIndex += value;
-  if (gamedata.libraryIndex < 0) gamedata.libraryIndex = 0;
-  if (gamedata.libraryIndex >= gamedata.library.length) gamedata.libraryIndex = gamedata.library.length - 1;
-  updateLibrary();
-}
-
-function updateList(listElement, listObject) {
-  while (listElement.lastElementChild) {
-    listElement.lastElementChild.remove();
-  }
-
-  let inventoryOccupied = false;
-  for (let name in listObject) {
-    if (listObject[name] == 0) continue;
-
-    inventoryOccupied = true;
-    let li = document.createElement("li");
-    li.name = name;
-    li.textContent = name+" ("+listObject[name]+")";
-    listElement.appendChild(li);
-  }
-
-  if (!inventoryOccupied) {
-    let span = document.createElement("i");
-    span.textContent = "It's empty...";
-    listElement.appendChild(span);
   }
 }
