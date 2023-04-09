@@ -15,6 +15,11 @@ var _sounds = {
     new Howl({ src: "sound/chime/3.wav" }),
     new Howl({ src: "sound/chime/4.wav" })
   ],
+  talk: [
+    new Howl({ src: "sound/click/1.wav" }),
+    new Howl({ src: "sound/click/2.wav" }),
+    new Howl({ src: "sound/click/3.wav" })
+  ],
 };
 
 function sfx(name, fadetime) {

@@ -462,7 +462,7 @@
       }
 
       .gone {
-        display: none;
+        display: none !important;
       }
 
       #burgeria-timer {
@@ -567,11 +567,21 @@
         position: relative;
       }
       .guy div[name="text"] {
+        display: inline;
         margin: 0;
         border-style: dashed;
         border-top: none;
         padding: 3px;
+        min-height: 1rem;
+        text-align: justify;
       }
+      .guy div[name="text"] * {
+        display: inline;
+      }
+      .guy div[name="text"] *::after {
+        content: " ";
+      }
+
       .guy div[name="number"] {
         margin: 0;
         border: 1px dashed var(--lines);
@@ -753,9 +763,7 @@
           99
         </div>
         <img src="img/cat.png" alt="cat" title="cat">
-        <div name="text" class="block attached-top">
-          hello
-        </div>
+        <div name="text" class="block attached-top"></div>
       </div>
     </template>
 
@@ -805,9 +813,5 @@
     _game.config.init_playerdata();
 
     _game.init();
-
-    setTimeout(function() {
-      console.clear();
-    }, 100);
   </script>
 </html>

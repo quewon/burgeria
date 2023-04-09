@@ -1,3 +1,9 @@
+function _animate() {
+  draw_trays();
+  draw_guys();
+  requestAnimationFrame(_animate);
+}
+
 const _game = {
   config: {
     dayLength: 1000 * 10,
@@ -52,16 +58,6 @@ Silent, athwart my soul, moves the symphony true.`);
     },
   },
   init: function() {
-    var _animateBG = { x:0, y:0 };
-    function animate() {
-      _animateBG.x += .2;
-      _animateBG.y += .2;
-      document.body.style.backgroundPosition = _animateBG.x+"px "+_animateBG.y+"px";
-
-      draw_trays();
-      requestAnimationFrame(animate);
-    }
-    animate();
     init_workshop();
     init_3d();
 
@@ -73,6 +69,8 @@ Silent, athwart my soul, moves the symphony true.`);
 
     playerdata.themes.index--;
     toggleTheme();
+
+    _animate();
   },
 
   updateDay: function() {
@@ -134,6 +132,7 @@ Silent, athwart my soul, moves the symphony true.`);
     } else {
       this.beginDay();
     }
+    console.clear();
   }
 }
 
