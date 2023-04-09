@@ -70,7 +70,7 @@ class prices {
       let char = abc[i];
       let label = document.createElement("span");
       label.textContent = char;
-      label.style.textAlign = "center";
+      label.classList.add("graphlabel");
       label.style.gridColumnStart = i+2;
       label.style.gridRowStart = 2;
       graph.appendChild(label);
@@ -112,7 +112,7 @@ class prices {
       hoverarea.style.position = "relative";
 
       let tooltip = document.createElement("div");
-      tooltip.innerHTML = char+"<br><span class='burgerpoints'>BP</span> "+p[p.length-1];
+      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+p[p.length-1];
       if (diff != 0) {
         tooltip.innerHTML += " <span style='color:"+(diff > 0 ? "var(--graph-positive)'>↑" : "var(--graph-negative)'>↓")+Math.abs(diff)+"</span>";
       }
@@ -121,10 +121,10 @@ class prices {
       hoverarea.appendChild(tooltip);
 
       hoverarea.addEventListener("mouseover", function() {
-        this.firstElementChild.style.display = "block";
+        this.firstElementChild.classList.remove("gone");
       });
       hoverarea.addEventListener("mouseout", function() {
-        this.firstElementChild.style.display = "none";
+        this.firstElementChild.classList.add("gone");
       });
 
       graph.appendChild(hoverarea);
@@ -140,11 +140,13 @@ var scenes = {
   current: "storefront",
   other: "kitchen",
   themeName: document.getElementById("theme-name"),
+  pointsCounter: document.getElementById("points-counter"),
   "storefront": {
     name: "STOREFRONT",
     element: document.getElementById("scene-storefront"),
     body: document.getElementById("scene-storefront-body"),
-    news: document.getElementById("scene-storefront-news")
+    news: document.getElementById("scene-storefront-news"),
+    recipesList: document.getElementById("scene-recipes"),
   },
   "kitchen": {
     name: "KITCHEN",
@@ -172,6 +174,8 @@ var scenes = {
 
     this[this.current].element.classList.remove("hidden");
     this[this.other].element.classList.add("hidden");
+
+    sfx("click");
   }
 };
 

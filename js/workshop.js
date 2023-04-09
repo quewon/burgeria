@@ -29,12 +29,13 @@ function init_workshop() {
     let deleted = "";
     let caret = 0;
 
-    
+
 
     console.log(prevtext, text);
     console.log("added: "+added, "deleted: "+deleted, caret);
 
     gamedata.workshop = this.value;
+    sfx("type");
   }
 
   workshop.addEventListener("input", update_workshop);

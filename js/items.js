@@ -21,6 +21,13 @@ function draw_trays() {
   }
 }
 
+var _renderer;
+function init_3d() {
+  _renderer = new THREE.WebGLRenderer({ alpha: true });
+  _renderer.setPixelRatio( window.devicePixelRatio );
+  _renderer.setSize(150, 150);
+}
+
 class tray {
   constructor() {
     this.id = gamedata.trays.length;
@@ -92,11 +99,11 @@ class tray {
 
     let sendbutton = this.element.querySelector("footer").firstElementChild;
     sendbutton.dataset.id = this.id;
-    sendbutton.onclick = function() { gamedata.trays[this.dataset.id].send(); }
+    sendbutton.onclick = function() { gamedata.trays[this.dataset.id].send(); sfx("click"); }
 
     let stockbutton = this.element.querySelector("[name='stockbutton']");
     stockbutton.dataset.id = this.id;
-    stockbutton.onclick = function() { gamedata.trays[this.dataset.id].toggleMinistockWindow(); }
+    stockbutton.onclick = function() { gamedata.trays[this.dataset.id].toggleMinistockWindow(); sfx("click"); }
     this.stockbutton = stockbutton;
     this.element.dataset.id = this.id;
 
@@ -123,7 +130,7 @@ class tray {
   updateMinistockPosition() {
     let rect = this.stockbutton.getBoundingClientRect();
     this.ministock.style.left = rect.left+"px";
-    this.ministock.style.top = rect.bottom+"px";
+    this.ministock.style.top = (rect.bottom + window.scrollY)+"px";
   }
 
   toggleMinistockWindow() {
@@ -136,16 +143,15 @@ class tray {
   }
 
   resize_3d() {
-    let width = this.renderer.domElement.offsetWidth;
-    let height = this.renderer.domElement.offsetHeight;
-    let aspect = height / width;
-    let camWidth = 300;
-    let camHeight = camWidth * aspect;
+    let width = this.context.canvas.width;
+    let height = this.context.canvas.height;
+    let aspect = this.context.canvas.offsetHeight/this.context.canvas.offsetWidth;
+    height = width * aspect;
 
-    this.camera.left = -camWidth/2;
-    this.camera.right = camWidth/2;
-    this.camera.top = camHeight/2;
-    this.camera.bottom = -camHeight/2;
+    this.camera.left = -width/2;
+    this.camera.right = width/2;
+    this.camera.top = height/2;
+    this.camera.bottom = -height/2;
     this.camera.updateProjectionMatrix();
 
     this.updateMinistockPosition();
@@ -153,34 +159,32 @@ class tray {
 
   init_3d() {
     let canvas = this.element.querySelector("canvas");
+    let width = canvas.width;
+    let height = canvas.height;
+    let context = canvas.getContext("2d");
 
-    var scene, camera, renderer;
-    scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(canvas.width/-2, canvas.width/2, canvas.height/2, canvas.height/-2, .1, 1000);
+    var camera = new THREE.OrthographicCamera(0, 0, 0, 0, .1, 1000);
     camera.zoom = 35;
-    renderer = new THREE.WebGLRenderer({ alpha: true });
 
-    canvas.parentNode.replaceChild(renderer.domElement, canvas);
-
+    var scene = new THREE.Scene();
     scene.add(new THREE.AmbientLight(0xffffff, .5));
     var light = new THREE.DirectionalLight(0xffe6e6, .5);
     light.position.set(10, 10, -10);
     scene.add(light);
-    camera.position.set(0, 1, -10);
-    camera.lookAt(0, 0, 0);
 
-    this.renderer = renderer;
     this.scene = scene;
+    this.context = context;
     this.camera = camera;
     this.resize_3d();
-
-    //
 
     var traymesh = new THREE.Mesh(
       new THREE.BoxGeometry(6, .3, 4.5),
       new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
     traymesh.position.set(0, -2, 0);
+
+    camera.position.set(0, 1, -10);
+    camera.lookAt(0, 0, 0);
 
     scene.add(traymesh);
     this.mesh = traymesh;
@@ -201,13 +205,13 @@ class tray {
 
     this.mesh.add(item.mesh);
     item.ground = col.groundheight;
-    col.groundheight += item.height * 1.5;
+    col.groundheight += item.height;
     item.mesh.position.y = 7+item.ground;
   }
 
   removeMesh(item, col) {
     this.mesh.remove(item.mesh);
-    col.groundheight -= item.height * 1.5;
+    col.groundheight -= item.height;
   }
 
   setCollection(side, col) {
@@ -221,6 +225,11 @@ class tray {
   }
 
   draw() {
+    let width = this.context.canvas.width;
+    let height = this.context.canvas.height;
+
+    this.context.clearRect(0, 0, width, height);
+
     for (let side in this.collections) {
       if (!this.collections[side]) continue;
       this.collections[side].draw();
@@ -228,10 +237,13 @@ class tray {
 
     this.mesh.rotation.y += .01;
 
-    this.renderer.render(this.scene, this.camera);
+    _renderer.render(this.scene, this.camera);
+    this.context.drawImage(_renderer.domElement, 0, 0);
   }
 
   send() {
+    this.ministock.classList.add("gone");
+
     let tray = this.element;
     tray.dataset.id = this.id;
     tray.classList.add("sending");
