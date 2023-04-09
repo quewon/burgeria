@@ -30,7 +30,7 @@ class tray {
 
   init_tray() {
     this.element = divContainingTemplate("template-tray");
-    this.element.classList.add("slide-up");
+    this.element.classList.add("slide-down");
     scenes.storefront.body.appendChild(this.element);
 
     let cons = this.element.querySelectorAll(".collection");

@@ -33,7 +33,6 @@ const _game = {
       for (let char of abc) {
         playerdata.prices[char] = [];
         playerdata.prices[char].push(Math.ceil(Math.random() * 100));
-        playerdata.prices[char].push(Math.ceil(Math.random() * 100));
       }
 
       for (let name of ["top bun", "bottom bun", "tomato", "cheese", "patty", "lettuce", "mayo", "fries", "coke"]) {
@@ -97,12 +96,20 @@ Silent, athwart my soul, moves the symphony true.`);
     }
   },
   beginDay: function() {
+    generateNewPrices();
+
     playerdata.daytime = 0;
     this.updateDay();
 
     updateDayUI();
   },
   endDay: function() {
+    if (playerdata.daytime < _game.config.dayLength) {
+      if (!confirm("Are you sure you want to end the day now?")) {
+        return;
+      }
+    }
+
     for (let i=playerdata.guys.length-1; i>=0; i--) {
       let guy = playerdata.guys[i];
       guy.element.remove();
@@ -260,5 +267,12 @@ class writingpiece {
       this.disintegrated = true;
     }
     updateLibrary();
+  }
+}
+
+function generateNewPrices() {
+  let abc = "abcdefghijklmnopqrstuvwxyz";
+  for (let char of abc) {
+    playerdata.prices[char].push(Math.ceil(Math.random() * 100));
   }
 }

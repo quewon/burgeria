@@ -100,13 +100,13 @@ function updateDayUI() {
   if (playerdata.daytime == -1) {
     dtb.textContent = "open store";
     di.textContent = "☾";
-    timer.style.height = "0%";
+    timer.style.height = "100%";
     state.textContent = "CLOSED";
   } else {
     dtb.textContent = "close store early";
     di.textContent = "☼";
     state.textContent = "OPEN";
-    // timer.style.height = "0%";
+    timer.style.height = "0%";
   }
 }
 
@@ -247,7 +247,7 @@ class headline {
     //   container.remove();
     // };
     div.classList.add("slide-up");
-    scenes.storefront.news.appendChild(div);
+    scenes.storefront.news.prepend(div);
 
     let l1 = div.querySelector("#line1");
     let l2 = div.querySelector("#line2");
@@ -272,14 +272,8 @@ class prices {
     let div = divContainingTemplate("template-news-prices");
     div.style.position = "relative";
 
-    // let xbutton = div.querySelector("button");
-    // xbutton.onclick = function() {
-    //   let container = this.parentNode.parentNode;
-    //   container.remove();
-    // };
-
     div.classList.add("slide-up");
-    scenes.storefront.news.appendChild(div);
+    scenes.storefront.news.prepend(div);
 
     //
 
@@ -314,10 +308,12 @@ class prices {
       graph.appendChild(label);
 
       let p = abcprices[char];
-      let diff = p[p.length - 1] - p[p.length - 2];
+      let currentPrice = p[p.length - 1];
+      let previousPrice = p[p.length - 2];
+      let diff = currentPrice - previousPrice;
 
       let bar = document.createElement("div");
-      bar.style.height = p[p.length - 1]+"%";
+      bar.style.height = currentPrice+"%";
       bar.style.gridRowStart = 1;
       bar.style.gridColumnStart = i+2;
       if (diff > 0) {
@@ -331,7 +327,7 @@ class prices {
 
       if (diff != 0) {
         let cbar = document.createElement("div");
-        cbar.style.height = p[p.length - 2]+"%";
+        cbar.style.height = previousPrice+"%";
         cbar.style.gridRowStart = 1;
         cbar.style.gridColumnStart = i+2;
         if (diff > 0) {
@@ -350,12 +346,12 @@ class prices {
       hoverarea.style.position = "relative";
 
       let tooltip = document.createElement("div");
-      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+p[p.length-1];
+      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+currentPrice;
       if (diff != 0) {
         tooltip.innerHTML += " <span style='color:"+(diff > 0 ? "var(--graph-positive)'>↑" : "var(--graph-negative)'>↓")+Math.abs(diff)+"</span>";
       }
 
-      tooltip.className = "tooltip";
+      tooltip.className = "tooltip gone";
       hoverarea.appendChild(tooltip);
 
       hoverarea.addEventListener("mouseover", function() {
