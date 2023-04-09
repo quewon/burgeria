@@ -113,17 +113,21 @@
         background: var(--bg);
       }
 
-      .tray footer {
+      .has-footer {
+        padding-bottom: 1.5rem;
+      }
+      .block footer {
         width: 100%;
+        justify-content: space-between;
         border-top: 1px solid var(--lines);
         position: absolute;
         bottom: 0;
         left: 0;
+        height: 1.5rem;
       }
       .tray main {
         display: flex;
         box-sizing: border-box;
-        padding-bottom: 1.5rem;
         width: 100%;
         height: 100%;
       }
@@ -164,7 +168,7 @@
         pointer-events: none;
         opacity: .2;
       }
-      .tray button {
+      footer button {
         border-top: none;
         border-bottom: none;
         border-right: 1px solid var(--lines);
@@ -491,11 +495,11 @@
         bottom: 0;
       }
 
-      .tray footer button {
+      .block footer button {
         border-left: none;
       }
-      .tray footer button:last-child {
-        border-left: 1px solid;
+      .block footer button:last-child {
+        border-left: 1px solid var(--lines);
         border-right: none;
       }
 
@@ -644,16 +648,17 @@
           <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
         </div>
 
-        <div class="block attached-above" id="library-page-container" style="padding-bottom: 0;">
+        <div class="block attached-above has-footer" id="library-page-container">
           <nav id="library-nav" style="text-align: center; margin-bottom: .5rem;">
             <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
             <span id="library-index"></span>/<span id="library-pages-total"></span>
             <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
           </nav>
           <p id="library-page" class="block"></p>
-          <div style="text-align: right; margin-top: 0; margin-right: -.5rem; height: fit-content;">
-            <button class="bottom top right" onclick="playerdata.library[playerdata.libraryIndex].disintegrate(); sfx('click');" style="position: relative;">disintegrate</button>
-          </div>
+          <footer class="flexbox">
+            <div class="grow"></div>
+            <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate(); sfx('click');">disintegrate</button>
+          </footer>
         </div>
         <div id="library-page-empty" class="gone block attached-above">
           <i>There are no words here.</i>
@@ -671,7 +676,7 @@
 
     <template id="template-tray">
       <div class="flexbox">
-        <div class="tray block" name="tray">
+        <div class="tray block has-footer" name="tray">
           <main>
             <div class="container">
               <div class="collection empty" placeholder="burger" data-capacity="-1">
@@ -684,7 +689,7 @@
               </div>
             </div>
           </main>
-          <footer class="flexbox" style="justify-content: space-between;">
+          <footer class="flexbox">
             <button name="send">send off</button>
             <button name="clear">clear</button>
             <div class="grow"></div>

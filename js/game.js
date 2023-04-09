@@ -1,6 +1,6 @@
 const _game = {
   config: {
-    dayLength: 2000,
+    dayLength: 1000 * 10,
     init_playerdata: function() {
       playerdata.daytime = -1;
       playerdata.points = 100;
@@ -80,6 +80,8 @@ Silent, athwart my soul, moves the symphony true.`);
     if (playerdata.daytime == 0) {
       new headline("SMALL BURGERS...", "... ARE IN!");
       new prices();
+    }
+    if (playerdata.daytime % 2000 == 0) {
       new guy();
     }
 
@@ -89,9 +91,7 @@ Silent, athwart my soul, moves the symphony true.`);
 
     scenes.storefront.day.timer.style.height = (playerdata.daytime/_game.config.dayLength * 100)+"%";
 
-    if (playerdata.daytime == -1) {
-
-    } else {
+    if (playerdata.daytime != -1) {
       playerdata.daytime++;
       setObjectTimeout(this, "updateDay", 1);
     }
@@ -114,6 +114,7 @@ Silent, athwart my soul, moves the symphony true.`);
       tray.element.remove();
       playerdata.trays.splice(i, 1);
     }
+    scenes.storefront.ministock.classList.add("gone");
 
     playerdata.daytime = -1;
     updateDayUI();
@@ -173,8 +174,8 @@ class ingredient {
     scenes.kitchen.ingredientButtons.appendChild(button);
     button.dataset.ingredientName = name;
     button.onclick = function(e) {
-      playerdata.ingredients[this.dataset.ingredientName].create();
       sfx("click");
+      playerdata.ingredients[this.dataset.ingredientName].create();
     };
     this.button = button;
 

@@ -9,6 +9,12 @@ var _sounds = {
     new Howl({ src: "sound/click/3.wav" })
   ],
   disintegrate: new Howl({ src: "sound/disintegrate.wav", loop: true }),
+  chime: [
+    new Howl({ src: "sound/chime/1.wav" }),
+    new Howl({ src: "sound/chime/2.wav" }),
+    new Howl({ src: "sound/chime/3.wav" }),
+    new Howl({ src: "sound/chime/4.wav" })
+  ],
 };
 
 function sfx(name, fadetime) {

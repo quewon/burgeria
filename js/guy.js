@@ -25,6 +25,7 @@ class guy {
 
     new tray();
     playerdata.guys.push(this);
+    sfx("chime");
   }
 
   update() {
