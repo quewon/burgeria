@@ -54,13 +54,23 @@ class tray {
       con.addEventListener("mouseup", function(e) {
         this.classList.remove("draghover");
       });
-      con.onclick = function() {
-        let tray = playerdata.trays[this.dataset.trayId];
-        let col = tray.collections[this.dataset.side];
-        col.removeItemByIndex(col.items.length-1);
-        tray.resize_3d();
-        tray.updateMinistockPosition();
-      };
+      con.addEventListener("mousedown", function(e) {
+        // let item = col.items[col.items.length - 1];
+        let item = col.removeItemByIndex(col.items.length-1);
+        if (!item) return;
+
+        item.drag();
+        this.classList.add("draghover");
+        this.prepend(item.element);
+        item.dragGhost.classList.add("gone");
+      });
+      // con.onclick = function() {
+      //   let tray = playerdata.trays[this.dataset.trayId];
+      //   let col = tray.collections[this.dataset.side];
+      //   col.removeItemByIndex(col.items.length-1);
+      //   tray.resize_3d();
+      //   tray.updateMinistockPosition();
+      // };
       con.addEventListener("mouseleave", function(e) {
         this.classList.remove("draghover");
 
@@ -351,7 +361,10 @@ class collection {
       this.tray.addMesh(item, this);
     }
 
-    if (this.element) this.element.prepend(item.element);
+    if (this.element) {
+      this.element.prepend(item.element);
+      this.element.classList.add("draggable");
+    }
     this.items.push(item);
     this.addToList(item);
     if (this == playerdata.inventory) {
@@ -390,11 +403,10 @@ class collection {
   }
 
   removeItemByName(name) {
-    let itemRemoved;
     for (let i=0; i<this.items.length; i++) {
       let item = this.items[i];
       if (item.name == name) {
-        this.removeItemByIndex(i);
+        return this.removeItemByIndex(i);
         break;
       }
     }
@@ -406,22 +418,25 @@ class collection {
 
     if (this.tray) this.tray.removeMesh(item, this);
     this.removeFromList(item);
-    if (this != playerdata.inventory) {
-      item.setCollection(playerdata.inventory, true);
-    } else {
-      item.setCollection(null, true);
-    }
+    item.setCollection(null, true);
 
     if (this.capacity != -1) {
       this.capacity++;
       this.element.classList.remove("at-capacity");
     }
-    if (this.element && this.element.children.length == 0) this.element.classList.add("empty");
+    if (this.element) {
+      this.element.classList.remove("draggable");
+      if (this.element.children.length == 0) {
+        this.element.classList.add("empty");
+      }
+    }
 
     if (this == playerdata.inventory) {
       updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
       updateMinistockWindow();
     }
+
+    return item;
   }
 
   clear(dontUpdateMinistock) {
@@ -438,6 +453,7 @@ class collection {
         this.capacity++;
         this.element.classList.remove("at-capacity");
       }
+      this.element.classList.remove("draggable");
       this.items.splice(i, 1);
     }
     this.element.classList.add("empty");
@@ -558,7 +574,8 @@ class item {
   }
 
   drag() {
-    this.element.classList.add("grabbing");
+    document.body.classList.add("grabbing");
+
     _dragdrop.itemInHand = this;
     this.dragGhost.classList.remove("gone");
     this.dragGhost.style.left = _dragdrop.mouse.x+"px";
@@ -566,13 +583,16 @@ class item {
   }
 
   drop() {
-    this.element.classList.remove("grabbing");
+    document.body.classList.remove("grabbing");
+
     if (this.element.isConnected) {
       let parent = this.element.parentNode;
       let tray = playerdata.trays[parent.dataset.trayId];
       let col = tray.collections[parent.dataset.side];
 
       this.setCollection(col);
+    } else {
+      this.setCollection(playerdata.inventory);
     }
     _dragdrop.itemInHand = null;
     this.dragGhost.classList.add("gone");

@@ -166,10 +166,9 @@ function updateMinistockWindow() {
     li.addEventListener("mousedown", function(e) {
       if (!this.name) return;
 
-      this.classList.add("grabbing");
-
       let tray = playerdata.trays[this.parentNode.dataset.id];
-      let item = playerdata.inventory.getItemByName(this.name);
+      let item = playerdata.inventory.removeItemByName(this.name);
+      if (!item) return;
       item.drag();
     });
   }

@@ -17,6 +17,10 @@
         --graph-positive: blue;
       }
 
+      body.grabbing, body.grabbing * {
+        cursor: grabbing;
+      }
+
       body {
         margin: auto;
         margin-top: 1rem;
@@ -271,26 +275,14 @@
         user-select: none;
         -ms-user-select: none;
         -webkit-user-select: none;
-
-        cursor: pointer;
-      }
-      .collection:active {
-        border-color: var(--burgeria);
       }
       .collection:hover .item:first-child, .collection:active .item:first-child {
         background: var(--burgeria);
         color: var(--bg);
       }
-      .collection:active .item:first-child {
-        font-style: italic;
-      }
 
       .collection.empty {
         opacity: .5;
-        cursor: default;
-      }
-      .collection.empty:active {
-        border-color: var(--lines);
       }
       .collection.empty::after {
         content: attr(placeholder);
@@ -302,6 +294,9 @@
       }
       .collection.draghover::after {
         content: "";
+      }
+      .collection.draghover .item:first-child {
+        font-style: italic;
       }
 
       .collection.at-capacity {
@@ -335,11 +330,9 @@
         background: var(--burgeria);
         color: var(--bg);
       }
-      .draggable.grabbing {
-        cursor: grabbing;
-        background: var(--burgeria);
-        color: var(--bg);
-        font-style: italic;
+      .collection.draggable {
+        background: var(--bg);
+        color: var(--lines);
       }
       .dragghost {
         position: absolute;
