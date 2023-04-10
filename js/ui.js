@@ -101,7 +101,7 @@ function updateDayUI() {
   let di = scenes.storefront.day.icon;
   let timer = scenes.storefront.day.timer;
   let state = scenes.storefront.day.state;
-  if (playerdata.daytime == -1) {
+  if (playerdata.storetime == -1) {
     let all_served = true;
     for (let guy of playerdata.guys) {
       if (!guy.served) {
@@ -111,10 +111,13 @@ function updateDayUI() {
     }
     if (!all_served) {
       dtb.classList.add("disabled");
+      di.textContent = "☾";
+    } else {
+      dtb.classList.remove("disabled");
+      di.textContent = "☼";
     }
 
     dtb.textContent = "open store";
-    di.textContent = "☾";
     timer.style.height = "100%";
     state.textContent = "CLOSED";
   } else {

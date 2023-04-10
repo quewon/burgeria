@@ -66,7 +66,8 @@ class guy {
 
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
-    this.currentTalkInterval = 5 * this.talkInterval;
+    // this.currentTalkInterval = 5 * this.talkInterval;
+    this.currentTalkInterval = 100;
 
     this.tray = new tray(this);
     this.tray.deploy();
@@ -76,8 +77,8 @@ class guy {
   }
 
   generateDesiredMenu() {
-    // const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
-    const originalRecipe = playerdata.recipes[1];
+    const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
+    // const originalRecipe = playerdata.recipes[1];
 
     let construction = originalRecipe.construction;
 
@@ -116,8 +117,6 @@ class guy {
   }
 
   draw() {
-    console.log("a");
-
     if (this.words.length == 0) return;
 
     this.talkTime++;
@@ -139,12 +138,11 @@ class guy {
 
       // check: am i done serving everybody?
       // if so, allow player to start the day up again!
-      if (playerdata.daytime == -1) {
+      if (playerdata.storetime == -1) {
         for (let guy of playerdata.guys) {
           if (!guy.served) return;
         }
-        scenes.storefront.day.toggleButton.classList.remove("disabled");
-        sfx("store_can_open");
+        _game.beginDay();
       }
     });
 

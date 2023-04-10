@@ -192,7 +192,7 @@ class tray {
     for (let side in this.collections) {
       const col = this.collections[side];
       for (let item of col.items) {
-        item.mesh.position.y = 7+item.ground;
+        item.mesh.position.y = 7 + item.ground;
         item.velocity = 0;
       }
     }
@@ -214,7 +214,7 @@ class tray {
     this.mesh.add(item.mesh);
     item.ground = col.groundheight;
     col.groundheight += item.height;
-    item.mesh.position.y = 7+item.ground;
+    item.mesh.position.y = 7 + item.ground;
   }
 
   removeMesh(item, col) {
@@ -306,10 +306,11 @@ class tray {
         if (construction[side].length != recipe.construction[side].length) {
           if (construction[side].length == 0) {
             return "there needs to be a "+side+"...";
-          } else {
+          } else if (construction[side].length < recipe.construction[side].length) {
             return side+" is missing ingredients!";
+          } else {
+            return side+" has too many ingredients!";
           }
-          // return false;
         }
         for (let i=construction[side].length-1; i>=0; i--) {
           const itemname = construction[side][i];
@@ -319,13 +320,15 @@ class tray {
             } else {
               return itemname+" should not be here!";
             }
-            // return false;
           }
         }
       } else {
         if (construction[side] != recipe.construction[side]) {
-          return "the "+side+" is different...";
-          // return false;
+          if (recipe.construction.side && recipe.construction.drink && construction.drink == recipe.construction.side && construction.side == recipe.construction.drink) {
+            return "the drink and sides were mixed up...";
+          } else {
+            return "the "+side+" is different...";
+          }
         }
       }
     }
@@ -336,8 +339,6 @@ class tray {
       }
     }
 
-    // console.log("this tray is satisfactory!");
-    // return true;
     return null;
   }
 }
@@ -515,18 +516,18 @@ class item {
   createMesh() {
     const type = playerdata.ingredients[this.name].type;
 
-    let geo = new THREE.CylinderGeometry(1, 1, .3, 12);
     this.height = .3;
+    let geo = new THREE.CylinderGeometry(1, 1, .3);
     let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 
     switch (type) {
       case "lettuce":
-        geo = new THREE.CylinderGeometry(1.2, 1.2, .1, 12);
+        geo = new THREE.CylinderGeometry(1.2, 1.2, .1);
         this.height = .1;
         material.color.setHex(0x90ee90);
         break;
       case "tomato":
-        geo = new THREE.CylinderGeometry(1, 1, .2, 12);
+        geo = new THREE.CylinderGeometry(1, 1, .2);
         this.height = .2;
         material.color.setHex(0xff0000);
         break;
@@ -539,20 +540,22 @@ class item {
         material.color.setHex(0xffd700);
         break;
       case "mayo":
-        geo = new THREE.CylinderGeometry(.8, .8, .1, 12);
+        geo = new THREE.CylinderGeometry(.8, .8, .1);
         this.height = .1;
         material.color.setHex(0xffffe0);
         break;
       case "top bun":
-        geo = new THREE.CylinderGeometry(1, 1.1, .5, 12);
+        geo = new THREE.CylinderGeometry(1, 1.1, .5);
+        this.height = .5;
         material.color.setHex(0xf5deb3);
         break;
       case "bottom bun":
-        geo = new THREE.CylinderGeometry(1.1, 1, .5, 12);
+        geo = new THREE.CylinderGeometry(1.1, 1, .5);
+        this.height = .5;
         material.color.setHex(0xf5deb3);
         break;
       case "coke":
-        geo = new THREE.CylinderGeometry(.5, .5, 1.2, 12);
+        geo = new THREE.CylinderGeometry(.5, .5, 1.2);
         this.height = 1.2;
         break;
       case "fries":
@@ -568,16 +571,17 @@ class item {
   }
 
   draw() {
-    this.velocity += .01;
+    this.velocity += .0125;
     this.mesh.position.y -= this.velocity;
 
     if (this.mesh.position.y - this.height/2 < this.ground) {
       this.mesh.position.y = this.ground + this.height/2;
-      this.velocity = this.velocity / -2;
+      this.velocity /= -2;
     }
   }
 
   drag() {
+    sfx("grab");
     document.body.classList.add("grabbing");
 
     _dragdrop.itemInHand = this;
@@ -587,6 +591,7 @@ class item {
   }
 
   drop() {
+    sfx("drop");
     document.body.classList.remove("grabbing");
 
     if (this.element.isConnected) {

@@ -18,7 +18,7 @@ const _game = {
   config: {
     dayLength: 2000 * 10,
     init_playerdata: function() {
-      playerdata.daytime = -1;
+      playerdata.storetime = -1;
       playerdata.points = 100;
 
       playerdata.themes = {
@@ -110,27 +110,6 @@ Silent, athwart my soul, moves the symphony true.`);
     _animate();
   },
 
-  updateDay: function() {
-    if (playerdata.daytime == 0) {
-      new headline("SMALL BURGERS...", "... ARE IN!");
-      new prices();
-    }
-
-    if (playerdata.daytime >= _game.config.dayLength) {
-      _game.endDay();
-    } else {
-      if (playerdata.daytime % 4000 == 0) {
-        new guy();
-      }
-    }
-
-    scenes.storefront.day.timer.style.height = (playerdata.daytime/_game.config.dayLength * 100)+"%";
-
-    if (playerdata.daytime != -1) {
-      playerdata.daytime++;
-      setObjectTimeout(this, "updateDay", 1);
-    }
-  },
   beginDay: function() {
     for (let i=playerdata.guys.length-1; i>=0; i--) {
       let guy = playerdata.guys[i];
@@ -146,38 +125,64 @@ Silent, athwart my soul, moves the symphony true.`);
 
     generateNewPrices();
 
-    playerdata.daytime = 0;
-    _game.updateDay();
+    new headline("SMALL BURGERS...", "... ARE IN!");
+    new prices();
+
+    sfx("begin_day");
 
     updateDayUI();
   },
-  endDay: function() {
-    if (playerdata.daytime < _game.config.dayLength) {
+
+  openStore: function() {
+    playerdata.storetime = 0;
+    _game.updateStore();
+    updateDayUI();
+  },
+  closeStore: function() {
+    if (playerdata.storetime < _game.config.dayLength) {
       if (!confirm("Are you sure you want to end the day now?")) {
         return;
       }
+      sfx("close_store");
+    } else {
+      // day ended naturally
+      _game.beginDay();
     }
 
-    sfx("close_store");
     scenes.storefront.ministock.classList.add("gone");
-
-    playerdata.daytime = -1;
+    playerdata.storetime = -1;
     updateDayUI();
+  },
+  updateStore: function() {
+    if (playerdata.storetime >= _game.config.dayLength) {
+      _game.closeStore();
+    } else {
+      if (playerdata.storetime % 4000 == 0) {
+        new guy();
+      }
+    }
+
+    scenes.storefront.day.timer.style.height = (playerdata.storetime/_game.config.dayLength * 100)+"%";
+
+    if (playerdata.storetime != -1) {
+      playerdata.storetime++;
+      setObjectTimeout(this, "updateStore", 1);
+    }
   },
 
   // day toggle action
   burgeria: function() {
     console.clear();
-    if (playerdata.daytime > -1) {
-      _game.endDay();
+    if (playerdata.storetime != -1) {
+      _game.closeStore();
     } else {
-      _game.beginDay();
+      _game.openStore();
     }
   }
 }
 
 var playerdata = {
-  daytime: null,
+  storetime: null,
   prices: {},
   recipes: [],
   trays: [],
@@ -223,6 +228,7 @@ class recipe {
     button.onclick = function(e) {
       const recipe = playerdata.recipes[this.dataset.id];
       recipe.previewRecipe();
+      sfx("click");
     }
     this.element.appendChild(button);
     this.button = button;
@@ -248,7 +254,6 @@ class recipe {
     }
 
     this.button.classList.add("selected");
-    sfx("click");
     this.tray.resize_3d(scenes.storefront.recipePreviewContext);
     this.tray.resetMeshes();
 
