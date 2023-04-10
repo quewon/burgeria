@@ -111,7 +111,7 @@ class guy {
     el.classList.remove("gone");
     this.currentTalkInterval = el.textContent.length * this.talkInterval;
     sfx("talk");
-    this.tray.updateMinistockPosition();
+    if (scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition();
   }
 
   draw() {

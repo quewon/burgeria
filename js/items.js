@@ -103,8 +103,6 @@ class tray {
       let number = this.element.querySelector("[name='number']");
       number.textContent = this.guy.id+1;
     }
-
-    this.ministockOpenHere = false;
   }
 
   deploy() {
@@ -114,7 +112,7 @@ class tray {
   }
 
   updateMinistockPosition() {
-    if (!this.ministockOpenHere) return;
+    if (scenes.storefront.ministockTray != this) return;
 
     let rect = this.stockbutton.getBoundingClientRect();
     const ministock = scenes.storefront.ministock;
@@ -123,21 +121,17 @@ class tray {
   }
 
   toggleMinistockWindow() {
-    if (!this.ministockOpenHere) {
+    if (scenes.storefront.ministockTray != this) {
       this.openMinistockWindow();
     } else {
       const ministock = scenes.storefront.ministock;
       ministock.classList.add("gone");
-      this.ministockOpenHere = false;
+      scenes.storefront.ministockTray = null;
     }
   }
 
   openMinistockWindow() {
-    for (let tray of playerdata.trays) {
-      tray.ministockOpenHere = false;
-    }
-
-    this.ministockOpenHere = true;
+    scenes.storefront.ministockTray = this;
     updateMinistockWindow();
     this.updateMinistockPosition();
     const ministock = scenes.storefront.ministock;
@@ -253,7 +247,7 @@ class tray {
   }
 
   send() {
-    if (this.ministockOpenHere) {
+    if (scenes.storefront.ministockTray == this) {
       this.toggleMinistockWindow();
     }
 
@@ -492,6 +486,8 @@ class item {
   }
 
   setCollection(collection, fromCollection) {
+    this.previousCollection = this.collection;
+
     this.element.remove();
     if (this.collection && !fromCollection) {
       this.collection.removeItemByName(this.name);
@@ -592,6 +588,7 @@ class item {
 
       this.setCollection(col);
     } else {
+      if (this.previousCollection) this.previousCollection.tray.openMinistockWindow();
       this.setCollection(playerdata.inventory);
     }
     _dragdrop.itemInHand = null;

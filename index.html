@@ -19,6 +19,9 @@
 
       body.grabbing, body.grabbing * {
         cursor: grabbing;
+        user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
       }
 
       body {
@@ -105,9 +108,6 @@
         border: 1px solid var(--lines);
         width: 100%;
         padding: 0;
-        user-select: none;
-        -ms-user-select: none;
-        -webkit-user-select: none;
       }
       .tray::after {
         content: attr(name);
@@ -271,10 +271,6 @@
         flex-wrap: nowrap;
         align-items: center;
         justify-content: center;
-
-        user-select: none;
-        -ms-user-select: none;
-        -webkit-user-select: none;
       }
       .collection:hover .item:first-child, .collection:active .item:first-child {
         background: var(--burgeria);
@@ -305,6 +301,7 @@
       .collection.at-capacity.draghover .item:first-child {
         color: var(--lines);
         background: var(--bg);
+        font-style: normal;
       }
 
       .collection.preview {

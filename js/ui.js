@@ -17,6 +17,7 @@ var scenes = {
     news: document.getElementById("scene-storefront-news"),
     recipesList: document.getElementById("scene-recipes"),
     ministock: document.getElementById("storefront-ministock"),
+    ministockTray: null,
     recipePreview: document.getElementById("recipe-preview"),
     recipePreviewContext: document.getElementById("recipe-preview").querySelector("canvas").getContext("2d"),
     day: {
