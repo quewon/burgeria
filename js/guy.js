@@ -116,6 +116,8 @@ class guy {
   }
 
   draw() {
+    console.log("a");
+
     if (this.words.length == 0) return;
 
     this.talkTime++;
@@ -128,20 +130,22 @@ class guy {
   receive() {
     let tray = this.tray;
 
+    this.served = true;
     this.element.dataset.id = this.id;
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
       let guy = playerdata.guys[this.dataset.id];
       guy.element.remove();
-      guy.served = true;
 
       // check: am i done serving everybody?
       // if so, allow player to start the day up again!
-      for (let guy of playerdata.guys) {
-        if (!guy.served) return;
+      if (playerdata.daytime == -1) {
+        for (let guy of playerdata.guys) {
+          if (!guy.served) return;
+        }
+        scenes.storefront.day.toggleButton.classList.remove("disabled");
+        sfx("store_can_open");
       }
-      scenes.storefront.day.toggleButton.classList.remove("disabled");
-      sfx("store_can_open");
     });
 
     const feedback = this.tray.requestFeedback(this.desiredMenu);
@@ -159,6 +163,7 @@ class guy {
     div.querySelector("[name='text']").textContent = feedback;
     div.className = "slide-up";
     scenes.storefront.news.prepend(div);
+    sfx("scrawl");
   }
 }
 
