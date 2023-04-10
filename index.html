@@ -161,6 +161,7 @@
         background: var(--bg);
         cursor: pointer;
         color: inherit;
+        height: 1.5rem;
       }
       /* button:hover {
         background: var(--burgeria);
@@ -185,6 +186,10 @@
         border-top: none;
         border-bottom: none;
         border-right: 1px solid var(--lines);
+      }
+
+      li button {
+        margin-top: 5px;
       }
 
       .slide-up {
@@ -506,6 +511,7 @@
         animation: lifespan 1s;
         font-size: .8rem;
         color: var(--burgeria);
+        pointer-events: none;
       }
       @keyframes lifespan {
         0% {
@@ -622,6 +628,13 @@
         font-weight: normal;
       }
 
+      #scene-recipes b {
+        margin-top: 1rem;
+      }
+      #scene-recipes b:first-child {
+        margin-top: 0;
+      }
+
       #recipe-preview {
         width: 50%;
       }
@@ -694,7 +707,7 @@
     </header>
 
     <div id="navbar" class="block">
-      <i>You are in the <b id="currentLocation">STOREFRONT</b></i>
+      <i>You are in the <b id="currentLocation">STOREFRONT</b>.</i>
       <button onclick="scenes.switchLocation()">go to the <b id="otherLocation">KITCHEN</b></button>
     </div>
 

@@ -62,7 +62,7 @@ class guy {
 
     this.generateDesiredMenu();
     this.createDialogue();
-    this.disabled = false;
+    this.served = false;
 
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
@@ -76,10 +76,15 @@ class guy {
   }
 
   generateDesiredMenu() {
-    this.desiredMenu = {
-      recipe: playerdata.recipes[0],
-      substitutes: [],
-    };
+    const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
+
+    let construction = originalRecipe.construction;
+
+    this.desiredMenu = new recipe({
+      name: originalRecipe.name,
+      cost: originalRecipe.cost,
+      construction: construction
+    });
   }
 
   createDialogue() {
@@ -87,7 +92,7 @@ class guy {
 
     this.words = [];
     this.addString("hi i would like the", "span");
-    this.addString(menu.recipe.name, "em");
+    this.addString(menu.name, "em");
     this.addString("thanks :)");
   }
 
@@ -106,6 +111,7 @@ class guy {
     el.classList.remove("gone");
     this.currentTalkInterval = el.textContent.length * this.talkInterval;
     sfx("talk");
+    this.tray.updateMinistockPosition();
   }
 
   draw() {
@@ -126,11 +132,21 @@ class guy {
     this.element.addEventListener("animationend", function(e) {
       let guy = playerdata.guys[this.dataset.id];
       guy.element.remove();
-      guy.disabled = true;
+      guy.served = true;
+
+      // check: am i done serving everybody?
+      // if so, allow player to start the day up again!
+      for (let guy of playerdata.guys) {
+        if (!guy.served) return;
+      }
+      scenes.storefront.day.toggleButton.classList.remove("disabled");
+      sfx("store_can_open");
     });
 
-    for (let i=0; i<this.desiredMenu.recipe.cost; i++) {
-      setTimeout(burgerpointParticle, Math.random() * 100 * this.desiredMenu.recipe.cost);
+    if (this.tray.satisfies(this.desiredMenu)) {
+      for (let i=0; i<this.desiredMenu.cost; i++) {
+        setTimeout(burgerpointParticle, Math.random() * 100 * this.desiredMenu.cost);
+      }
     }
   }
 }

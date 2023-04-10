@@ -1,6 +1,6 @@
 function _animate() {
   for (let guy of playerdata.guys) {
-    if (!guy.disabled) guy.draw();
+    if (!guy.served) guy.draw();
   }
 
   for (let tray of playerdata.trays) {
@@ -57,8 +57,34 @@ const _game = {
         // new item(name, playerdata.inventory);
       }
 
-      new recipe("Burgeria Special", 10, ["bottom bun", "patty", "top bun"]);
-      new recipe("Basic Set", 20, ["bottom bun", "patty", "top bun"], "coke", "fries");
+      new recipe({
+        name: "Burgeria Special",
+        cost: 10,
+        construction: {
+          burger: ["bottom bun", "patty", "top bun"]
+        },
+        addToMenu: true
+      });
+      new recipe({
+        name: "Burgeria Set",
+        cost: 20,
+        construction: {
+          burger: ["bottom bun", "patty", "top bun"],
+          drink: "coke",
+          side: "fries"
+        },
+        addToMenu: true
+      });
+      new recipe({
+        name: "Weird Set",
+        cost: 20,
+        construction: {
+          burger: [],
+          drink: "coke",
+          side: "fries"
+        },
+        addToMenu: true
+      });
 
       new writingpiece(`Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen, and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.`);
       new writingpiece(`After the dazzle of day is gone,
@@ -106,6 +132,18 @@ Silent, athwart my soul, moves the symphony true.`);
     }
   },
   beginDay: function() {
+    for (let i=playerdata.guys.length-1; i>=0; i--) {
+      let guy = playerdata.guys[i];
+      guy.element.remove();
+      playerdata.guys.splice(i, 1);
+    }
+
+    for (let i=playerdata.trays.length-1; i>=0; i--) {
+      let tray = playerdata.trays[i];
+      tray.element.remove();
+      playerdata.trays.splice(i, 1);
+    }
+
     generateNewPrices();
 
     playerdata.daytime = 0;
@@ -121,18 +159,6 @@ Silent, athwart my soul, moves the symphony true.`);
     }
 
     sfx("close_store");
-
-    for (let i=playerdata.guys.length-1; i>=0; i--) {
-      let guy = playerdata.guys[i];
-      guy.element.remove();
-      playerdata.guys.splice(i, 1);
-    }
-
-    for (let i=playerdata.trays.length-1; i>=0; i--) {
-      let tray = playerdata.trays[i];
-      tray.element.remove();
-      playerdata.trays.splice(i, 1);
-    }
     scenes.storefront.ministock.classList.add("gone");
 
     playerdata.daytime = -1;
@@ -141,12 +167,12 @@ Silent, athwart my soul, moves the symphony true.`);
 
   // day toggle action
   burgeria: function() {
+    console.clear();
     if (playerdata.daytime > -1) {
       _game.endDay();
     } else {
       _game.beginDay();
     }
-    console.clear();
   }
 }
 
@@ -169,12 +195,25 @@ var playerdata = {
 };
 
 class recipe {
-  constructor(name, cost, burger, drink, side) {
-    this.name = name || "Nameless Burger";
-    this.burger = burger || ["bottom bun", "patty", "top bun"];
-    this.drink = drink;
-    this.side = side;
-    this.cost = cost || 10;
+  constructor(p) {
+    this.name = p.name || "Nameless Burger";
+    this.construction = p.construction || {
+      burger: ["bottom bun", "patty", "top bun"],
+      drink: null,
+      side: null,
+    };
+    this.category = "singles";
+    if (this.construction.drink || this.construction.side) {
+      this.category = "sets";
+    }
+    this.cost = p.cost || 10;
+
+    if (p.addToMenu) {
+      this.addToMenu();
+    }
+  }
+
+  addToMenu() {
     this.id = playerdata.recipes.length;
 
     this.element = document.createElement("li");
@@ -190,14 +229,14 @@ class recipe {
 
     this.visible = false;
     this.tray = new tray();
-    for (let name of this.burger) {
+    for (let name of this.construction.burger) {
       new item(name, this.tray.collections.burger);
     }
-    if (this.drink) {
-      new item(this.drink, this.tray.collections.drink);
+    if (this.construction.drink) {
+      new item(this.construction.drink, this.tray.collections.drink);
     }
-    if (this.side) {
-      new item(this.side, this.tray.collections.side);
+    if (this.construction.side) {
+      new item(this.construction.side, this.tray.collections.side);
     }
 
     playerdata.recipes.push(this);

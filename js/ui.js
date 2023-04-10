@@ -100,6 +100,17 @@ function updateDayUI() {
   let timer = scenes.storefront.day.timer;
   let state = scenes.storefront.day.state;
   if (playerdata.daytime == -1) {
+    let all_served = true;
+    for (let guy of playerdata.guys) {
+      if (!guy.served) {
+        all_served = false;
+        break;
+      }
+    }
+    if (!all_served) {
+      dtb.classList.add("disabled");
+    }
+
     dtb.textContent = "open store";
     di.textContent = "☾";
     timer.style.height = "100%";
@@ -125,38 +136,21 @@ function updateRecipes() {
     scenes.storefront.recipesList.lastElementChild.remove();
   }
 
-  let singles = [];
-  let sets = [];
+  let categories = {};
 
   for (let recipe of playerdata.recipes) {
-    if (recipe.drink || recipe.side) {
-      sets.push(recipe);
-    } else {
-      singles.push(recipe);
+    if (!(recipe.category in categories)) {
+      categories[recipe.category] = [];
     }
+    categories[recipe.category].push(recipe);
   }
 
-  if (singles.length > 0) {
+  for (let name in categories) {
+    const category = categories[name];
     let label = document.createElement("b");
-    label.textContent = "SINGLES";
-
+    label.textContent = category[0].category.toUpperCase();
     let ul = document.createElement("ul");
-    for (let recipe of singles) {
-      ul.appendChild(recipe.element);
-    }
-    scenes.storefront.recipesList.appendChild(label);
-    scenes.storefront.recipesList.appendChild(ul);
-  }
-
-  if (sets.length > 0) {
-    let label = document.createElement("b");
-    label.textContent = "SETS";
-    if (singles.length > 0) {
-      label.classList.add("margintop");
-    }
-
-    let ul = document.createElement("ul");
-    for (let recipe of sets) {
+    for (let recipe of category) {
       ul.appendChild(recipe.element);
     }
     scenes.storefront.recipesList.appendChild(label);

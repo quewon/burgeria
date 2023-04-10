@@ -22,6 +22,7 @@ var _sounds = {
   ],
   close_store: new Howl({ src: "sound/click/3.wav" }),
   burgerpoints: new Howl({ src: "sound/dewdrop.wav" }),
+  store_can_open: new Howl({ src: "sound/click/3.wav" }),
 };
 
 function sfx(name, fadetime) {
