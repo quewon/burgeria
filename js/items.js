@@ -55,6 +55,8 @@ class tray {
         this.classList.remove("draghover");
       });
       con.addEventListener("mousedown", function(e) {
+        if (_dragdrop.itemInHand) return;
+
         // let item = col.items[col.items.length - 1];
         let item = col.removeItemByIndex(col.items.length-1);
         if (!item) return;
@@ -272,65 +274,71 @@ class tray {
     this.openMinistockWindow();
   }
 
-  satisfies(recipe) {
-    console.log("checking if tray matches menu "+recipe.name+"...");
+  requestFeedback(recipe) {
+    // console.log("checking if tray matches menu "+recipe.name+"...");
 
     let construction = {};
 
+    let trayHasNothing = true;
     for (let side in this.collections) {
       const collection = this.collections[side];
       if (side == "drink" || side == "side") {
         let item = collection.items[0];
-        construction[side] = item ? item.name : null;
+        if (item) {
+          construction[side] = item.name;
+          trayHasNothing = false;
+        }
       } else {
         construction[side] = [];
         for (let item of collection.items) {
           construction[side].push(item.name);
+          trayHasNothing = false;
         }
       }
+    }
+
+    if (trayHasNothing) {
+      return "this tray has nothing on it!";
     }
 
     for (let side in construction) {
-      if (!construction[side]) {
-        if (!recipe.construction[side]) {
-          continue;
-        } else {
-          console.log("tray needs to have a "+side);
-          return false;
+      if (construction[side].constructor === Array) {
+        if (construction[side].length != recipe.construction[side].length) {
+          if (construction[side].length == 0) {
+            return "there needs to be a "+side+"...";
+          } else {
+            return side+" is missing ingredients!";
+          }
+          // return false;
+        }
+        for (let i=construction[side].length-1; i>=0; i--) {
+          const itemname = construction[side][i];
+          if (recipe.construction[side][i] != itemname) {
+            if (recipe.construction[side].includes(itemname)) {
+              return itemname+" is in the wrong spot!";
+            } else {
+              return itemname+" should not be here!";
+            }
+            // return false;
+          }
         }
       } else {
-        if (construction[side].constructor === Array) {
-          if (construction[side].length != recipe.construction[side].length) {
-            if (construction[side].length == 0) {
-              console.log("tray needs to have a "+side);
-            } else {
-              console.log(side+" is missing ingredients!");
-            }
-            return false;
-          }
-          for (let i=construction[side].length-1; i>=0; i--) {
-            const itemname = construction[side][i];
-            if (recipe.construction[side][i] != itemname) {
-              if (recipe.construction[side].includes(itemname)) {
-                console.log(itemname+" is in the wrong spot!");
-              } else {
-                console.log(itemname+" should not be here!");
-              }
-              return false;
-            }
-          }
-        } else {
-          if (construction[side] != recipe.construction[side]) {
-            console.log(side+" is not satisfactory.");
-            return false;
-          }
+        if (construction[side] != recipe.construction[side]) {
+          return "the "+side+" is different...";
+          // return false;
         }
       }
     }
 
-    console.log("this tray is satisfactory!");
+    for (let side in recipe.construction) {
+      if (!construction[side]) {
+        return "there needs to be a "+side+"...";
+      }
+    }
 
-    return true;
+    // console.log("this tray is satisfactory!");
+    // return true;
+    return null;
   }
 }
 
@@ -588,7 +596,7 @@ class item {
 
       this.setCollection(col);
     } else {
-      if (this.previousCollection) this.previousCollection.tray.openMinistockWindow();
+      if (this.previousCollection && this.previousCollection.tray) this.previousCollection.tray.openMinistockWindow();
       this.setCollection(playerdata.inventory);
     }
     _dragdrop.itemInHand = null;

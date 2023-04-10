@@ -3,7 +3,8 @@ var scenes = {
     "template-tray": document.getElementById("template-tray"),
     "template-news-headline": document.getElementById("template-news-headline"),
     "template-news-prices": document.getElementById("template-news-prices"),
-    "template-guy": document.getElementById("template-guy")
+    "template-guy": document.getElementById("template-guy"),
+    "template-feedback-napkin": document.getElementById("template-feedback-napkin")
   },
   currentLocationElement: document.getElementById("currentLocation"),
   otherLocationElement: document.getElementById("otherLocation"),

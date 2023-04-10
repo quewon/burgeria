@@ -76,7 +76,8 @@ class guy {
   }
 
   generateDesiredMenu() {
-    const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
+    // const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
+    const originalRecipe = playerdata.recipes[1];
 
     let construction = originalRecipe.construction;
 
@@ -143,11 +144,21 @@ class guy {
       sfx("store_can_open");
     });
 
-    if (this.tray.satisfies(this.desiredMenu)) {
+    const feedback = this.tray.requestFeedback(this.desiredMenu);
+    if (feedback == null) {
       for (let i=0; i<this.desiredMenu.cost; i++) {
         setTimeout(burgerpointParticle, Math.random() * 100 * this.desiredMenu.cost);
       }
+    } else {
+      this.sendFeedback(feedback);
     }
+  }
+
+  sendFeedback(feedback) {
+    let div = divContainingTemplate("template-feedback-napkin");
+    div.querySelector("[name='text']").textContent = feedback;
+    div.className = "slide-up";
+    scenes.storefront.news.prepend(div);
   }
 }
 

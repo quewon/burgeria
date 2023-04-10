@@ -16,7 +16,7 @@ function _animate() {
 
 const _game = {
   config: {
-    dayLength: 1000 * 10,
+    dayLength: 2000 * 10,
     init_playerdata: function() {
       playerdata.daytime = -1;
       playerdata.points = 100;
@@ -119,7 +119,7 @@ Silent, athwart my soul, moves the symphony true.`);
     if (playerdata.daytime >= _game.config.dayLength) {
       _game.endDay();
     } else {
-      if (playerdata.daytime % 2000 == 0) {
+      if (playerdata.daytime % 4000 == 0) {
         new guy();
       }
     }

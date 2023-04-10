@@ -874,6 +874,16 @@
       </div>
     </template>
 
+    <template id="template-feedback-napkin">
+      <div class="block dashed">
+        <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
+        <div class="marginbelow">
+          <i>Someone left a note on a napkin...</i>
+        </div>
+        <span name="text"></span>
+      </div>
+    </template>
+
   </body>
   <script type="text/javascript">
     var _objectTimeouts = [];
