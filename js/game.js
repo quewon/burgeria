@@ -1,6 +1,16 @@
 function _animate() {
-  draw_trays();
-  draw_guys();
+  for (let guy of playerdata.guys) {
+    if (!guy.disabled) guy.draw();
+  }
+
+  for (let tray of playerdata.trays) {
+    if (tray.enabled) tray.draw();
+  }
+
+  for (let recipe of playerdata.recipes) {
+    if (recipe.visible) recipe.draw();
+  }
+
   requestAnimationFrame(_animate);
 }
 
@@ -66,6 +76,7 @@ Silent, athwart my soul, moves the symphony true.`);
     updateRecipes();
     updateList(scenes.kitchen.lettersList, playerdata.letters);
     updateDayUI();
+    playerdata.recipes[0].previewRecipe();
 
     playerdata.themes.index--;
     toggleTheme();
@@ -78,12 +89,13 @@ Silent, athwart my soul, moves the symphony true.`);
       new headline("SMALL BURGERS...", "... ARE IN!");
       new prices();
     }
-    if (playerdata.daytime % 2000 == 0) {
-      new guy();
-    }
 
     if (playerdata.daytime >= _game.config.dayLength) {
-      this.endDay();
+      _game.endDay();
+    } else {
+      if (playerdata.daytime % 2000 == 0) {
+        new guy();
+      }
     }
 
     scenes.storefront.day.timer.style.height = (playerdata.daytime/_game.config.dayLength * 100)+"%";
@@ -97,7 +109,7 @@ Silent, athwart my soul, moves the symphony true.`);
     generateNewPrices();
 
     playerdata.daytime = 0;
-    this.updateDay();
+    _game.updateDay();
 
     updateDayUI();
   },
@@ -107,6 +119,8 @@ Silent, athwart my soul, moves the symphony true.`);
         return;
       }
     }
+
+    sfx("close_store");
 
     for (let i=playerdata.guys.length-1; i>=0; i--) {
       let guy = playerdata.guys[i];
@@ -128,9 +142,9 @@ Silent, athwart my soul, moves the symphony true.`);
   // day toggle action
   burgeria: function() {
     if (playerdata.daytime > -1) {
-      this.endDay();
+      _game.endDay();
     } else {
-      this.beginDay();
+      _game.beginDay();
     }
     console.clear();
   }
@@ -161,19 +175,69 @@ class recipe {
     this.drink = drink;
     this.side = side;
     this.cost = cost || 10;
+    this.id = playerdata.recipes.length;
 
     this.element = document.createElement("li");
-    this.element.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+    let button = document.createElement("button");
+    button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+    button.dataset.id = this.id;
+    button.onclick = function(e) {
+      const recipe = playerdata.recipes[this.dataset.id];
+      recipe.previewRecipe();
+    }
+    this.element.appendChild(button);
+    this.button = button;
 
-    this.disintegrating = false;
+    this.visible = false;
+    this.tray = new tray();
+    for (let name of this.burger) {
+      new item(name, this.tray.collections.burger);
+    }
+    if (this.drink) {
+      new item(this.drink, this.tray.collections.drink);
+    }
+    if (this.side) {
+      new item(this.side, this.tray.collections.side);
+    }
 
     playerdata.recipes.push(this);
+  }
+
+  previewRecipe() {
+    for (let recipe of playerdata.recipes) {
+      recipe.closePreview();
+    }
+
+    this.button.classList.add("selected");
+    sfx("click");
+    this.tray.resize_3d(scenes.storefront.recipePreviewContext);
+    this.tray.resetMeshes();
+
+    const preview = scenes.storefront.recipePreview;
+    for (let side in this.tray.collections) {
+      const label = preview.querySelector("[placeholder='"+side+"']");
+      const el = this.tray.collections[side].element;
+      label.parentNode.replaceChild(el, label);
+      el.classList.add("preview");
+    }
+
+    this.visible = true;
+  }
+
+  closePreview() {
+    this.visible = false;
+    this.button.classList.remove("selected");
+  }
+
+  draw() {
+    this.tray.draw(scenes.storefront.recipePreviewContext);
   }
 }
 
 class ingredient {
   constructor(name) {
     this.name = name;
+    this.type = name; //todo
 
     let button = document.createElement("button");
     button.textContent = name;

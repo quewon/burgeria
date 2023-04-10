@@ -20,6 +20,8 @@ var _sounds = {
     new Howl({ src: "sound/click/2.wav" }),
     new Howl({ src: "sound/click/3.wav" })
   ],
+  close_store: new Howl({ src: "sound/click/3.wav" }),
+  burgerpoints: new Howl({ src: "sound/dewdrop.wav" }),
 };
 
 function sfx(name, fadetime) {

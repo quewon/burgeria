@@ -17,6 +17,8 @@ var scenes = {
     news: document.getElementById("scene-storefront-news"),
     recipesList: document.getElementById("scene-recipes"),
     ministock: document.getElementById("storefront-ministock"),
+    recipePreview: document.getElementById("recipe-preview"),
+    recipePreviewContext: document.getElementById("recipe-preview").querySelector("canvas").getContext("2d"),
     day: {
       toggleButton: document.getElementById("day-toggle-button"),
       state: document.getElementById("day-state"),
@@ -107,6 +109,10 @@ function updateDayUI() {
     di.textContent = "☼";
     state.textContent = "OPEN";
     timer.style.height = "0%";
+    timer.classList.add("transition");
+    timer.onanimationend = function() {
+      scenes.storefront.day.timer.classList.remove("transition");
+    };
   }
 }
 

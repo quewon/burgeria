@@ -1,9 +1,3 @@
-function draw_trays() {
-  for (let tray of playerdata.trays) {
-    if (!tray.disabled) tray.draw();
-  }
-}
-
 var _renderer;
 function init_3d() {
   _renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -12,8 +6,10 @@ function init_3d() {
 }
 
 class tray {
-  constructor() {
+  constructor(guy) {
     this.id = playerdata.trays.length;
+    this.guy = guy;
+    this.enabled = false;
 
     this.collections = {
       burger: null,
@@ -23,15 +19,12 @@ class tray {
     this.init_tray();
     this.init_3d();
 
-    this.disabled = false;
-
     playerdata.trays.push(this);
   }
 
   init_tray() {
     this.element = divContainingTemplate("template-tray");
     this.element.classList.add("slide-down");
-    scenes.storefront.body.appendChild(this.element);
 
     let cons = this.element.querySelectorAll(".collection");
     for (let con of cons) {
@@ -44,14 +37,13 @@ class tray {
       con.addEventListener("mouseenter", function(e) {
         let item = _dragdrop.itemInHand;
         if (!item) return;
-        let tray = playerdata.trays[this.dataset.trayId];
-        let col = tray.collections[this.dataset.side];
-        if (col.capacity > -1 && col.capacity < 1) {
-          this.classList.add("at-capacity");
-          return;
-        }
 
         this.classList.add("draghover");
+
+        let tray = playerdata.trays[this.dataset.trayId];
+        let col = tray.collections[this.dataset.side];
+        if (col.capacity != -1 && col.capacity < 1) return;
+
         this.prepend(item.element);
         item.dragGhost.classList.add("gone");
         tray.resize_3d();
@@ -59,7 +51,6 @@ class tray {
       });
       con.addEventListener("mouseup", function(e) {
         this.classList.remove("draghover");
-        this.classList.remove("at-capacity");
       });
       con.onclick = function() {
         let tray = playerdata.trays[this.dataset.trayId];
@@ -70,7 +61,7 @@ class tray {
       };
       con.addEventListener("mouseleave", function(e) {
         this.classList.remove("draghover");
-        this.classList.remove("at-capacity");
+
         let item = _dragdrop.itemInHand;
         if (item) {
           item.element.remove();
@@ -96,7 +87,18 @@ class tray {
     this.stockbutton = stockbutton;
     this.element.dataset.id = this.id;
 
+    if (this.guy) {
+      let number = this.element.querySelector("[name='number']");
+      number.textContent = this.guy.id+1;
+    }
+
     this.ministockOpenHere = false;
+  }
+
+  deploy() {
+    this.enabled = true;
+    scenes.storefront.body.appendChild(this.element);
+    this.resize_3d();
   }
 
   updateMinistockPosition() {
@@ -128,10 +130,12 @@ class tray {
     ministock.classList.remove("gone");
   }
 
-  resize_3d() {
-    let width = this.context.canvas.width;
-    let height = this.context.canvas.height;
-    let aspect = this.context.canvas.offsetHeight/this.context.canvas.offsetWidth;
+  resize_3d(context) {
+    context = context || this.context;
+
+    let width = context.canvas.width;
+    let height = context.canvas.height;
+    let aspect = context.canvas.offsetHeight/context.canvas.offsetWidth;
     height = width * aspect;
 
     this.camera.left = -width/2;
@@ -159,7 +163,6 @@ class tray {
     this.scene = scene;
     this.context = context;
     this.camera = camera;
-    this.resize_3d();
 
     var traymesh = new THREE.Mesh(
       new THREE.BoxGeometry(6, .3, 4.5),
@@ -172,6 +175,17 @@ class tray {
 
     scene.add(traymesh);
     this.mesh = traymesh;
+  }
+
+  resetMeshes() {
+    this.mesh.rotation.y = 0;
+    for (let side in this.collections) {
+      const col = this.collections[side];
+      for (let item of col.items) {
+        item.mesh.position.y = 7+item.ground;
+        item.velocity = 0;
+      }
+    }
   }
 
   addMesh(item, col) {
@@ -200,19 +214,18 @@ class tray {
 
   setCollection(side, col) {
     this.collections[side] = col;
-    if (!col.element.isConnected) {
-      this.element.querySelector(".container").appendChild(collection.element);
-    }
     for (let item of col.items) {
       this.addMesh(item, col);
     }
   }
 
-  draw() {
-    let width = this.context.canvas.width;
-    let height = this.context.canvas.height;
+  draw(context) {
+    context = context || this.context;
 
-    this.context.clearRect(0, 0, width, height);
+    let width = context.canvas.width;
+    let height = context.canvas.height;
+
+    context.clearRect(0, 0, width, height);
 
     for (let side in this.collections) {
       if (!this.collections[side]) continue;
@@ -222,7 +235,7 @@ class tray {
     this.mesh.rotation.y += .01;
 
     _renderer.render(this.scene, this.camera);
-    this.context.drawImage(_renderer.domElement, 0, 0);
+    context.drawImage(_renderer.domElement, 0, 0);
   }
 
   send() {
@@ -230,13 +243,16 @@ class tray {
       this.toggleMinistockWindow();
     }
 
-    let tray = this.element;
-    tray.dataset.id = this.id;
-    tray.classList.add("sending");
-    tray.addEventListener("animationend", function(e) {
-      playerdata.trays[this.dataset.id].element.remove();
-      this.disabled = true;
+    let el = this.element;
+    el.dataset.id = this.id;
+    el.classList.add("sending");
+    el.addEventListener("animationend", function(e) {
+      let tray = playerdata.trays[this.dataset.id];
+      tray.element.remove();
+      tray.enabled = false;
     });
+
+    this.guy.receive();
   }
 
   clear() {
@@ -278,7 +294,12 @@ class collection {
       updateMinistockWindow();
     }
 
-    this.capacity--;
+    if (this.capacity != -1) {
+      this.capacity--;
+      if (this.capacity <= 0) {
+        this.element.classList.add("at-capacity");
+      }
+    }
   }
 
   addToList(item) {
@@ -326,7 +347,10 @@ class collection {
       item.setCollection(null, true);
     }
 
-    this.capacity++;
+    if (this.capacity != -1) {
+      this.capacity++;
+      this.element.classList.remove("at-capacity");
+    }
     if (this.element && this.element.children.length == 0) this.element.classList.add("empty");
 
     if (this == playerdata.inventory) {
@@ -345,7 +369,10 @@ class collection {
       } else {
         item.setCollection(null, true);
       }
-      this.capacity++;
+      if (this.capacity != -1) {
+        this.capacity++;
+        this.element.classList.remove("at-capacity");
+      }
       this.items.splice(i, 1);
     }
     this.element.classList.add("empty");
@@ -363,12 +390,12 @@ class collection {
 }
 
 class item {
-  constructor(name, collection, type) {
+  constructor(name, collection) {
     this.name = name;
 
     this.createElement();
     this.createGhost();
-    this.createMesh(type || name);
+    this.createMesh(name);
 
     this.setCollection(collection);
   }
@@ -400,7 +427,9 @@ class item {
     this.dragGhost = ghost;
   }
 
-  createMesh(type) {
+  createMesh() {
+    const type = playerdata.ingredients[this.name].type;
+
     let geo = new THREE.CylinderGeometry(1, 1, .3, 12);
     this.height = .3;
     let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });

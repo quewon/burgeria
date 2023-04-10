@@ -27,6 +27,16 @@
         background-size: 20px 20px;
 
         color: var(--lines);
+
+        animation: burgeria-bg 2s linear infinite;
+      }
+      @keyframes burgeria-bg {
+        0% {
+          background-position: 0px 0px;
+        }
+        100% {
+          background-position: 20px 20px;
+        }
       }
 
       header {
@@ -35,6 +45,12 @@
         margin-bottom: 1rem;
         color: var(--burgeria);
         position: relative;
+      }
+
+      header h1 {
+        display: inline-block;
+        pointer-events: unset;
+        cursor: pointer;
       }
 
       h1, h2 {
@@ -58,14 +74,6 @@
         margin-bottom: .5rem;
       }
 
-      .hidden {
-        visibility: hidden;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-        transform: scale(0, 0);
-      }
-
       .block {
         border: 1px solid var(--lines);
         padding: .5rem;
@@ -83,10 +91,6 @@
         display: flex;
         justify-content: space-between;
         height: fit-content;
-      }
-      button.selected {
-        pointer-events: none;
-        color: var(--burgeria);
       }
 
       .menu b {
@@ -131,14 +135,17 @@
         width: 100%;
         height: 100%;
       }
-      .tray .container {
+      .container {
         width: 50%;
-        height: 100%;
+        /* height: 100%; */
         display: flex;
         flex-direction: column;
         gap: .5rem;
-        padding: .5rem;
+        padding: 0;
         box-sizing: border-box;
+      }
+      .tray .container {
+        padding: .5rem;
       }
       .container:first-child {
         padding-right: .25rem;
@@ -167,6 +174,12 @@
       button.disabled {
         pointer-events: none;
         opacity: .2;
+      }
+      button.selected {
+        background: var(--burgeria);
+        color: var(--bg);
+        font-style: italic;
+        pointer-events: none;
       }
       footer button {
         border-top: none;
@@ -203,7 +216,9 @@
       }
 
       .sending {
+        /* opacity: 0; */
         animation: send .5s;
+        pointer-events: none;
       }
       @keyframes send {
         0% {
@@ -215,6 +230,22 @@
           max-height: 0;
         }
       }
+      /* @keyframes send {
+        100% { }
+      } */
+      .removing-ticket {
+        animation: removing-ticket 1s;
+      }
+      @keyframes removing-ticket {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -100%) rotate(90deg);
+        }
+      }
 
       .collection {
         border: 1px dashed var(--lines);
@@ -224,6 +255,7 @@
         line-height: var(--line-height);
         overflow: hidden;
         height: 100%;
+        color: var(--lines);
 
         display: flex;
         flex-direction: column;
@@ -244,38 +276,42 @@
         background: var(--burgeria);
         color: var(--bg);
       }
-      .collection.at-capacity:hover .item:first-child {
-        background: var(--bg);
-        color: var(--lines);
-      }
       .collection:active .item:first-child {
         font-style: italic;
       }
+
       .collection.empty {
-        color: var(--lines);
         opacity: .5;
         cursor: default;
       }
-      .collection.empty:hover, .collection.empty:active {
+      .collection.empty:active {
         border-color: var(--lines);
       }
       .collection.empty::after {
         content: attr(placeholder);
         font-style: italic;
       }
+
       .collection.draghover {
-        border-color: var(--burgeria);
         opacity: 1;
-        cursor: default;
       }
       .collection.draghover::after {
         content: "";
       }
-      .collection.draghover .item:first-child {
-        background: var(--bg);
-        color: var(--lines);
-        font-style: italic;
+
+      .collection.at-capacity {
+        border-style: solid;
       }
+      .collection.at-capacity.draghover .item:first-child {
+        color: var(--lines);
+        background: var(--bg);
+      }
+
+      .collection.preview {
+        pointer-events: none;
+        border-style: solid;
+      }
+
       .collection .item {
         border: none;
         max-width: 70%;
@@ -312,8 +348,12 @@
       }
 
       canvas {
+        display: block;
         width: 10rem;
-        min-height: 10rem;
+        height: 10rem;
+        margin: auto;
+      }
+      .tray canvas {
         height: 100%;
       }
 
@@ -460,9 +500,26 @@
         left: 50%;
         transform: translate(-50%, -50%);
       }
-
-      .gone {
-        display: none !important;
+      .particle {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        animation: lifespan 1s;
+        font-size: .8rem;
+        color: var(--burgeria);
+      }
+      @keyframes lifespan {
+        0% {
+          opacity: 0;
+          transform: scale(1, 1);
+        }
+        50% {
+          opacity: .5;
+          transform: scale(1.1, 1.1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1, 1);
+        }
       }
 
       #burgeria-timer {
@@ -473,7 +530,17 @@
         height: 100%;
         background: var(--lines);
         opacity: .5;
-        transition: height 100ms;
+      }
+      #burgeria-timer.transition {
+        animation: transition-up .5s ease-out;
+      }
+      @keyframes transition-up {
+        0% {
+          height: 100%;
+        }
+        100% {
+          height: 0%;
+        }
       }
 
       @media (max-width: calc(1000px + 1rem)) {
@@ -518,47 +585,6 @@
         border-right: none;
       }
 
-      .marginbelow {
-        margin-bottom: 1rem;
-      }
-      .margintop {
-        margin-top: 1rem;
-      }
-      .dashed {
-        border-style: dashed;
-      }
-      .attached-above {
-        margin-top: -1rem;
-        border-top: none;
-      }
-      .attached-below {
-        margin-bottom: 0;
-        border-bottom: none;
-      }
-      .attached-right {
-        border-right: none;
-      }
-
-      .flexbox {
-        display: flex;
-      }
-      .flexbox.wrap {
-        flex-wrap: wrap;
-      }
-      .flexbox.column {
-        flex-direction: column;
-      }
-      .flexbox.gap {
-        gap: .5rem;
-      }
-      .flexbox .grow {
-        flex-grow: 1;
-      }
-
-      .centeroriginY {
-        transform-origin: 0 50%;
-      }
-
       #guys-container {
         column-gap: .5rem;
       }
@@ -595,12 +621,74 @@
         font-style: normal;
         font-weight: normal;
       }
+
+      #recipe-preview {
+        width: 50%;
+      }
+
+      /*  */
+
+      .marginbelow {
+        margin-bottom: 1rem;
+      }
+      .margintop {
+        margin-top: 1rem;
+      }
+      .dashed {
+        border-style: dashed;
+      }
+      .attached-above {
+        margin-top: -1rem;
+        border-top: none;
+      }
+      .attached-below {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+      .attached-right {
+        border-right: none;
+      }
+      .attached-left {
+        border-left: none;
+      }
+
+      .flexbox {
+        position: relative;
+        display: flex;
+      }
+      .flexbox.wrap {
+        flex-wrap: wrap;
+      }
+      .flexbox.column {
+        flex-direction: column;
+      }
+      .flexbox.gap {
+        gap: .5rem;
+      }
+      .flexbox .grow {
+        flex-grow: 1;
+      }
+
+      .centeroriginY {
+        transform-origin: 0 50%;
+      }
+
+      .hidden {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        transform: scale(0, 0);
+      }
+      .gone {
+        display: none !important;
+      }
     </style>
   </head>
   <body>
 
     <header>
-      <h1>BURGERIA!</h1>
+      <h1 onclick="scenes.switchLocation();">BURGERIA!</h1>
       <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
       <button class="bottom right" onclick="toggleTheme(); sfx('click');" title="toggle theme" style="height: 1.5rem; border-right: 1px solid; border-color: var(--burgeria);"><span id="theme-name"></span></button>
     </header>
@@ -612,9 +700,26 @@
 
     <div id="scene-storefront" class="scene">
       <div class="">
-        <div class="menu block">
-          <h1 class="marginbelow">MENU</h1>
-          <div id="scene-recipes">
+        <div class="menu flexbox">
+          <div class="block grow">
+            <h1 class="marginbelow">MENU</h1>
+            <div id="scene-recipes">
+            </div>
+          </div>
+          <div id="recipe-preview" class="block attached-left">
+            <canvas width="300" height="300"></canvas>
+            <div class="flexbox">
+              <div class="container">
+                <div class="collection empty" placeholder="burger" data-capacity="-1">
+                </div>
+              </div>
+              <div class="container">
+                <div class="collection empty" placeholder="drink" data-capacity="1">
+                </div>
+                <div class="collection empty" placeholder="side" data-capacity="1">
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -706,6 +811,7 @@
 
     <template id="template-tray">
       <div class="flexbox">
+        <div name="number" class="block top right" style="border: 1px dashed var(--lines)">99</div>
         <div class="tray block has-footer" name="tray">
           <main>
             <div class="container">
@@ -759,9 +865,7 @@
 
     <template id="template-guy">
       <div class="guy flexbox column">
-        <div name="number" class="block top left">
-          99
-        </div>
+        <div name="number" class="block top left">99</div>
         <img src="img/cat.png" alt="cat" title="cat">
         <div name="text" class="block attached-top"></div>
       </div>
@@ -789,16 +893,19 @@
     }
     setInterval(_objectTimeoutUpdate, 1);
 
-    var _animateBG = {
-      x: 0, y:0,
-      update: function() {
-        this.x += .2;
-        this.y += .2;
-        document.body.style.backgroundPosition = _animateBG.x+"px "+_animateBG.y+"px";
-        requestAnimationFrame(_animateBG.update);
-      }
-    };
-    _animateBG.update();
+    // var _animateBG = {
+    //   x: 0, y: 0,
+    //   w: 20, h: 20,
+    //   update: function() {
+    //     _animateBG.x += .2;
+    //     _animateBG.y += .2;
+    //     if (_animateBG.x > _animateBG.w) _animateBG.x = 0;
+    //     if (_animateBG.y > _animateBG.h) _animateBG.y = 0;
+    //     document.body.style.backgroundPosition = _animateBG.x+"px "+_animateBG.y+"px";
+    //     requestAnimationFrame(_animateBG.update);
+    //   }
+    // };
+    // _animateBG.update();
   </script>
   <script type="text/javascript" src="js/howler.core.js"></script>
   <script type="text/javascript" src="js/three.min.js"></script>
