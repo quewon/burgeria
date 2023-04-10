@@ -146,7 +146,18 @@ Silent, athwart my soul, moves the symphony true.`);
       sfx("close_store");
     } else {
       // day ended naturally
-      _game.beginDay();
+      let everyoneserved = true;
+      for (let guy of playerdata.guys) {
+        if (!guy.served) {
+          everyoneserved = false;
+          break;
+        }
+      }
+      if (everyoneserved) {
+        _game.beginDay();
+      } else {
+        sfx("close_store");
+      }
     }
 
     scenes.storefront.ministock.classList.add("gone");

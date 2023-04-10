@@ -21,13 +21,13 @@ var _sounds = {
     new Howl({ src: "sound/click/3.wav" })
   ],
   close_store: new Howl({ src: "sound/click/3.wav" }),
+  begin_day: new Howl({ src: "sound/click/3.wav" }),
   burgerpoints: [
     new Howl({ src: "sound/point/1.wav", volume: .5 }),
     new Howl({ src: "sound/point/2.wav", volume: .5 }),
     new Howl({ src: "sound/point/3.wav", volume: .5 }),
     new Howl({ src: "sound/point/4.wav", volume: .5 })
   ],
-  begin_day: new Howl({ src: "sound/click/3.wav" }),
   scrawl: [
     new Howl({ src: "sound/scrawl/1.wav" }),
     new Howl({ src: "sound/scrawl/2.wav" }),
