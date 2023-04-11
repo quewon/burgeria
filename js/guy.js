@@ -203,8 +203,9 @@ class guy {
 
     const feedback = this.tray.requestFeedback(this.desiredMenu);
     if (feedback.tray_is_perfect) {
-      for (let i=0; i<this.desiredMenu.cost; i++) {
-        setTimeout(burgerpointParticle, Math.random() * 100 * this.desiredMenu.cost);
+      var points = playerdata.storetime == -1 ? Math.ceil(this.desiredMenu.cost/2) : this.desiredMenu.cost;
+      for (let i=0; i<points; i++) {
+        setTimeout(burgerpointParticle, Math.random() * 100 * points);
       }
     }
     this.sendFeedback(feedback);
@@ -217,9 +218,9 @@ class guy {
       "tray_has_nothing",
       "categories_swapped",
       "categories_mixed_up",
-      "categories_missing",
       "unwanted_categories",
       "unwanted_items",
+      "categories_missing",
       "items_missing",
       "items_misplaced",
       "categories_in_wrong_order",

@@ -219,7 +219,7 @@ Silent, athwart my soul, moves the symphony true.`);
   },
   closeStore: function() {
     if (playerdata.storetime < _game.config.dayLength) {
-      if (!confirm("Are you sure you want to end the day now?")) {
+      if (!confirm("Are you sure you want to end the day now?\n\n(While the store's closed, any money you make will be halved.)")) {
         return;
       }
       sfx("close_store");

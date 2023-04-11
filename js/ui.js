@@ -26,7 +26,8 @@ var scenes = {
       state: document.getElementById("day-state"),
       timer: document.getElementById("burgeria-timer"),
       icon: document.getElementById("burgeria-day-icon"),
-      guysContainer: document.getElementById("guys-container")
+      guysContainer: document.getElementById("guys-container"),
+      overtimeMessage: document.getElementById("burgeria-overtime-message")
     },
   },
   "kitchen": {
@@ -101,6 +102,8 @@ function updateDayUI() {
   let di = scenes.storefront.day.icon;
   let timer = scenes.storefront.day.timer;
   let state = scenes.storefront.day.state;
+  let overtime = scenes.storefront.day.overtimeMessage;
+
   if (playerdata.storetime == -1) {
     let all_served = true;
     for (let guy of playerdata.guys) {
@@ -112,9 +115,11 @@ function updateDayUI() {
     if (!all_served) {
       dtb.classList.add("disabled");
       di.textContent = "☾";
+      overtime.classList.remove("gone");
     } else {
       dtb.classList.remove("disabled");
       di.textContent = "☼";
+      overtime.classList.add("gone");
     }
 
     dtb.textContent = "open store";

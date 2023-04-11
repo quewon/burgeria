@@ -231,22 +231,21 @@
 
       .sending {
         /* opacity: 0; */
-        animation: send .5s;
+        animation: send 1s;
         pointer-events: none;
+        height: 0;
+        z-index: 10;
       }
       @keyframes send {
         0% {
-          transform: scale(1, 1);
-          max-height: 100vh;
+          opacity: 1;
+          transform: scale(1, 1) translate(0, 0);
         }
         100% {
-          transform: scale(1.2, 0);
-          max-height: 0;
+          opacity: 0;
+          transform: scale(1, 1) translate(0, -5rem);
         }
       }
-      /* @keyframes send {
-        100% { }
-      } */
       .removing-ticket {
         animation: removing-ticket 1s;
         height: 0;
@@ -623,6 +622,23 @@
         width: 50%;
       }
 
+      #burgeria-overtime-message {
+        animation: open 1s ease-in-out;
+        overflow: hidden;
+      }
+      @keyframes open {
+        0% {
+          max-height: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+        100% {
+          max-height: 2rem;
+          padding-top: .5rem;
+          padding-bottom: .5rem;
+        }
+      }
+
       /*  */
 
       .marginbelow {
@@ -762,6 +778,9 @@
             </div>
             <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
           </div>
+        </div>
+        <div id="burgeria-overtime-message" class="block attached-above gone">
+          <i>The day is done. Any money you make will be halved.</i>
         </div>
       </div>
     </div>
@@ -936,20 +955,6 @@
       }
     }
     setInterval(_objectTimeoutUpdate, 1);
-
-    // var _animateBG = {
-    //   x: 0, y: 0,
-    //   w: 20, h: 20,
-    //   update: function() {
-    //     _animateBG.x += .2;
-    //     _animateBG.y += .2;
-    //     if (_animateBG.x > _animateBG.w) _animateBG.x = 0;
-    //     if (_animateBG.y > _animateBG.h) _animateBG.y = 0;
-    //     document.body.style.backgroundPosition = _animateBG.x+"px "+_animateBG.y+"px";
-    //     requestAnimationFrame(_animateBG.update);
-    //   }
-    // };
-    // _animateBG.update();
   </script>
   <script type="text/javascript" src="js/howler.core.js"></script>
   <script type="text/javascript" src="js/three.min.js"></script>
