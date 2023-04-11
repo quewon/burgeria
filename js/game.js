@@ -127,6 +127,16 @@ const _game = {
         addToMenu: true
       });
       new recipe({
+        name: "Onions",
+        cost: 5,
+        construction: {
+          burger: ["onion", "onion", "onion"],
+          side: "onion",
+          drink: "onion"
+        },
+        addToMenu: true
+      });
+      new recipe({
         name: "Deluxe Burger",
         cost: 30,
         construction: {
@@ -297,6 +307,22 @@ class recipe {
     if (p.addToMenu) {
       this.addToMenu();
     }
+
+    this.size = 0;
+    var ingredientsCounted = [];
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      if (typeof side === "string") {
+        this.size++;
+        if (ingredientsCounted.indexOf(side)==-1) ingredientsCounted.push(side);
+      } else if (side.constructor === Array) {
+        this.size == side.length;
+        for (let item of side) {
+          if (ingredientsCounted.indexOf(item)==-1) ingredientsCounted.push(item);
+        }
+      }
+    }
+    this.uniqueIngredients = ingredientsCounted.length;
   }
 
   addToMenu() {
@@ -367,8 +393,6 @@ class recipe {
       }
     }
 
-    console.log(deviableCategories);
-
     if (deviableCategories.length == 0) return;
 
     var deviationTypes = ["replace", "remove"];
@@ -432,6 +456,7 @@ class recipe {
         category = null;
       }
     }
+    // uniqueingredients, size should change... but does it even matter?
   }
 
   replace(a, b) {
@@ -448,6 +473,7 @@ class recipe {
         category = b;
       }
     }
+    // uniqueingredients, size should change... but does it even matter?
   }
 
   draw() {

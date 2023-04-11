@@ -249,6 +249,8 @@
       } */
       .removing-ticket {
         animation: removing-ticket 1s;
+        height: 0;
+        z-index: 10;
       }
       @keyframes removing-ticket {
         0% {
@@ -257,7 +259,7 @@
         }
         100% {
           opacity: 0;
-          transform: translate(-50%, -100%) rotate(90deg);
+          transform: translate(0, -3rem) rotate(45deg);
         }
       }
 

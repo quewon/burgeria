@@ -108,15 +108,14 @@ class guy {
     //
 
     complexity = Math.ceil(Math.random() * complexity);
-    // complexity should not overcome size of recipe
+    // you shouldn't be able to change everything in a recipe
+    if (complexity >= newRecipe.uniqueIngredients) complexity = newRecipe.uniqueIngredients - 1;
 
     for (let i=0; i<complexity; i++) {
       newRecipe.deviate();
     }
 
     this.desiredMenu = newRecipe;
-
-    console.log(construction);
   }
 
   createDialogue() {
@@ -132,7 +131,7 @@ class guy {
         const deviation = deviations[i];
         switch (deviation.type) {
           case "remove":
-            this.addString("without the "+deviation.item, "em");
+            this.addString("without any "+deviation.item, "em");
             if (i<deviations.length-1 && deviations[i+1].type == "remove") {
               this.addString("and");
             }
@@ -219,22 +218,22 @@ class guy {
       "categories_swapped",
       "categories_mixed_up",
       "categories_missing",
+      "unwanted_categories",
       "unwanted_items",
       "items_missing",
       "items_misplaced",
       "categories_in_wrong_order",
-      "unwanted_categories",
     ];
     const dialogue = {
       "tray_has_nothing": "this tray has nothing on it!",
       "categories_missing": "i didn't get my [item]...",
       "categories_in_wrong_order": "[item] was in the wrong order.",
-      "categories_swapped": "[a] and [b] got mixed up.",
-      "categories_mixed_up": "my [should_be] was where my [category] should be.",
+      "categories_swapped": "the [a] and the [b] got mixed up.",
+      "categories_mixed_up": "my [should_be] was in the wrong spot!",
       "unwanted_categories": "haha, free [item]!",
       "unwanted_items": "why was there [item] in my [category]?",
       "items_missing": "my [category] was missing [item]...",
-      "items_misplaced": "this [item] was in the wrong spot",
+      "items_misplaced": "this [item] was in the wrong spot.",
     };
     for (let i=priority.length-1; i>=0; i--) {
       let f = feedback[priority[i]];

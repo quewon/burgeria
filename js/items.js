@@ -471,8 +471,6 @@ class tray {
       }
     }
 
-    console.log(feedback);
-
     return feedback;
   }
 }
