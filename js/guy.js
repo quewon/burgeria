@@ -66,8 +66,8 @@ class guy {
 
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
-    // this.currentTalkInterval = 5 * this.talkInterval;
-    this.currentTalkInterval = 100;
+    this.currentTalkInterval = 30 * this.talkInterval;
+    // this.currentTalkInterval = 50;
 
     this.tray = new tray(this);
     this.tray.deploy();

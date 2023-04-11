@@ -165,17 +165,19 @@ function updateRecipes() {
 
 function updateMinistockWindow() {
   const ministock = scenes.storefront.ministock;
-  updateList(ministock, playerdata.inventory.list);
-  for (let li of ministock.children) {
-    li.classList.add("draggable");
-    li.addEventListener("mousedown", function(e) {
-      if (!this.name) return;
 
-      let tray = playerdata.trays[this.parentNode.dataset.id];
-      let item = playerdata.inventory.removeItemByName(this.name);
-      if (!item) return;
-      item.drag();
-    });
+  if (updateList(ministock, playerdata.inventory.list)) {
+    for (let li of ministock.children) {
+      li.classList.add("draggable");
+      li.addEventListener("mousedown", function(e) {
+        if (!this.name) return;
+
+        let tray = playerdata.trays[this.parentNode.dataset.id];
+        let item = playerdata.inventory.removeItemByName(this.name);
+        if (!item) return;
+        item.drag();
+      });
+    }
   }
 }
 
@@ -237,7 +239,10 @@ function updateList(listElement, listObject) {
     let span = document.createElement("i");
     span.textContent = "It's empty...";
     listElement.appendChild(span);
+    return false;
   }
+
+  return true;
 }
 
 // news

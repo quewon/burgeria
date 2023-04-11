@@ -514,58 +514,18 @@ class item {
   }
 
   createMesh() {
-    const type = playerdata.ingredients[this.name].type;
+    const ing = playerdata.ingredients[this.name];
 
-    this.height = .3;
-    let geo = new THREE.CylinderGeometry(1, 1, .3);
-    let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-
-    switch (type) {
-      case "lettuce":
-        geo = new THREE.CylinderGeometry(1.2, 1.2, .1);
-        this.height = .1;
-        material.color.setHex(0x90ee90);
-        break;
-      case "tomato":
-        geo = new THREE.CylinderGeometry(1, 1, .2);
-        this.height = .2;
-        material.color.setHex(0xff0000);
-        break;
-      case "patty":
-        material.color.setHex(0x8b4513);
-        break;
-      case "cheese":
-        geo = new THREE.BoxGeometry(1.7, .1, 1.7);
-        this.height = .1;
-        material.color.setHex(0xffd700);
-        break;
-      case "mayo":
-        geo = new THREE.CylinderGeometry(.8, .8, .1);
-        this.height = .1;
-        material.color.setHex(0xffffe0);
-        break;
-      case "top bun":
-        geo = new THREE.CylinderGeometry(1, 1.1, .5);
-        this.height = .5;
-        material.color.setHex(0xf5deb3);
-        break;
-      case "bottom bun":
-        geo = new THREE.CylinderGeometry(1.1, 1, .5);
-        this.height = .5;
-        material.color.setHex(0xf5deb3);
-        break;
-      case "coke":
-        geo = new THREE.CylinderGeometry(.5, .5, 1.2);
-        this.height = 1.2;
-        break;
-      case "fries":
-        geo = new THREE.BoxGeometry(1.2, 1, .5);
-        this.height = 1;
-        material.color.setHex(0xFFA500);
-        break;
-    }
+    const geo = ing.mesh.geometry;
+    const material = new THREE.MeshStandardMaterial({ color: ing.mesh.color });
 
     this.mesh = new THREE.Mesh(geo, material);
+
+    if (ing.mesh.rx != 0) {
+      this.mesh.rotation.x += Math.PI * ing.mesh.rx;
+    }
+
+    this.height = ing.mesh.height;
     this.velocity = 0;
     this.ground = 0;
   }

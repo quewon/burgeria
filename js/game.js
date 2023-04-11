@@ -51,10 +51,71 @@ const _game = {
         playerdata.prices[char].push(Math.ceil(Math.random() * 100));
       }
 
-      for (let name of ["top bun", "bottom bun", "tomato", "cheese", "patty", "lettuce", "mayo", "fries", "coke"]) {
-        new ingredient(name);
+      new ingredient({
+        name: "top bun",
+        geometry: "bun",
+        color: 0xFFE4B5
+      });
+      new ingredient({
+        name: "bottom bun",
+        geometry: "bun",
+        rx: 1,
+        color: 0xFFE4B5
+      });
+      new ingredient({
+        name: "patty",
+        geometry: "patty",
+        color: 0x8b4513
+      });
+      new ingredient({
+        name: "ketchup",
+        geometry: "condiment",
+        color: 0xff0000
+      });
+      new ingredient({
+        name: "pickle",
+        geometry: "pickle",
+        color: 0x3CB371
+      });
+      new ingredient({
+        name: "onion",
+        geometry: "onion",
+        color: 0xffffe0,
+      });
+      new ingredient({
+        name: "cheese",
+        geometry: "cheese",
+        color: 0xffd700
+      });
+      new ingredient({
+        name: "tomato",
+        geometry: "tomato",
+        color: 0xff0000
+      });
+      new ingredient({
+        name: "lettuce",
+        geometry: "lettuce",
+        color: 0x90ee90
+      });
+      new ingredient({
+        name: "mayo",
+        geometry: "condiment",
+        color: 0xffffe0
+      });
+
+      new ingredient({
+        name: "fries",
+        geometry: "fries",
+        color: 0xFFA500
+      });
+      new ingredient({
+        name: "coke",
+        geometry: "can",
+        color: 0xff0000
+      });
+
+      for (let name of ["top bun", "bottom bun", "patty", "fries", "coke"]) {
         new item(name, playerdata.inventory);
-        // new item(name, playerdata.inventory);
       }
 
       new recipe({
@@ -62,6 +123,14 @@ const _game = {
         cost: 10,
         construction: {
           burger: ["bottom bun", "patty", "top bun"]
+        },
+        addToMenu: true
+      });
+      new recipe({
+        name: "Deluxe Burger",
+        cost: 10,
+        construction: {
+          burger: ["bottom bun", "mayo", "lettuce", "tomato", "patty", "cheese", "onion", "pickle", "ketchup", "top bun"]
         },
         addToMenu: true
       });
@@ -202,7 +271,7 @@ var playerdata = {
   points: null,
   inventory: null,
   letters: {},
-  ingredients: [],
+  ingredients: {},
   workshop: "",
   library: [],
   libraryIndex: 0,
@@ -290,21 +359,33 @@ class recipe {
 }
 
 class ingredient {
-  constructor(name) {
-    this.name = name;
-    this.type = name; //todo
+  constructor(p) {
+    this.name = p.name;
+
+    this.createMeshRules(p.geometry, p.color, p.rx);
 
     let button = document.createElement("button");
-    button.textContent = name;
+    button.textContent = this.name;
     scenes.kitchen.ingredientButtons.appendChild(button);
-    button.dataset.ingredientName = name;
+    button.dataset.ingredientName = this.name;
     button.onclick = function(e) {
       sfx("click");
       playerdata.ingredients[this.dataset.ingredientName].create();
     };
     this.button = button;
 
-    playerdata.ingredients[name] = this;
+    playerdata.ingredients[this.name] = this;
+  }
+
+  createMeshRules(geoname, color, rx) {
+    let def = _geo(geoname, rx);
+    color = color || 0xff0000;
+    this.mesh = {
+      geometry: def.geometry,
+      height: def.height,
+      color: color,
+      rx: def.rx
+    };
   }
 
   create() {
