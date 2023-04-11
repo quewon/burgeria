@@ -126,7 +126,7 @@ class guy {
     let a = arr[arr.length * Math.random() | 0];
     if (a != "") {
       if (this.capitalize) {
-        a = a.charAt(0).toUpperCase() + a.slice(1).replaceAll(" i", " I");
+        a = a.charAt(0).toUpperCase() + a.slice(1).replaceAll("i ", "I ");
       }
       if (!dontPunctuate && this.punctuate) {
         a = this.randomPunctuateLine(a);
@@ -146,9 +146,9 @@ class guy {
     this.punctuate = Math.random() < .5 ? true : false;
     this.capitalize = Math.random() < .5 ? true : false;
 
-    const greeting = this.randomLine(["", "hello", "hi"]);
-    const request = this.randomLine(["i would like the", "can i have the", "give me the", "gotta go for the", "i'll have the "], true);
-    const signoff = this.randomLine(["", "thank you", "thanks"]);
+    const greeting = this.randomLine(["", "hello", "hi", "um", "hmm", "ey"]);
+    const request = this.randomLine(["i would like the", "can i have the", "give me the", "gotta go for the", "i'll have the ", "i'm craving the"], true);
+    const signoff = this.randomLine(["", "", "", "thank you", "thanks", "thank you", "thanks", "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria", "make it tasty", "can't wait", ":)", ":D", "eh"]);
 
     if (greeting!="") this.addString(greeting);
     this.addString(request);
