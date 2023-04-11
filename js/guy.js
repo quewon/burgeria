@@ -117,11 +117,41 @@ class guy {
     this.desiredMenu = newRecipe;
   }
 
+  randomPunctuateLine(line) {
+    const punctuation = [".", "!", "...", "!!!"];
+    return line+punctuation[punctuation.length * Math.random() | 0];
+  }
+
+  randomLine(arr, dontPunctuate) {
+    let a = arr[arr.length * Math.random() | 0];
+    if (a != "") {
+      if (this.capitalize) {
+        a = a.charAt(0).toUpperCase() + a.slice(1).replaceAll(" i", " I");
+      }
+      if (!dontPunctuate && this.punctuate) {
+        a = this.randomPunctuateLine(a);
+      }
+    }
+    return a;
+  }
+
+  isPunctuated(text) {
+    return text!="" && "...???!!!".includes(text.charAt(text.length - 1));
+  }
+
   createDialogue() {
     let menu = this.desiredMenu;
     this.words = [];
 
-    this.addString("hi i would like the");
+    this.punctuate = Math.random() < .5 ? true : false;
+    this.capitalize = Math.random() < .5 ? true : false;
+
+    const greeting = this.randomLine(["", "hello", "hi"]);
+    const request = this.randomLine(["i would like the", "can i have the", "give me the", "gotta go for the", "i'll have the "], true);
+    const signoff = this.randomLine(["", "thank you", "thanks"]);
+
+    if (greeting!="") this.addString(greeting);
+    this.addString(request);
     this.addString(menu.name, "order");
 
     if (menu.deviations.length > 0) {
@@ -141,15 +171,20 @@ class guy {
             } else {
               this.addString("and");
             }
-            this.addString("can i have");
+            this.addString("can");
+            this.addString(this.capitalize ? "I" : "i");
+            this.addString("have");
             this.addString(deviation.to+" instead of "+deviation.from, "em");
             this.addString("?");
             break;
         }
       }
     }
+    if (this.punctuate && !this.isPunctuated(this.words[this.words.length - 1].textContent)) {
+      this.addString(this.randomPunctuateLine(""));
+    }
 
-    this.addString("thanks :)");
+    if (signoff!="") this.addString(signoff);
   }
 
   addString(string, classname) {
@@ -163,10 +198,10 @@ class guy {
   }
 
   updateTalk() {
+    this.soundId = sfx_talk(this.voice, this.soundId);
     let el = this.words.shift();
     el.classList.remove("gone");
     this.currentTalkInterval = el.textContent.length * this.talkInterval;
-    this.soundId = sfx_talk(this.voice, this.soundId);
     if (scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition();
   }
 
