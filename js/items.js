@@ -89,7 +89,13 @@ class tray {
 
     let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
-    sendbutton.onclick = function() { playerdata.trays[this.dataset.id].send(); sfx("click"); }
+    sendbutton.onclick = function() {
+      const tray = playerdata.trays[this.dataset.id];
+      if (tray.enabled) {
+        tray.send();
+        sfx("click");
+      }
+    }
 
     let clearbutton = this.element.querySelector("[name='clear']");
     clearbutton.dataset.id = this.id;
@@ -249,6 +255,8 @@ class tray {
   }
 
   send() {
+    this.enabled = false;
+
     if (scenes.storefront.ministockTray == this) {
       this.toggleMinistockWindow();
     }
@@ -257,9 +265,7 @@ class tray {
     el.dataset.id = this.id;
     el.classList.add("sending");
     el.addEventListener("animationend", function(e) {
-      let tray = playerdata.trays[this.dataset.id];
-      tray.element.remove();
-      tray.enabled = false;
+      this.remove();
     });
 
     this.guy.receive();

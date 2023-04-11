@@ -40,6 +40,7 @@
         animation: burgeria-bg 2s linear infinite;
 
         font-family: serif;
+        word-break: keep-all;
       }
       @keyframes burgeria-bg {
         0% {
@@ -170,7 +171,7 @@
         background: var(--bg);
         cursor: pointer;
         color: inherit;
-        height: 1.5rem;
+        min-height: 1.5rem;
       }
       /* button:hover {
         background: var(--burgeria);
@@ -191,14 +192,23 @@
         font-style: italic;
         pointer-events: none;
       }
+      button.selected em, button:active em {
+        /* background: var(--bg); */
+        color: inherit;
+        font-style: inherit;
+      }
       footer button {
         border-top: none;
         border-bottom: none;
         border-right: 1px solid var(--lines);
       }
+      s {
+        opacity: .5;
+      }
 
       li button {
         margin-top: 5px;
+        text-align: left;
       }
 
       .slide-up {
@@ -477,32 +487,27 @@
         background: var(--newsgray);
         text-align: justify;
         white-space: pre-wrap;
-        word-break: break-word;
       }
 
       .burgerpoints {
-        display: inline-block;
-        width: calc(1ch + .25rem);
-        height: 1rem;
+        display: inline;
+        /* width: calc(1ch + .25rem); */
+        /* height: 1rem; */
         position: relative;
         vertical-align: top;
-
-        /* border: 1px solid var(--lines); */
-        border-radius: 50%;
-        box-sizing: border-box;
       }
       .burgerpoints::after {
         content: "✸";
-        display: inline-block;
-        height: 1rem;
-        width: 1rem;
-        text-align: center;
+        display: inline;
+        /* height: 1rem; */
+        /* width: 1rem; */
+        /* text-align: center; */
 
-        position: absolute;
-        box-sizing: border-box;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        /* position: absolute; */
+        /* box-sizing: border-box; */
+        /* top: 50%; */
+        /* left: 50%; */
+        /* transform: translate(-50%, -50%); */
       }
       .particle {
         position: absolute;
@@ -780,7 +785,7 @@
           </div>
         </div>
         <div id="burgeria-overtime-message" class="block attached-above gone">
-          <i>The day is done. Any money you make will be halved.</i>
+          <i>The day is done. Any points you make will be halved.</i>
         </div>
       </div>
     </div>

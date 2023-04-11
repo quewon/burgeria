@@ -153,6 +153,7 @@ function updateRecipes() {
       categories[recipe.category] = [];
     }
     categories[recipe.category].push(recipe);
+    recipe.setDiscounted(!playerdata.daytime);
   }
 
   for (let name in categories) {

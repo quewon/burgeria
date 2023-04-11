@@ -190,6 +190,8 @@ Silent, athwart my soul, moves the symphony true.`);
   },
 
   beginDay: function() {
+    playerdata.daytime = true;
+
     for (let i=playerdata.guys.length-1; i>=0; i--) {
       let guy = playerdata.guys[i];
       guy.element.remove();
@@ -209,6 +211,7 @@ Silent, athwart my soul, moves the symphony true.`);
 
     sfx("begin_day");
 
+    updateRecipes();
     updateDayUI();
   },
 
@@ -222,26 +225,26 @@ Silent, athwart my soul, moves the symphony true.`);
       if (!confirm("Are you sure you want to end the day now?\n\n(While the store's closed, any money you make will be halved.)")) {
         return;
       }
-      sfx("close_store");
-    } else {
-      // day ended naturally
-      let everyoneserved = true;
-      for (let guy of playerdata.guys) {
-        if (!guy.served) {
-          everyoneserved = false;
-          break;
-        }
-      }
-      if (everyoneserved) {
-        _game.beginDay();
-      } else {
-        sfx("close_store");
-      }
     }
 
-    scenes.storefront.ministock.classList.add("gone");
     playerdata.storetime = -1;
-    updateDayUI();
+    scenes.storefront.ministock.classList.add("gone");
+
+    let everyoneserved = true;
+    for (let guy of playerdata.guys) {
+      if (!guy.served) {
+        everyoneserved = false;
+        break;
+      }
+    }
+    if (everyoneserved) {
+      _game.beginDay();
+    } else {
+      sfx("close_store");
+      playerdata.daytime = false;
+      updateRecipes();
+      updateDayUI();
+    }
   },
   updateStore: function() {
     if (playerdata.storetime >= _game.config.dayLength) {
@@ -262,16 +265,17 @@ Silent, athwart my soul, moves the symphony true.`);
 
   // day toggle action
   burgeria: function() {
-    console.clear();
     if (playerdata.storetime != -1) {
       _game.closeStore();
     } else {
+      console.clear();
       _game.openStore();
     }
   }
 }
 
 var playerdata = {
+  daytime: true,
   storetime: null,
   prices: {},
   recipes: [],
@@ -353,6 +357,14 @@ class recipe {
     }
 
     playerdata.recipes.push(this);
+  }
+
+  setDiscounted(discounted) {
+    if (discounted) {
+      this.button.innerHTML = this.name+" (<s><span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+"</s> <em><span class='burgerpoints' title='BurgerPoints'></span>"+Math.ceil(this.cost/2)+"</em>)";
+    } else {
+      this.button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+    }
   }
 
   previewRecipe() {
