@@ -17,7 +17,7 @@ class guy {
         chime: 1,
         complexity: 0,
         talkInterval: .7,
-        voice: "pa"
+        voice: "ka"
       },
       {
         name: "monkeey",
@@ -25,7 +25,7 @@ class guy {
         chime: 2,
         complexity: 1,
         talkInterval: 1,
-        voice: "wa"
+        voice: "pa"
       },
       {
         name: "mouse",
@@ -33,7 +33,7 @@ class guy {
         chime: 3,
         complexity: 3,
         talkInterval: .5,
-        voice: "ka"
+        voice: "wa"
       },
       {
         name: "dog",
