@@ -8,8 +8,8 @@ var _geobank = {
     height: 1.2
   },
   "condiment": {
-    geometry: new THREE.CylinderGeometry(1, 1, .1),
-    height: 0
+    geometry: new THREE.CylinderGeometry(1, 1, .03),
+    height: .03
   },
   "patty": {
     geometry: new THREE.CylinderGeometry(1, 1, .2),
@@ -25,8 +25,8 @@ var _geobank = {
     rx: .5
   },
   "cheese": {
-    geometry: new THREE.BoxGeometry(1.7, .1, 1.7),
-    height: .1
+    geometry: new THREE.BoxGeometry(1.7, .07, 1.7),
+    height: .07
   },
   "tomato": {
     geometry: new THREE.CylinderGeometry(1, 1, .1),

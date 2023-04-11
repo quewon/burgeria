@@ -278,68 +278,187 @@ class tray {
     // console.log("checking if tray matches menu "+recipe.name+"...");
 
     let construction = {};
+    let feedback = {
+      tray_has_nothing: true,
+      tray_is_perfect: true,
+      categories_in_wrong_order: [],
+      categories_missing: [],
+      categories_mixed_up: [
+        // {
+        //   category: "",
+        //   should_be: "",
+        // }
+      ],
+      items_missing: [
+        // {
+        //   category: "",
+        //   item: ""
+        // }
+      ],
+      items_misplaced: [],
+      unwanted_categories: [],
+      unwanted_items: [],
+    };
 
-    let trayHasNothing = true;
+    // create construction of tray
     for (let side in this.collections) {
       const collection = this.collections[side];
       if (side == "drink" || side == "side") {
         let item = collection.items[0];
         if (item) {
           construction[side] = item.name;
-          trayHasNothing = false;
+          feedback.tray_has_nothing = false;
         }
       } else {
         construction[side] = [];
         for (let item of collection.items) {
           construction[side].push(item.name);
-          trayHasNothing = false;
+          feedback.tray_has_nothing = false;
         }
       }
     }
 
-    if (trayHasNothing) {
-      return "this tray has nothing on it!";
-    }
-
-    for (let side in construction) {
-      if (construction[side].constructor === Array) {
-        if (construction[side].length != recipe.construction[side].length) {
-          if (construction[side].length == 0) {
-            return "there needs to be a "+side+"...";
-          } else if (construction[side].length < recipe.construction[side].length) {
-            return side+" is missing ingredients!";
-          } else {
-            return side+" has too many ingredients!";
-          }
-        }
-        for (let i=construction[side].length-1; i>=0; i--) {
-          const itemname = construction[side][i];
-          if (recipe.construction[side][i] != itemname) {
-            if (recipe.construction[side].includes(itemname)) {
-              return itemname+" is in the wrong spot!";
-            } else {
-              return itemname+" should not be here!";
-            }
-          }
+    var all_items_in_recipe = [];
+    for (let side in recipe.construction) {
+      if (recipe.construction[side].constructor === Array) {
+        for (let item of recipe.construction[side]) {
+          all_items_in_recipe.push(item);
         }
       } else {
-        if (construction[side] != recipe.construction[side]) {
-          if (recipe.construction.side && recipe.construction.drink && construction.drink == recipe.construction.side && construction.side == recipe.construction.drink) {
-            return "the drink and sides were mixed up...";
-          } else {
-            return "the "+side+" is different...";
+        all_items_in_recipe.push(recipe.construction[side]);
+      }
+    }
+
+    var all_items_in_tray = [];
+    for (let side in construction) {
+      const a = construction[side];
+      const b = recipe.construction[side];
+      var aj, bj;
+
+      if (a.constructor === Array) {
+        aj = a.join("|");
+        bj = b.join("|");
+
+        if (aj != bj && a.length == b.length && a.toSorted().join("|") == b.toSorted().join("|")) {
+          feedback.tray_is_perfect = false;
+          feedback.categories_in_wrong_order.push(side);
+        } else {
+          if (a.length > 0 && b.length == 0) {
+            feedback.tray_is_perfect = false;
+            feedback.unwanted_categories.push(side);
           }
+        }
+
+        for (let i=a.length-1; i>=0; i--) {
+          const item = a[i];
+          all_items_in_tray.push(item);
+          if (item != b[i]) {
+            if (all_items_in_recipe.includes(item)) {
+              feedback.tray_is_perfect = false;
+              feedback.items_misplaced.push({
+                category: side,
+                item: item
+              });
+            } else {
+              feedback.tray_is_perfect = false;
+              feedback.unwanted_items.push({
+                category: side,
+                item: item
+              });
+            }
+          }
+          all_items_in_recipe.splice(all_items_in_recipe.indexOf(item), 1);
+        }
+      } else {
+        if (a != b) {
+          if (a && !b) {
+            feedback.tray_is_perfect = false;
+            feedback.unwanted_categories.push(side);
+          }
+          if (all_items_in_recipe.includes(a)) {
+            feedback.tray_is_perfect = false;
+            feedback.items_misplaced.push({
+              category: side,
+              item: a
+            });
+          } else {
+            feedback.tray_is_perfect = false;
+            feedback.unwanted_items.push({
+              category: side,
+              item: a
+            });
+          }
+        }
+        all_items_in_recipe.splice(all_items_in_recipe.indexOf(b), 1);
+        all_items_in_tray.push(a);
+      }
+
+      // this checks if a side in the tray is equal to another side in the recipe,
+      // but in the future this code could be an issue if there are categories of the same construction in the same recipe.
+      for (let s in recipe.construction) {
+        if (s == side) continue;
+        let items;
+        if (recipe.construction[s].constructor !== Array) {
+          items = [recipe.construction[s]];
+        } else {
+          items = recipe.construction[s];
+        }
+
+        aj = aj || a;
+        if (items.join("|") == aj) {
+          feedback.tray_is_perfect = false;
+          feedback.categories_mixed_up.push({
+            category: side,
+            should_be: s
+          });
         }
       }
     }
 
     for (let side in recipe.construction) {
-      if (!construction[side]) {
-        return "there needs to be a "+side+"...";
+      if (recipe.construction[side].constructor === Array) {
+        if (recipe.construction[side].length != 0 && construction[side].length == 0) {
+          feedback.tray_is_perfect = false;
+          feedback.categories_missing.push(side);
+          continue;
+        }
+        for (let i=recipe.construction[side].length-1; i>=0; i--) {
+          let item = recipe.construction[side][i];
+          if (item != construction[side][i]) {
+            if (all_items_in_tray.includes(item)) {
+              feedback.tray_is_perfect = false;
+              // feedback.items_misplaced.push(item);
+            } else {
+              feedback.tray_is_perfect = false;
+              feedback.items_missing.push({
+                category: side,
+                item: item
+              });
+            }
+          }
+          all_items_in_tray.splice(all_items_in_tray.indexOf(item), 1);
+        }
+      } else {
+        let item = recipe.construction[side];
+        if (item != construction[side]) {
+          if (item != null && !construction[side]) {
+            feedback.tray_is_perfect = false;
+            feedback.categories_missing.push(side);
+            continue;
+          }
+          if (!all_items_in_tray.includes(item)) {
+            feedback.tray_is_perfect = false;
+            feedback.items_missing.push({
+              category: side,
+              item: item
+            });
+          }
+        }
+        all_items_in_tray.splice(all_items_in_tray.indexOf(item), 1);
       }
     }
 
-    return null;
+    return feedback;
   }
 }
 

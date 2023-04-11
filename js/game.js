@@ -128,7 +128,7 @@ const _game = {
       });
       new recipe({
         name: "Deluxe Burger",
-        cost: 10,
+        cost: 30,
         construction: {
           burger: ["bottom bun", "mayo", "lettuce", "tomato", "patty", "cheese", "onion", "pickle", "ketchup", "top bun"]
         },
@@ -136,7 +136,7 @@ const _game = {
       });
       new recipe({
         name: "Burgeria Set",
-        cost: 20,
+        cost: 15,
         construction: {
           burger: ["bottom bun", "patty", "top bun"],
           drink: "coke",
@@ -146,7 +146,7 @@ const _game = {
       });
       new recipe({
         name: "Weird Set",
-        cost: 20,
+        cost: 10,
         construction: {
           burger: [],
           drink: "coke",
@@ -287,6 +287,7 @@ class recipe {
       drink: null,
       side: null,
     };
+    this.deviationsFromOriginal = p.deviationsFromOriginal || [];
     this.category = "singles";
     if (this.construction.drink || this.construction.side) {
       this.category = "sets";
