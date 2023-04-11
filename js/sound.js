@@ -15,11 +15,26 @@ var _sounds = {
     new Howl({ src: "sound/chime/3.wav" }),
     new Howl({ src: "sound/chime/4.wav" })
   ],
-  talk: [
-    new Howl({ src: "sound/click/1.wav" }),
-    new Howl({ src: "sound/click/2.wav" }),
-    new Howl({ src: "sound/click/3.wav" })
-  ],
+  talk: {
+    "wa": [
+      new Howl({ src: "sound/talk/wa/wa.wav" }),
+      new Howl({ src: "sound/talk/wa/we.wav" }),
+      new Howl({ src: "sound/talk/wa/wi.wav" }),
+      new Howl({ src: "sound/talk/wa/wo.wav" })
+    ],
+    "pa": [
+      new Howl({ src: "sound/talk/pa/pa.wav" }),
+      new Howl({ src: "sound/talk/pa/pe.wav" }),
+      new Howl({ src: "sound/talk/pa/pi.wav" }),
+      new Howl({ src: "sound/talk/pa/po.wav" })
+    ],
+    "ka": [
+      new Howl({ src: "sound/talk/ka/ka.wav" }),
+      new Howl({ src: "sound/talk/ka/ke.wav" }),
+      new Howl({ src: "sound/talk/ka/ki.wav" }),
+      new Howl({ src: "sound/talk/ka/ko.wav" })
+    ],
+  },
   close_store: new Howl({ src: "sound/click/3.wav" }),
   begin_day: new Howl({ src: "sound/click/3.wav" }),
   burgerpoints: [
@@ -35,6 +50,18 @@ var _sounds = {
   grab: new Howl({ src: "sound/grab.wav" }),
   drop: new Howl({ src: "sound/wetdrop.wav" }),
 };
+
+function sfx_talk(name, id) {
+  let sound = _sounds.talk[name][_sounds.talk[name].length * Math.random() | 0];
+  // if (id) {
+  //   sound.stop(id);
+  //   sound.play(id);
+  // } else {
+  //   return sound.play();
+  // }
+  if (id) sound.stop(id);
+  return sound.play();
+}
 
 function sfx(name, fadetime) {
   let sound = _sounds[name];

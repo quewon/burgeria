@@ -275,8 +275,6 @@ class tray {
   }
 
   requestFeedback(recipe) {
-    // console.log("checking if tray matches menu "+recipe.name+"...");
-
     let construction = {};
     let feedback = {
       tray_has_nothing: true,
@@ -289,6 +287,7 @@ class tray {
         //   should_be: "",
         // }
       ],
+      categories_swapped: [],
       items_missing: [
         // {
         //   category: "",
@@ -320,6 +319,7 @@ class tray {
 
     var all_items_in_recipe = [];
     for (let side in recipe.construction) {
+      if (!recipe.construction[side]) continue;
       if (recipe.construction[side].constructor === Array) {
         for (let item of recipe.construction[side]) {
           all_items_in_recipe.push(item);
@@ -346,6 +346,17 @@ class tray {
           if (a.length > 0 && b.length == 0) {
             feedback.tray_is_perfect = false;
             feedback.unwanted_categories.push(side);
+          }
+
+          for (let s in recipe.construction) {
+            if (!recipe.construction[s] || s==side || typeof recipe.construction[s].length !== Array) continue;
+            if (recipe.construction[s].join("|") == aj) {
+              feedback.tray_is_perfect = false;
+              feedback.categories_mixed_up.push({
+                category: side,
+                should_be: s,
+              });
+            }
           }
         }
 
@@ -388,34 +399,25 @@ class tray {
               item: a
             });
           }
+
+          for (let s in recipe.construction) {
+            if (!recipe.construction[s] || s==side || typeof recipe.construction[s] === Array) continue;
+            if (recipe.construction[s] == a) {
+              feedback.tray_is_perfect = false;
+              feedback.categories_mixed_up.push({
+                category: side,
+                should_be: s,
+              });
+            }
+          }
         }
         all_items_in_recipe.splice(all_items_in_recipe.indexOf(b), 1);
         all_items_in_tray.push(a);
       }
-
-      // this checks if a side in the tray is equal to another side in the recipe,
-      // but in the future this code could be an issue if there are categories of the same construction in the same recipe.
-      for (let s in recipe.construction) {
-        if (s == side) continue;
-        let items;
-        if (recipe.construction[s].constructor !== Array) {
-          items = [recipe.construction[s]];
-        } else {
-          items = recipe.construction[s];
-        }
-
-        aj = aj || a;
-        if (items.join("|") == aj) {
-          feedback.tray_is_perfect = false;
-          feedback.categories_mixed_up.push({
-            category: side,
-            should_be: s
-          });
-        }
-      }
     }
 
     for (let side in recipe.construction) {
+      if (!recipe.construction[side]) continue;
       if (recipe.construction[side].constructor === Array) {
         if (recipe.construction[side].length != 0 && construction[side].length == 0) {
           feedback.tray_is_perfect = false;
@@ -457,6 +459,19 @@ class tray {
         all_items_in_tray.splice(all_items_in_tray.indexOf(item), 1);
       }
     }
+
+    for (let a of feedback.categories_mixed_up) {
+      for (let b of feedback.categories_mixed_up) {
+        if (a.should_be == b.category && a.category == b.should_be) {
+          feedback.categories_swapped.push({
+            a: a.category,
+            b: b.category
+          });
+        }
+      }
+    }
+
+    console.log(feedback);
 
     return feedback;
   }

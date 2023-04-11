@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>BURGERIA!</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style media="screen">
       :root {
         --line-height: 1.1rem;
@@ -558,28 +559,6 @@
         }
       }
 
-      .top {
-        position: absolute;
-        top: 0;
-        border-top: none;
-      }
-      .right {
-        position: absolute;
-        text-align: right;
-        right: 0;
-        border-right: none;
-      }
-      .left {
-        position: absolute;
-        left: 0;
-        border-left: none;
-      }
-      .bottom {
-        border-bottom: none;
-        position: absolute;
-        bottom: 0;
-      }
-
       .block footer button {
         border-left: none;
       }
@@ -590,6 +569,7 @@
 
       #guys-container {
         column-gap: .5rem;
+        justify-content: flex-end;
       }
       #guys-container > div {
         width: calc(20% - .4rem);
@@ -601,7 +581,7 @@
         border-style: dashed;
         border-top: none;
         padding: 3px;
-        min-height: 1rem;
+        /* min-height: 1rem; */
         text-align: justify;
       }
       .guy div[name="text"] * {
@@ -611,18 +591,21 @@
         content: " ";
       }
 
-      .guy div[name="number"] {
+      div[name="number"] {
         margin: 0;
         border: 1px dashed var(--lines);
         border-top: none;
         padding: 3px;
       }
 
-      em {
+      em, .em, .order {
         color: var(--burgeria);
         /* font-style: italic; */
         font-style: normal;
         font-weight: normal;
+      }
+      .order {
+        font-weight: bold;
       }
 
       #scene-recipes b {
@@ -662,6 +645,28 @@
       }
       .attached-left {
         border-left: none;
+      }
+
+      .top {
+        position: absolute;
+        top: 0;
+        border-top: none;
+      }
+      .right {
+        position: absolute;
+        text-align: right;
+        right: 0;
+        border-right: none;
+      }
+      .left {
+        position: absolute;
+        left: 0;
+        border-left: none;
+      }
+      .bottom {
+        border-bottom: none;
+        position: absolute;
+        bottom: 0;
       }
 
       .flexbox {
@@ -734,6 +739,8 @@
             </div>
           </div>
         </div>
+        <div id="guys-container" class="flexbox wrap attached-above marginbelow">
+        </div>
 
         <div id="scene-storefront-news">
 
@@ -753,8 +760,6 @@
             </div>
             <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
           </div>
-        </div>
-        <div id="guys-container" class="flexbox wrap attached-above marginbelow">
         </div>
       </div>
     </div>
@@ -838,7 +843,7 @@
 
     <template id="template-tray">
       <div class="flexbox">
-        <div name="number" class="block top right dashed">99</div>
+        <div name="number" class="block top right">99</div>
         <div class="tray block has-footer" name="tray">
           <main>
             <div class="container">

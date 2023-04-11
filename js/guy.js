@@ -9,6 +9,7 @@ class guy {
         chime: 0,
         complexity: 2,
         talkInterval: 2,
+        voice: "pa"
       },
       {
         name: "fish",
@@ -16,6 +17,7 @@ class guy {
         chime: 1,
         complexity: 0,
         talkInterval: .7,
+        voice: "pa"
       },
       {
         name: "monkeey",
@@ -23,6 +25,7 @@ class guy {
         chime: 2,
         complexity: 1,
         talkInterval: 1,
+        voice: "wa"
       },
       {
         name: "mouse",
@@ -30,13 +33,15 @@ class guy {
         chime: 3,
         complexity: 3,
         talkInterval: .5,
+        voice: "ka"
       },
       {
         name: "dog",
         source: "img/dog.png",
         chime: 0,
         complexity: 1,
-        talkInterval: 1.5
+        talkInterval: 1.5,
+        voice: "wa"
       }
     ];
     const arch = archs[Math.random() * archs.length | 0];
@@ -67,6 +72,8 @@ class guy {
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
     this.currentTalkInterval = 15 * this.talkInterval;
+    this.voice = arch.voice;
+    this.soundId = null;
     // this.currentTalkInterval = 50;
 
     this.tray = new tray(this);
@@ -77,8 +84,8 @@ class guy {
   }
 
   generateDesiredMenu(complexity) {
-    // const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
-    const originalRecipe = playerdata.recipes[0];
+    const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
+
     let construction = {};
     for (let side in originalRecipe.construction) {
       let b = originalRecipe.construction[side];
@@ -92,49 +99,53 @@ class guy {
       }
     }
 
-    let deviations = [];
-    switch (complexity) {
-      case 1:
-        // replace drink or side
-        break;
-      case 2:
-        // replace ingredient
-        break;
-      case 3:
-        // replace drink or side + ingredient
-        break;
-    }
-
-    construction.burger.splice(construction.burger.indexOf("patty"), 1);
-    deviations.push({
-      type: "remove",
-      side: "burger",
-      item: "patty"
-    });
-    console.log(construction);
-
-    this.desiredMenu = new recipe({
+    var newRecipe = new recipe({
       name: originalRecipe.name,
       cost: originalRecipe.cost,
-      construction: construction,
-      deviationsFromOriginal: deviations
+      construction: construction
     });
+
+    //
+
+    complexity = Math.ceil(Math.random() * complexity);
+    // complexity should not overcome size of recipe
+
+    for (let i=0; i<complexity; i++) {
+      newRecipe.deviate();
+    }
+
+    this.desiredMenu = newRecipe;
+
+    console.log(construction);
   }
 
   createDialogue() {
     let menu = this.desiredMenu;
     this.words = [];
 
-    this.addString("hi i would like the", "span");
-    this.addString(menu.name, "em");
+    this.addString("hi i would like the");
+    this.addString(menu.name, "order");
 
-    if (menu.deviationsFromOriginal.length > 0) {
-      const deviations = menu.deviationsFromOriginal;
-      for (let deviation of deviations) {
-        const item = deviation.item;
+    if (menu.deviations.length > 0) {
+      const deviations = menu.deviations;
+      for (let i=0; i<deviations.length; i++) {
+        const deviation = deviations[i];
         switch (deviation.type) {
           case "remove":
-            this.addString("without the "+item);
+            this.addString("without the "+deviation.item, "em");
+            if (i<deviations.length-1 && deviations[i+1].type == "remove") {
+              this.addString("and");
+            }
+            break;
+          case "replace":
+            if (i==0) {
+              this.addString("but");
+            } else {
+              this.addString("and");
+            }
+            this.addString("can i have");
+            this.addString(deviation.to+" instead of "+deviation.from, "em");
+            this.addString("?");
             break;
         }
       }
@@ -143,11 +154,11 @@ class guy {
     this.addString("thanks :)");
   }
 
-  addString(string, tag) {
+  addString(string, classname) {
     for (let word of string.split(" ")) {
-      let el = document.createElement(tag);
+      let el = document.createElement("span");
+      el.className = (classname || "") + " gone";
       el.textContent = word;
-      el.className = "gone";
       this.words.push(el);
       this.textElement.appendChild(el);
     }
@@ -157,7 +168,7 @@ class guy {
     let el = this.words.shift();
     el.classList.remove("gone");
     this.currentTalkInterval = el.textContent.length * this.talkInterval;
-    sfx("talk");
+    this.soundId = sfx_talk(this.voice, this.soundId);
     if (scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition();
   }
 
@@ -201,60 +212,29 @@ class guy {
   }
 
   sendFeedback(feedback) {
-    // feedback looks like {
-    //   tray_has_nothing: true,
-    //   tray_is_perfect: true,
-    //   categories_in_wrong_order: [],
-    //   categories_missing: [],
-    //   categories_mixed_up: [
-    //     {
-    //       category: "",
-    //       should_be: "",
-    //     }
-    //   ],
-    //   items_missing: [
-    //     {
-    //       category: "",
-    //       item: ""
-    //     }
-    //   ],
-    //   items_misplaced: [
-    //     {
-    //       category: "",
-    //       item: "",
-    //     }
-    //   ],
-    //   unwanted_categories: [],
-    //   unwanted_items: [
-    //     {
-    //       category: "",
-    //       item: ""
-    //     }
-    //   ],
-    // }
     let text = "";
-
-    console.log(feedback);
 
     const priority = [
       "tray_has_nothing",
+      "categories_swapped",
+      "categories_mixed_up",
       "categories_missing",
-      "unwanted_categories",
       "unwanted_items",
       "items_missing",
       "items_misplaced",
       "categories_in_wrong_order",
-      "categories_mixed_up"
+      "unwanted_categories",
     ];
     const dialogue = {
       "tray_has_nothing": "this tray has nothing on it!",
       "categories_missing": "i didn't get my [item]...",
+      "categories_in_wrong_order": "[item] was in the wrong order.",
+      "categories_swapped": "[a] and [b] got mixed up.",
+      "categories_mixed_up": "my [should_be] was where my [category] should be.",
       "unwanted_categories": "haha, free [item]!",
       "unwanted_items": "why was there [item] in my [category]?",
-      "items_missing": "my [category] was incomplete...",
+      "items_missing": "my [category] was missing [item]...",
       "items_misplaced": "this [item] was in the wrong spot",
-      "categories_in_wrong_order": "[item] was in the wrong order.",
-      "categories_mixed_up": "[category] and [should_be] got mixed up."
     };
     for (let i=priority.length-1; i>=0; i--) {
       let f = feedback[priority[i]];

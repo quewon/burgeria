@@ -287,7 +287,7 @@ class recipe {
       drink: null,
       side: null,
     };
-    this.deviationsFromOriginal = p.deviationsFromOriginal || [];
+    this.deviations = p.deviations || [];
     this.category = "singles";
     if (this.construction.drink || this.construction.side) {
       this.category = "sets";
@@ -352,6 +352,102 @@ class recipe {
   closePreview() {
     this.visible = false;
     this.button.classList.remove("selected");
+  }
+
+  deviate() {
+    var deviableCategories = [];
+    for (let categoryname in this.construction) {
+      const category = this.construction[categoryname];
+      if (!category) continue;
+      if (
+        typeof category == "string" ||
+        (category.constructor === Array && category.length > 0)
+      ) {
+        deviableCategories.push(categoryname);
+      }
+    }
+
+    console.log(deviableCategories);
+
+    if (deviableCategories.length == 0) return;
+
+    var deviationTypes = ["replace", "remove"];
+    var type = deviationTypes[deviationTypes.length * Math.random() | 0];
+
+    var randomCategory = deviableCategories[deviableCategories.length * Math.random() | 0];
+    var item = this.construction[randomCategory];
+    if (item.constructor === Array) item = item[item.length * Math.random() | 0];
+
+    switch (type) {
+      case "replace":
+        var inglist = Object.keys(playerdata.ingredients);
+        inglist.splice(inglist.indexOf(item), 1);
+
+        var replacement = inglist[inglist.length * Math.random() | 0];
+        if (!replacement) return; // in the rare case that a category contains every single ingredient
+
+        if (typeof this.construction[randomCategory] === "string") {
+          this.construction[randomCategory] = replacement;
+        } else {
+          this.construction[randomCategory][this.construction[randomCategory].indexOf(item)] = replacement;
+        }
+
+        this.deviations.push({
+          type: type,
+          category: randomCategory,
+          from: item,
+          to: replacement
+        });
+
+        break;
+
+      case "remove":
+        if (typeof this.construction[randomCategory] === "string") {
+          this.construction[randomCategory] = null;
+        } else {
+          this.construction[randomCategory].splice(this.construction[randomCategory].indexOf(item), 1);
+        }
+
+        this.deviations.push({
+          type: type,
+          category: randomCategory,
+          item: item
+        });
+
+        break;
+    }
+  }
+
+  remove(itemname) {
+    for (let categoryname in construction) {
+      const category = construction[categoryname];
+      if (!category) continue;
+      if (category.constructor === Array) {
+        let index = category.indexOf(itemname);
+        while (index != -1) {
+          category.splice(index, 1);
+          index = category.indexOf(itemname);
+        }
+      } else if (category == a) {
+        category = null;
+      }
+    }
+  }
+
+  replace(a, b) {
+    for (let categoryname in construction) {
+      const category = construction[categoryname];
+      if (!category) continue;
+      if (category.constructor === Array) {
+        let index = category.indexOf(a);
+        while (index != -1) {
+          category[index] = b;
+          index = category.indexOf(a);
+        }
+      } else if (category == a) {
+        category = b;
+      }
+    }
   }
 
   draw() {
