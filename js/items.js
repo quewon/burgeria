@@ -11,11 +11,7 @@ class tray {
     this.guy = guy;
     this.enabled = false;
 
-    this.collections = {
-      burger: null,
-      drink: null,
-      side: null
-    };
+    this.collections = {};
     this.init_tray();
     this.init_3d();
 
@@ -28,9 +24,10 @@ class tray {
 
     let cons = this.element.querySelectorAll(".collection");
     for (let con of cons) {
-      let col = new collection(this, con, con.getAttribute("placeholder"));
+      let sidename = con.getAttribute("placeholder");
+      this.collections[sidename] = [];
+      let col = new collection(this, con, sidename);
       col.capacity = Number(con.dataset.capacity);
-      // col.side = con.getAttribute("placeholder");
       con.dataset.containerValue = 2;
       con.dataset.trayId = this.id;
       con.dataset.side = col.side;
@@ -57,7 +54,6 @@ class tray {
       con.addEventListener("mousedown", function(e) {
         if (_dragdrop.itemInHand) return;
 
-        // let item = col.items[col.items.length - 1];
         let item = col.removeItemByIndex(col.items.length-1);
         if (!item) return;
 
@@ -66,13 +62,6 @@ class tray {
         this.prepend(item.element);
         item.dragGhost.classList.add("gone");
       });
-      // con.onclick = function() {
-      //   let tray = playerdata.trays[this.dataset.trayId];
-      //   let col = tray.collections[this.dataset.side];
-      //   col.removeItemByIndex(col.items.length-1);
-      //   tray.resize_3d();
-      //   tray.updateMinistockPosition();
-      // };
       con.addEventListener("mouseleave", function(e) {
         this.classList.remove("draghover");
 
@@ -280,8 +269,22 @@ class tray {
     this.openMinistockWindow();
   }
 
-  requestFeedback(recipe) {
+  getConstruction() {
     let construction = {};
+    for (let sidename in this.collections) {
+      const collection = this.collections[sidename];
+      const side = collection.items;
+      if (side.length > 0) {
+        construction[sidename] = [];
+        for (let item of side) {
+          construction[sidename].push(item.name);
+        }
+      }
+    }
+    return construction;
+  }
+
+  requestFeedback(recipe) {
     let feedback = {
       tray_has_nothing: true,
       tray_is_perfect: true,
@@ -303,163 +306,109 @@ class tray {
       items_misplaced: [],
       unwanted_categories: [],
       unwanted_items: [],
+      categories_overfilled: [],
     };
 
-    // create construction of tray
-    for (let side in this.collections) {
-      const collection = this.collections[side];
-      if (side == "drink" || side == "side") {
-        let item = collection.items[0];
-        if (item) {
-          construction[side] = item.name;
-          feedback.tray_has_nothing = false;
-        }
-      } else {
-        construction[side] = [];
-        for (let item of collection.items) {
-          construction[side].push(item.name);
-          feedback.tray_has_nothing = false;
-        }
-      }
-    }
+    let construction = this.getConstruction();
 
     var all_items_in_recipe = [];
-    for (let side in recipe.construction) {
-      if (!recipe.construction[side]) continue;
-      if (recipe.construction[side].constructor === Array) {
-        for (let item of recipe.construction[side]) {
-          all_items_in_recipe.push(item);
-        }
-      } else {
-        all_items_in_recipe.push(recipe.construction[side]);
+    for (let sidename in recipe.construction) {
+      const side = recipe.construction[sidename];
+      for (let item of side) {
+        all_items_in_recipe.push(item);
       }
     }
 
     var all_items_in_tray = [];
-    for (let side in construction) {
-      const a = construction[side];
-      const b = recipe.construction[side];
-      var aj, bj;
 
-      if (a.constructor === Array) {
-        aj = a.join("|");
-        bj = b.join("|");
-
-        if (aj != bj && a.length == b.length && a.toSorted().join("|") == b.toSorted().join("|")) {
-          feedback.tray_is_perfect = false;
-          feedback.categories_in_wrong_order.push(side);
-        } else {
-          if (a.length > 0 && b.length == 0) {
-            feedback.tray_is_perfect = false;
-            feedback.unwanted_categories.push(side);
-          }
-
-          for (let s in recipe.construction) {
-            if (!recipe.construction[s] || s==side || typeof recipe.construction[s].length !== Array) continue;
-            if (recipe.construction[s].join("|") == aj) {
-              feedback.tray_is_perfect = false;
-              feedback.categories_mixed_up.push({
-                category: side,
-                should_be: s,
-              });
-            }
-          }
-        }
-
-        for (let i=a.length-1; i>=0; i--) {
-          const item = a[i];
-          all_items_in_tray.push(item);
-          if (item != b[i]) {
-            if (all_items_in_recipe.includes(item)) {
-              feedback.tray_is_perfect = false;
-              feedback.items_misplaced.push({
-                category: side,
-                item: item
-              });
-            } else {
-              feedback.tray_is_perfect = false;
-              feedback.unwanted_items.push({
-                category: side,
-                item: item
-              });
-            }
-          }
-          all_items_in_recipe.splice(all_items_in_recipe.indexOf(item), 1);
-        }
+    for (let sidename in construction) {
+      const a = construction[sidename];
+      var b;
+      if (!(sidename in recipe.construction)) {
+        b = [];
       } else {
-        if (a != b) {
-          if (a && !b) {
+        b = recipe.construction[sidename];
+      }
+      const aj = a.join("|");
+      const bj = b.join("|");
+      const asj = a.toSorted().join("|");
+      const bsj = b.toSorted().join("|");
+
+      if (aj != bj && a.length == b.length && asj == bsj) {
+        feedback.tray_is_perfect = false;
+        feedback.categories_in_wrong_order.push(sidename);
+      } else {
+        if (a.length > 0 && b.length == 0) {
+          feedback.tray_is_perfect = false;
+          feedback.unwanted_categories.push(sidename);
+        } else if (a.length > b.length) {
+          feedback.tray_is_perfect = false;
+          feedback.categories_overfilled.push(sidename);
+        }
+
+        for (let bsidename in recipe.construction) {
+          const bside = recipe.construction[bsidename];
+          if (bside.length == 0 || sidename == bsidename || bside.join("|") == bj) continue;
+          if (bside.join("|") == aj) {
             feedback.tray_is_perfect = false;
-            feedback.unwanted_categories.push(side);
+            feedback.categories_mixed_up.push({
+              category: sidename,
+              should_be: bsidename
+            });
           }
-          if (all_items_in_recipe.includes(a)) {
+        }
+      }
+
+      for (let i=a.length-1; i>=0; i--) {
+        const item = a[i];
+        all_items_in_tray.push(item);
+        if (item != b[i]) {
+          if (all_items_in_recipe.includes(item)) {
             feedback.tray_is_perfect = false;
             feedback.items_misplaced.push({
-              category: side,
-              item: a
+              category: sidename,
+              item: item
             });
           } else {
             feedback.tray_is_perfect = false;
             feedback.unwanted_items.push({
-              category: side,
-              item: a
+              category: sidename,
+              item: item
             });
           }
-
-          for (let s in recipe.construction) {
-            if (!recipe.construction[s] || s==side || typeof recipe.construction[s] === Array) continue;
-            if (recipe.construction[s] == a) {
-              feedback.tray_is_perfect = false;
-              feedback.categories_mixed_up.push({
-                category: side,
-                should_be: s,
-              });
-            }
-          }
         }
-        all_items_in_recipe.splice(all_items_in_recipe.indexOf(b), 1);
-        all_items_in_tray.push(a);
+
+        all_items_in_recipe.splice(all_items_in_recipe.indexOf(item), 1);
       }
     }
 
-    for (let side in recipe.construction) {
-      if (!recipe.construction[side]) continue;
-      if (recipe.construction[side].constructor === Array) {
-        if (recipe.construction[side].length != 0 && construction[side].length == 0) {
-          feedback.tray_is_perfect = false;
-          feedback.categories_missing.push(side);
-          continue;
-        }
-        for (let i=recipe.construction[side].length-1; i>=0; i--) {
-          let item = recipe.construction[side][i];
-          if (item != construction[side][i]) {
-            if (all_items_in_tray.includes(item)) {
-              feedback.tray_is_perfect = false;
-              // feedback.items_misplaced.push(item);
-            } else {
-              feedback.tray_is_perfect = false;
-              feedback.items_missing.push({
-                category: side,
-                item: item
-              });
-            }
-          }
-          all_items_in_tray.splice(all_items_in_tray.indexOf(item), 1);
-        }
+    if (all_items_in_tray.length > 0) {
+      feedback.tray_has_nothing = false;
+    }
+
+    for (let sidename in recipe.construction) {
+      const side = recipe.construction[sidename];
+      var a;
+      if (!(sidename in construction)) {
+        a = [];
       } else {
-        let item = recipe.construction[side];
-        if (item != construction[side]) {
-          if (item != null && !construction[side]) {
-            feedback.tray_is_perfect = false;
-            feedback.categories_missing.push(side);
-            continue;
-          }
+        a = construction[sidename];
+      }
+
+      if (side.length != 0 && a.length == 0) {
+        feedback.tray_is_perfect = false;
+        feedback.categories_missing.push(sidename);
+        continue;
+      }
+      for (let i=side.length-1; i>=0; i--) {
+        const item = side[i];
+        if (item != a[i]) {
           if (!all_items_in_tray.includes(item)) {
             feedback.tray_is_perfect = false;
             feedback.items_missing.push({
-              category: side,
+              category: sidename,
               item: item
-            });
+            })
           }
         }
         all_items_in_tray.splice(all_items_in_tray.indexOf(item), 1);

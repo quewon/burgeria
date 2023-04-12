@@ -120,6 +120,7 @@ function updateDayUI() {
       dtb.classList.remove("disabled");
       di.textContent = "☼";
       overtime.classList.add("gone");
+      scenes.storefront.ministock.classList.add("gone");
     }
 
     dtb.textContent = "open store";
@@ -134,6 +135,7 @@ function updateDayUI() {
     timer.onanimationend = function() {
       scenes.storefront.day.timer.classList.remove("transition");
     };
+    scenes.storefront.ministock.classList.add("gone");
   }
 }
 
@@ -261,8 +263,8 @@ class headline {
     //   let container = this.parentNode.parentNode;
     //   container.remove();
     // };
-    div.classList.add("slide-up");
-    scenes.storefront.news.prepend(div);
+    div.classList.add("slide-down");
+    scenes.storefront.news.appendChild(div);
 
     let l1 = div.querySelector("#line1");
     let l2 = div.querySelector("#line2");
@@ -287,8 +289,8 @@ class prices {
     let div = divContainingTemplate("template-news-prices");
     div.style.position = "relative";
 
-    div.classList.add("slide-up");
-    scenes.storefront.news.prepend(div);
+    div.classList.add("slide-down");
+    scenes.storefront.news.appendChild(div);
 
     //
 

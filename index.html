@@ -575,7 +575,8 @@
 
       #guys-container {
         column-gap: .5rem;
-        justify-content: flex-end;
+        /* justify-content: flex-end; */
+        /* flex-direction: row-reverse; */
       }
       #guys-container > div {
         width: calc(20% - .4rem);
@@ -784,8 +785,8 @@
             <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
           </div>
         </div>
-        <div id="burgeria-overtime-message" class="block attached-above gone">
-          <i>The day is done. Any points you make will be halved.</i>
+        <div id="burgeria-overtime-message" class="block attached-above gone" onanimationend="if(scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition()">
+          <i>Overtime discount—All menu items are 50% off.</i>
         </div>
       </div>
     </div>
@@ -961,10 +962,10 @@
     }
     setInterval(_objectTimeoutUpdate, 1);
   </script>
-  <script type="text/javascript" src="js/howler.core.js"></script>
-  <script type="text/javascript" src="js/three.min.js"></script>
-  <script type="text/javascript" src="js/geobank.js"></script>
-  <script type="text/javascript" src="js/sound.js"></script>
+  <script type="text/javascript" src="js/lib/howler.core.js"></script>
+  <script type="text/javascript" src="js/lib/three.min.js"></script>
+  <script type="text/javascript" src="js/bank/geometries.js"></script>
+  <script type="text/javascript" src="js/bank/sound.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/items.js"></script>
   <script type="text/javascript" src="js/workshop.js"></script>
@@ -972,6 +973,8 @@
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
+    console.clear();
+
     _game.config.init_playerdata();
 
     _game.init();

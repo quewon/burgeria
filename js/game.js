@@ -131,8 +131,8 @@ const _game = {
         cost: 5,
         construction: {
           burger: ["onion", "onion", "onion"],
-          side: "onion",
-          drink: "onion"
+          side: ["onion"],
+          drink: ["onion"]
         },
         addToMenu: true
       });
@@ -149,8 +149,8 @@ const _game = {
         cost: 15,
         construction: {
           burger: ["bottom bun", "patty", "top bun"],
-          drink: "coke",
-          side: "fries"
+          drink: ["coke"],
+          side: ["fries"]
         },
         addToMenu: true
       });
@@ -158,9 +158,8 @@ const _game = {
         name: "Weird Set",
         cost: 10,
         construction: {
-          burger: [],
-          drink: "coke",
-          side: "fries"
+          drink: ["coke"],
+          side: ["fries"]
         },
         addToMenu: true
       });
@@ -222,13 +221,12 @@ Silent, athwart my soul, moves the symphony true.`);
   },
   closeStore: function() {
     if (playerdata.storetime < _game.config.dayLength) {
-      if (!confirm("Are you sure you want to end the day now?\n\n(While the store's closed, any money you make will be halved.)")) {
+      if (!confirm("Are you sure you want to end the day now?\n\n(Once your store closes, the overtime discount will be activated.)")) {
         return;
       }
     }
 
     playerdata.storetime = -1;
-    scenes.storefront.ministock.classList.add("gone");
 
     let everyoneserved = true;
     for (let guy of playerdata.guys) {
@@ -296,36 +294,57 @@ var playerdata = {
 class recipe {
   constructor(p) {
     this.name = p.name || "Nameless Burger";
-    this.construction = p.construction || {
-      burger: ["bottom bun", "patty", "top bun"],
-      drink: null,
-      side: null,
-    };
+    this.construction = p.construction || {};
     this.deviations = p.deviations || [];
-    this.category = "singles";
-    if (this.construction.drink || this.construction.side) {
+
+    if (this.construction.burger && Object.keys(this.construction).length > 1) {
       this.category = "sets";
+    } else {
+      this.category = "singles";
     }
+
+    this.calculateSize();
     this.cost = p.cost || 10;
 
     if (p.addToMenu) {
       this.addToMenu();
     }
+  }
 
-    this.size = 0;
+  copy() {
+    return new recipe({
+      name: this.name,
+      cost: this.cost,
+      construction: this.copyConstruction()
+    });
+  }
+
+  copyConstruction() {
+    let construction = {};
+
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      if (side.length == 0) continue;
+      construction[sidename] = [];
+      for (let item of side) {
+        construction[sidename].push(item);
+      }
+    }
+
+    return construction;
+  }
+
+  calculateSize() {
+    let size = 0;
     var ingredientsCounted = [];
     for (let sidename in this.construction) {
       const side = this.construction[sidename];
-      if (typeof side === "string") {
-        this.size++;
-        if (ingredientsCounted.indexOf(side)==-1) ingredientsCounted.push(side);
-      } else if (side.constructor === Array) {
-        this.size == side.length;
-        for (let item of side) {
-          if (ingredientsCounted.indexOf(item)==-1) ingredientsCounted.push(item);
-        }
+      size += side.length;
+      for (let item of side) {
+        if (ingredientsCounted.indexOf(item)==-1) ingredientsCounted.push(item);
       }
     }
+    this.size = size;
     this.uniqueIngredients = ingredientsCounted.length;
   }
 
@@ -346,14 +365,11 @@ class recipe {
 
     this.visible = false;
     this.tray = new tray();
-    for (let name of this.construction.burger) {
-      new item(name, this.tray.collections.burger);
-    }
-    if (this.construction.drink) {
-      new item(this.construction.drink, this.tray.collections.drink);
-    }
-    if (this.construction.side) {
-      new item(this.construction.side, this.tray.collections.side);
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      for (let itemname of side) {
+        new item(itemname, this.tray.collections[sidename]);
+      }
     }
 
     playerdata.recipes.push(this);
@@ -393,99 +409,73 @@ class recipe {
   }
 
   deviate() {
-    var deviableCategories = [];
-    for (let categoryname in this.construction) {
-      const category = this.construction[categoryname];
-      if (!category) continue;
-      if (
-        typeof category == "string" ||
-        (category.constructor === Array && category.length > 0)
-      ) {
-        deviableCategories.push(categoryname);
-      }
+    var deviableSides = [];
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      if (side.length==0) continue;
+      deviableSides.push(sidename);
     }
-
-    if (deviableCategories.length == 0) return;
+    if (deviableSides.length == 0) return;
 
     var deviationTypes = ["replace", "remove"];
-    var type = deviationTypes[deviationTypes.length * Math.random() | 0];
 
-    var randomCategory = deviableCategories[deviableCategories.length * Math.random() | 0];
-    var item = this.construction[randomCategory];
-    if (item.constructor === Array) item = item[item.length * Math.random() | 0];
+    var type = deviationTypes[deviationTypes.length * Math.random() | 0];
+    var sidename = deviableSides[deviableSides.length * Math.random() | 0];
+    var side = this.construction[sidename];
+    var item = side[side.length * Math.random() | 0];
 
     switch (type) {
       case "replace":
-        var inglist = Object.keys(playerdata.ingredients);
-        inglist.splice(inglist.indexOf(item), 1);
+        var potentialIngredients = Object.keys(playerdata.ingredients);
+        potentialIngredients.splice(potentialIngredients.indexOf(item), 1);
 
-        var replacement = inglist[inglist.length * Math.random() | 0];
+        var replacement = potentialIngredients[potentialIngredients.length * Math.random() | 0];
         if (!replacement) return; // in the rare case that a category contains every single ingredient
 
-        if (typeof this.construction[randomCategory] === "string") {
-          this.construction[randomCategory] = replacement;
-        } else {
-          this.construction[randomCategory][this.construction[randomCategory].indexOf(item)] = replacement;
-        }
+        side[side.indexOf(item)] = replacement;
 
         this.deviations.push({
           type: type,
-          category: randomCategory,
+          category: sidename,
           from: item,
           to: replacement
         });
-
         break;
 
       case "remove":
-        if (typeof this.construction[randomCategory] === "string") {
-          this.construction[randomCategory] = null;
-        } else {
-          this.construction[randomCategory].splice(this.construction[randomCategory].indexOf(item), 1);
-        }
+        side.splice(side.indexOf(item), 1);
 
         this.deviations.push({
           type: type,
-          category: randomCategory,
+          category: sidename,
           item: item
         });
-
         break;
     }
   }
 
-  remove(itemname) {
-    for (let categoryname in construction) {
-      const category = construction[categoryname];
-      if (!category) continue;
-      if (category.constructor === Array) {
-        let index = category.indexOf(itemname);
-        while (index != -1) {
-          category.splice(index, 1);
-          index = category.indexOf(itemname);
-        }
-      } else if (category == a) {
-        category = null;
+  remove(item) {
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      let index = side.indexOf(item);
+      while (index != -1) {
+        side.splice(index, 1);
+        index = side.indexOf(item);
       }
     }
-    // uniqueingredients, size should change... but does it even matter?
+    // size should update... but does it matter?
   }
 
-  replace(a, b) {
-    for (let categoryname in construction) {
-      const category = construction[categoryname];
-      if (!category) continue;
-      if (category.constructor === Array) {
-        let index = category.indexOf(a);
-        while (index != -1) {
-          category[index] = b;
-          index = category.indexOf(a);
-        }
-      } else if (category == a) {
-        category = b;
+  replace(item, replace_with) {
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      let index = side.indexOf(item);
+      while (index != -1) {
+        side[index] = replace_with;
+        index = side.indexOf(item);
       }
     }
-    // uniqueingredients, size should change... but does it even matter?
+    // size should update... but does it matter?
   }
 
   draw() {

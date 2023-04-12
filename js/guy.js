@@ -84,25 +84,7 @@ class guy {
 
   generateDesiredMenu(complexity) {
     const originalRecipe = playerdata.recipes[Math.random() * playerdata.recipes.length | 0];
-
-    let construction = {};
-    for (let side in originalRecipe.construction) {
-      let b = originalRecipe.construction[side];
-      if (b.constructor === Array) {
-        construction[side] = [];
-        for (let item of b) {
-          construction[side].push(item);
-        }
-      } else {
-        construction[side] = b;
-      }
-    }
-
-    var newRecipe = new recipe({
-      name: originalRecipe.name,
-      cost: originalRecipe.cost,
-      construction: construction
-    });
+    var newRecipe = originalRecipe.copy();
 
     //
 
@@ -117,19 +99,37 @@ class guy {
     this.desiredMenu = newRecipe;
   }
 
+  styleText(text, dontPunctuate, dontCapitalize) {
+    dontPunctuate = dontPunctuate || !this.punctuate;
+    dontCapitalize = dontCapitalize || !this.capitalize;
+
+    if (!dontCapitalize && text!="") {
+      text = text.charAt(0).toUpperCase() + text.slice(1).replaceAll("i ", "I ");
+    }
+    if (!dontPunctuate) {
+      text = this.randomPunctuateLine(text);
+    }
+
+    return text;
+  }
+
   randomPunctuateLine(line) {
-    const punctuation = [".", "!", "...", "!!!"];
+    const punctuation = [
+      ".", ".", ".",
+      "!", "!",
+      "...",
+      "!!!",
+      "?", "?!"
+    ];
     return line+punctuation[punctuation.length * Math.random() | 0];
   }
 
-  randomLine(arr, dontPunctuate) {
+  randomLine(arr, notEnd, notBeginning) {
     let a = arr[arr.length * Math.random() | 0];
     if (a != "") {
-      if (this.capitalize) {
-        a = a.charAt(0).toUpperCase() + a.slice(1).replaceAll("i ", "I ");
-      }
-      if (!dontPunctuate && this.punctuate) {
-        a = this.randomPunctuateLine(a);
+      a = this.styleText(a, notEnd);
+      if (notBeginning) {
+        a = a.charAt(0).toLowerCase() + a.slice(1);
       }
     }
     return a;
@@ -146,11 +146,40 @@ class guy {
     this.punctuate = Math.random() < .5 ? true : false;
     this.capitalize = Math.random() < .5 ? true : false;
 
-    const greeting = this.randomLine(["", "hello", "hi", "um", "hmm", "ey"]);
-    const request = this.randomLine(["i would like the", "can i have the", "give me the", "gotta go for the", "i'll have the ", "i'm craving the"], true);
-    const signoff = this.randomLine(["", "", "", "thank you", "thanks", "thank you", "thanks", "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria", "make it tasty", "can't wait", ":)", ":D", "eh"]);
+    const greeting = this.randomLine([
+      "", "",
+      "hello", "hello", "hello",
+      "hi", "hi", "hi",
+      "um",
+      "hmm", "hmm",
+      "ey",
+      "greetings",
+    ]);
+    const request = this.randomLine([
+      "i would like the",
+      "can i have the",
+      "give me the",
+      "gotta go for the",
+      "i'll have the",
+      "i'm craving the",
+      "make me the",
+      "i want the"
+    ], true);
+    const signoff = this.randomLine([
+      "", "", "",
+      "thank you", "thank you", "thank you :)",
+      "thanks", "thanks", "thanks :)",
+      "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
+      "make it tasty",
+      "can't wait",
+      "eh",
+      "yeah",
+      "yes",
+      "please and thank you",
+      ":)", ":D"
+    ]);
 
-    if (greeting!="") this.addString(greeting);
+    this.addString(greeting);
     this.addString(request);
     this.addString(menu.name, "order");
 
@@ -167,15 +196,19 @@ class guy {
             break;
           case "replace":
             if (i==0) {
-              this.addString("but");
+              this.addString(this.styleText("but", true));
             } else {
-              this.addString("and");
+              this.addString(this.styleText("and", true));
             }
-            this.addString("can");
-            this.addString(this.capitalize ? "I" : "i");
-            this.addString("have");
+
+            var question = Math.random() < .5 ? true : false;
+            if (question) {
+              this.addString(this.styleText("can i have", true, true));
+            } else {
+              this.addString("give me");
+            }
             this.addString(deviation.to+" instead of "+deviation.from, "em");
-            this.addString("?");
+            this.addString(question ? "?" : ".");
             break;
         }
       }
@@ -184,10 +217,12 @@ class guy {
       this.addString(this.randomPunctuateLine(""));
     }
 
-    if (signoff!="") this.addString(signoff);
+    this.addString(signoff);
   }
 
   addString(string, classname) {
+    if (string=="") return;
+
     for (let word of string.split(" ")) {
       let el = document.createElement("span");
       el.className = (classname || "") + " gone";
@@ -246,6 +281,8 @@ class guy {
   }
 
   sendFeedback(feedback) {
+    console.log(feedback);
+
     let text = "";
 
     const priority = [
@@ -256,6 +293,7 @@ class guy {
       "unwanted_items",
       "categories_missing",
       "items_missing",
+      "categories_overfilled",
       "items_misplaced",
       "categories_in_wrong_order",
     ];
@@ -268,6 +306,7 @@ class guy {
       "unwanted_categories": "haha, free [item]!",
       "unwanted_items": "why was there [item] in my [category]?",
       "items_missing": "my [category] was missing [item]...",
+      "categories_overfilled": "there was too much stuff in my [item].",
       "items_misplaced": "this [item] was in the wrong spot.",
     };
     for (let i=priority.length-1; i>=0; i--) {
@@ -286,10 +325,12 @@ class guy {
     }
 
     if (text != "") {
+      text = this.styleText(text, true);
+
       let div = divContainingTemplate("template-feedback-napkin");
       div.querySelector("[name='text']").textContent = text;
-      div.className = "slide-up";
-      scenes.storefront.news.prepend(div);
+      div.className = "slide-down";
+      scenes.storefront.news.appendChild(div);
       sfx("scrawl");
     }
   }
