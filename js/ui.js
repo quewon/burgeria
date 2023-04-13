@@ -4,7 +4,8 @@ var scenes = {
     "template-news-headline": document.getElementById("template-news-headline"),
     "template-news-prices": document.getElementById("template-news-prices"),
     "template-guy": document.getElementById("template-guy"),
-    "template-feedback-napkin": document.getElementById("template-feedback-napkin")
+    "template-feedback-napkin": document.getElementById("template-feedback-napkin"),
+    "template-writing-alert": document.getElementById("template-writing-alert"),
   },
   currentLocationElement: document.getElementById("currentLocation"),
   otherLocationElement: document.getElementById("otherLocation"),
@@ -46,6 +47,7 @@ var scenes = {
     lettersList: document.getElementById("letters-list"),
     workshop: document.getElementById("workshop-textarea"),
     pointsCounter: document.getElementById("points-counter"),
+    burgermanSpawnpoint: document.getElementById("burgerman-spawnpoint"),
   },
   switchLocation: function() {
     let current = this.current;

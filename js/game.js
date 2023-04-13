@@ -23,7 +23,7 @@ const _game = {
 
       playerdata.themes = {
         index: 0,
-        order: ["☼", "☁︎"],
+        order: ["☼", "☁︎", "☾"],
         "☼": {
           "burgeria": "red",
           "burgeria-bg": "pink",
@@ -32,7 +32,7 @@ const _game = {
           "bg": "white",
           "graph-neutral": "var(--lines)",
           "graph-negative": "var(--burgeria)",
-          "graph-positive": "blue"
+          "graph-positive": "blue",
         },
         "☁︎": {
           "burgeria": "#E03616",
@@ -41,6 +41,13 @@ const _game = {
           "newsgray": "#C6CFD2",
           "graph-positive": "#5B7553"
         },
+        "☾": {
+          "burgeria": "black",
+          "burgeria-bg": "#e3e3e3",
+          "bg": "#e3e3e3",
+          "newsgray": "#c7c7c7",
+          "lines": "black",
+        }
       };
 
       playerdata.inventory = new collection();
@@ -164,11 +171,14 @@ const _game = {
         addToMenu: true
       });
 
-      new writingpiece(`Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen, and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.`);
-      new writingpiece(`After the dazzle of day is gone,
-Only the dark, dark night shows to my eyes the stars;
-After the clangor of organ majestic, or chorus, or perfect band,
-Silent, athwart my soul, moves the symphony true.`);
+      // there should be a bank for the writing the player collects
+      // and a separate one for the player's writing
+      // but i don't want the first bank to be tied to the writingbank
+
+      new writingpiece("moby dick", WRITINGBANK["moby dick"]);
+      new writingpiece("after the dazzle of day", WRITINGBANK["after the dazzle of day"]);
+
+      new writingpieceAlert("burgerman's welcome", WRITINGBANK["burgerman's welcome"]);
     },
   },
   init: function() {
@@ -550,9 +560,11 @@ class ingredient {
 }
 
 class writingpiece {
-  constructor(text) {
+  constructor(title, text) {
+    this.title = title;
     this.text = text;
     this.disintegrated = false;
+    playerdata.libraryIndex = playerdata.library.length;
     playerdata.library.push(this);
     updateLibrary();
   }
@@ -591,6 +603,39 @@ class writingpiece {
       this.disintegrated = true;
     }
     updateLibrary();
+  }
+}
+
+class writingpieceAlert {
+  constructor(title, string, cost, parent) {
+    let div = divContainingTemplate("template-writing-alert");
+    cost = cost || 0;
+    parent = parent || scenes.storefront.news;
+    div.dataset.title = title;
+    div.dataset.string = string;
+    div.dataset.cost = cost;
+
+    div.querySelector("button").onclick = function() {
+      const p = this.parentNode.parentNode;
+      const c = Number(p.dataset.cost);
+
+      if (playerdata.points < c) {
+        alert("Not enough money!");
+        return;
+      }
+
+      playerdata.points -= c;
+      updatePoints();
+
+      p.remove();
+      new writingpiece(p.dataset.title, p.dataset.string);
+      sfx('click');
+    }
+
+    div.querySelector("[name='title']").textContent = title;
+    div.querySelector("[name='cost']").textContent = cost;
+
+    parent.appendChild(div);
   }
 }
 

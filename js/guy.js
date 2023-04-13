@@ -104,7 +104,10 @@ class guy {
     dontCapitalize = dontCapitalize || !this.capitalize;
 
     if (!dontCapitalize && text!="") {
-      text = text.charAt(0).toUpperCase() + text.slice(1).replaceAll("i ", "I ");
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    if (this.capitalize) {
+      text = text.replaceAll("i ", "I ");
     }
     if (!dontPunctuate) {
       text = this.randomPunctuateLine(text);
@@ -128,8 +131,8 @@ class guy {
     let a = arr[arr.length * Math.random() | 0];
     if (a != "") {
       a = this.styleText(a, notEnd);
-      if (notBeginning) {
-        a = a.charAt(0).toLowerCase() + a.slice(1);
+      if (notBeginning && a[0]!="I") {
+        a = a[0].toLowerCase() + a.slice(1);
       }
     }
     return a;
@@ -182,6 +185,7 @@ class guy {
     this.addString(greeting);
     this.addString(request);
     this.addString(menu.name, "order");
+    this.addString(this.randomPunctuateLine(""));
 
     if (menu.deviations.length > 0) {
       const deviations = menu.deviations;
@@ -189,10 +193,12 @@ class guy {
         const deviation = deviations[i];
         switch (deviation.type) {
           case "remove":
-            this.addString("without any "+deviation.item, "em");
-            if (i<deviations.length-1 && deviations[i+1].type == "remove") {
-              this.addString("and");
+            if (i>0) {
+              this.addString("and", true);
             }
+
+            this.addString(this.styleText("without any "+deviation.item, true, i>0), "em");
+            this.addString(".");
             break;
           case "replace":
             if (i==0) {
@@ -205,16 +211,13 @@ class guy {
             if (question) {
               this.addString(this.styleText("can i have", true, true));
             } else {
-              this.addString("give me");
+              this.addString(this.randomLine(["give me", "i want"], true, true));
             }
             this.addString(deviation.to+" instead of "+deviation.from, "em");
             this.addString(question ? "?" : ".");
             break;
         }
       }
-    }
-    if (this.punctuate && !this.isPunctuated(this.words[this.words.length - 1].textContent)) {
-      this.addString(this.randomPunctuateLine(""));
     }
 
     this.addString(signoff);

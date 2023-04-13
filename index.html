@@ -104,6 +104,7 @@
         display: flex;
         justify-content: space-between;
         height: fit-content;
+        align-items: center;
       }
 
       .menu b {
@@ -244,7 +245,7 @@
         animation: send 1s;
         pointer-events: none;
         height: 0;
-        z-index: 10;
+        z-index: 20;
       }
       @keyframes send {
         0% {
@@ -489,6 +490,17 @@
         white-space: pre-wrap;
       }
 
+      .lettericon {
+        /* margin-left: 1em; */
+      }
+      .lettericon::after {
+        content: "Aa";
+        display: inline-block;
+        padding: 2px;
+        font-style: italic;
+        background: var(--newsgray);
+        /* color: var(--bg); */
+      }
       .burgerpoints {
         display: inline;
         /* width: calc(1ch + .25rem); */
@@ -697,6 +709,9 @@
         position: relative;
         display: flex;
       }
+      .flexbox.centeraligned {
+        align-items: center;
+      }
       .flexbox.wrap {
         flex-wrap: wrap;
       }
@@ -778,7 +793,7 @@
             <span id="burgeria-day-icon"> </span>
             <div id="burgeria-timer"></div>
           </div>
-          <div class="block flexbox gap" style="flex-grow: 1;">
+          <div class="block flexbox gap grow centeraligned">
             <div class="grow">
               <i>The store is <b id="day-state"> </b>.</i>
             </div>
@@ -799,33 +814,16 @@
             You have <span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span>.
           </div>
         </div>
-        <div class="block dashed">
-          <button class="top right" title="close" onclick="this.parentNode.remove(); sfx('click');">x</button>
-          Dear New-owner-insert-name-here,
-          <blockquote>
-            Hello! I see you've found your way to the kitchen. That's very promising!<br><br>
-            In here you can check your balance, stock, and even <em>create new ingredients</em> out of the text in your library.<br><br>
-            Then, if you haven't already, you can go back to the storefront and <em>open the store</em> to start serving customers :)<br><br>
-            Don't worry if it seems like time is running out—<em><b>Burgeria</b></em> customers are a patient bunch.<br><br>
-            Good luck stacking burgers!
-          </blockquote>
-          <div style="text-align: right;">
-            Love,<br>
-            Burgerman
-          </div>
+        <div id="burgerman-spawnpoint">
+
         </div>
         <div class="block">
           <h1 class="marginbelow">STOCK</h1>
           <ul id="inventory-list" class="flexbox">
           </ul>
         </div>
-        <div class="block">
+        <div class="block" style="border-bottom: none;">
           <h1>WORKSHOP</h1>
-        </div>
-        <div class="block attached-above" style="border-bottom: none;">
-          <b>LETTERSTOCK</b>
-          <ul id="letters-list" class="flexbox">
-          </ul>
         </div>
         <div class="attached-above">
           <textarea id="workshop-textarea" placeholder="click here to start typing..."></textarea>
@@ -833,7 +831,7 @@
       </div>
       <div>
         <div class="block dashed attached-below">
-          <span id="ingredient-buttons" class="flexbox gap wrap" style="align-items: center;">
+          <span id="ingredient-buttons" class="flexbox gap wrap centeraligned">
             <b style="margin-right: .5rem;">create ingredient</b>
           </span>
         </div>
@@ -855,6 +853,11 @@
         </div>
         <div id="library-page-empty" class="gone block attached-above">
           <i>There are no words here.</i>
+        </div>
+        <div class="block attached-above">
+          <b>LETTERSTOCK</b>
+          <ul id="letters-list" class="flexbox">
+          </ul>
         </div>
 
         <!-- this is for LATER game stuff -->
@@ -940,6 +943,16 @@
       </div>
     </template>
 
+    <template id="template-writing-alert">
+      <div class="block flexbox centeraligned dashed gap">
+        <span>
+          <span class="lettericon"></span>
+        </span>
+        <span name="title" class="grow"></span>
+        <button>add to library (<span class="burgerpoints"></span><span name="cost">0</span>)</button>
+      </div>
+    </template>
+
   </body>
   <script type="text/javascript">
     var _objectTimeouts = [];
@@ -966,6 +979,7 @@
   <script type="text/javascript" src="js/lib/three.min.js"></script>
   <script type="text/javascript" src="js/bank/geometries.js"></script>
   <script type="text/javascript" src="js/bank/sound.js"></script>
+  <script type="text/javascript" src="js/bank/writing.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/items.js"></script>
   <script type="text/javascript" src="js/workshop.js"></script>
@@ -973,7 +987,7 @@
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
-    console.clear();
+    // console.clear();
 
     _game.config.init_playerdata();
 
