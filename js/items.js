@@ -253,11 +253,12 @@ class tray {
     let el = this.element;
     el.dataset.id = this.id;
     el.classList.add("sending");
+
+    this.guy.receive();
+    
     el.addEventListener("animationend", function(e) {
       this.remove();
     });
-
-    this.guy.receive();
   }
 
   clear() {

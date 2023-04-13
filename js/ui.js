@@ -260,12 +260,6 @@ function updateList(listElement, listObject) {
 class headline {
   constructor(line1, line2) {
     let div = divContainingTemplate("template-news-headline");
-    // let xbutton = div.querySelector("button");
-    // xbutton.onclick = function() {
-    //   let container = this.parentNode.parentNode;
-    //   container.remove();
-    // };
-    div.classList.add("slide-down");
     scenes.storefront.news.appendChild(div);
 
     let l1 = div.querySelector("#line1");
@@ -291,7 +285,6 @@ class prices {
     let div = divContainingTemplate("template-news-prices");
     div.style.position = "relative";
 
-    div.classList.add("slide-down");
     scenes.storefront.news.appendChild(div);
 
     //

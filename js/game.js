@@ -615,7 +615,8 @@ class writingpieceAlert {
     div.dataset.string = string;
     div.dataset.cost = cost;
 
-    div.querySelector("button").onclick = function() {
+    let button = div.querySelector("button");
+    button.onclick = function() {
       const p = this.parentNode.parentNode;
       const c = Number(p.dataset.cost);
 
@@ -627,13 +628,22 @@ class writingpieceAlert {
       playerdata.points -= c;
       updatePoints();
 
-      p.remove();
       new writingpiece(p.dataset.title, p.dataset.string);
       sfx('click');
+
+      p.classList.add("send-library");
+      p.onanimationend = function() {
+        this.remove();
+      }
+      this.onclick = null;
     }
 
     div.querySelector("[name='title']").textContent = title;
-    div.querySelector("[name='cost']").textContent = cost;
+    if (cost == 0) {
+      div.querySelector("[name='nonzerocost']").remove();
+    } else {
+      div.querySelector("[name='cost']").textContent = cost;
+    }
 
     parent.appendChild(div);
   }

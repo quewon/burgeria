@@ -218,7 +218,7 @@
       @keyframes slide-up {
         0% {
           opacity: 0;
-          transform: translate(0, 50%);
+          transform: translate(0, 1rem);
         }
         100% {
           opacity: 1;
@@ -232,11 +232,30 @@
       @keyframes slide-down {
         0% {
           opacity: 0;
-          transform: translate(0, -50%);
+          transform: translate(0, -1rem);
         }
         100% {
           opacity: 1;
           transform: translate(0, 0);
+        }
+      }
+
+      .send-library {
+        pointer-events: none;
+      }
+      .send-library .block {
+        animation: send-library .5s;
+      }
+      @keyframes send-library {
+        0% {
+          opacity: 1;
+          border-style: dashed;
+          background: var(--bg);
+        }
+        100% {
+          opacity: 0;
+          border-style: solid;
+          background: var(--newsgray);
         }
       }
 
@@ -245,22 +264,20 @@
         animation: send 1s;
         pointer-events: none;
         height: 0;
-        z-index: 20;
       }
       @keyframes send {
         0% {
           opacity: 1;
-          transform: scale(1, 1) translate(0, 0);
+          transform: translate(0, 0);
         }
         100% {
           opacity: 0;
-          transform: scale(1, 1) translate(0, -5rem);
+          transform: translate(0, -5rem);
         }
       }
       .removing-ticket {
         animation: removing-ticket 1s;
         height: 0;
-        z-index: 10;
       }
       @keyframes removing-ticket {
         0% {
@@ -826,7 +843,7 @@
           <h1>WORKSHOP</h1>
         </div>
         <div class="attached-above">
-          <textarea id="workshop-textarea" placeholder="click here to start typing..."></textarea>
+          <textarea class="block" id="workshop-textarea" placeholder="click here to start typing..."></textarea>
         </div>
       </div>
       <div>
@@ -901,7 +918,7 @@
     </template>
 
     <template id="template-news-headline">
-      <div class="news block">
+      <div class="news block slide-down">
         <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div class="centeroriginY">
           <h1 id="line1">BIG BURGERS...</h1>
@@ -914,7 +931,7 @@
     </template>
 
     <template id="template-news-prices">
-      <div class="news block">
+      <div class="news block slide-down">
         <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div style="margin-bottom: .5rem;">
           <b>Letter Prices</b>—<i>your daily ABC's</i>
@@ -934,7 +951,7 @@
     </template>
 
     <template id="template-feedback-napkin">
-      <div class="block dashed">
+      <div class="block dashed slide-down">
         <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div class="marginbelow">
           <i>Someone left a note on a napkin...</i>
@@ -944,12 +961,12 @@
     </template>
 
     <template id="template-writing-alert">
-      <div class="block flexbox centeraligned dashed gap">
+      <div class="block flexbox centeraligned dashed gap slide-down">
         <span>
           <span class="lettericon"></span>
         </span>
         <span name="title" class="grow"></span>
-        <button>add to library (<span class="burgerpoints"></span><span name="cost">0</span>)</button>
+        <button>add to library <span name="nonzerocost">(<span style="color: var(--burgeria)"><span class="burgerpoints">–</span><span name="cost">0</span></span>)</span></button>
       </div>
     </template>
 

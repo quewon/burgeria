@@ -332,8 +332,10 @@ class guy {
 
       let div = divContainingTemplate("template-feedback-napkin");
       div.querySelector("[name='text']").textContent = text;
-      div.className = "slide-down";
-      scenes.storefront.news.appendChild(div);
+      
+      // scenes.storefront.news.appendChild(div);
+      scenes.storefront.body.insertBefore(div, this.tray.element.nextSibling);
+
       sfx("scrawl");
     }
   }
