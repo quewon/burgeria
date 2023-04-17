@@ -1,4 +1,7 @@
-var scenes = {
+var ui = {
+  tutorial: {
+    "letterstock": document.getElementById("letterstock")
+  },
   templates: {
     "template-tray": document.getElementById("template-tray"),
     "template-news-headline": document.getElementById("template-news-headline"),
@@ -50,15 +53,17 @@ var scenes = {
     burgermanSpawnpoint: document.getElementById("burgerman-spawnpoint"),
   },
   switchLocation: function() {
-    let current = this.current;
-    this.current = this.other;
-    this.other = current;
+    let current = ui.current;
+    ui.current = ui.other;
+    ui.other = current;
 
-    this.currentLocationElement.textContent = this[this.current].name;
-    this.otherLocationElement.textContent = this[this.other].name;
+    ui.currentLocationElement.textContent = ui[ui.current].name;
+    ui.otherLocationElement.textContent = ui[ui.other].name;
 
-    this[this.current].element.classList.remove("hidden");
-    this[this.other].element.classList.add("hidden");
+    ui[ui.current].element.classList.remove("hidden");
+    ui[ui.other].element.classList.add("hidden");
+
+    if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition();
 
     sfx("click");
   }
@@ -68,7 +73,7 @@ var scenes = {
 
 function divContainingTemplate(templateId) {
   let div = document.createElement("div");
-  let template = scenes.templates[templateId];
+  let template = ui.templates[templateId];
   let clone = template.content.cloneNode(true);
   div.appendChild(clone);
   return div;
@@ -96,15 +101,15 @@ function toggleTheme(button) {
     document.documentElement.style.setProperty("--"+key, value);
   }
 
-  scenes.themeName.textContent = name;
+  ui.themeName.textContent = name;
 }
 
 function updateDayUI() {
-  let dtb = scenes.storefront.day.toggleButton;
-  let di = scenes.storefront.day.icon;
-  let timer = scenes.storefront.day.timer;
-  let state = scenes.storefront.day.state;
-  let overtime = scenes.storefront.day.overtimeMessage;
+  let dtb = ui.storefront.day.toggleButton;
+  let di = ui.storefront.day.icon;
+  let timer = ui.storefront.day.timer;
+  let state = ui.storefront.day.state;
+  let overtime = ui.storefront.day.overtimeMessage;
 
   if (playerdata.storetime == -1) {
     let all_served = true;
@@ -122,7 +127,7 @@ function updateDayUI() {
       dtb.classList.remove("disabled");
       di.textContent = "☼";
       overtime.classList.add("gone");
-      scenes.storefront.ministock.classList.add("gone");
+      ui.storefront.ministock.classList.add("gone");
     }
 
     dtb.textContent = "open store";
@@ -135,19 +140,19 @@ function updateDayUI() {
     timer.style.height = "0%";
     timer.classList.add("transition");
     timer.onanimationend = function() {
-      scenes.storefront.day.timer.classList.remove("transition");
+      ui.storefront.day.timer.classList.remove("transition");
     };
-    scenes.storefront.ministock.classList.add("gone");
+    ui.storefront.ministock.classList.add("gone");
   }
 }
 
 function updatePoints() {
-  scenes.kitchen.pointsCounter.textContent = playerdata.points;
+  ui.kitchen.pointsCounter.textContent = playerdata.points;
 }
 
 function updateRecipes() {
-  while (scenes.storefront.recipesList.lastElementChild) {
-    scenes.storefront.recipesList.lastElementChild.remove();
+  while (ui.storefront.recipesList.lastElementChild) {
+    ui.storefront.recipesList.lastElementChild.remove();
   }
 
   let categories = {};
@@ -168,13 +173,13 @@ function updateRecipes() {
     for (let recipe of category) {
       ul.appendChild(recipe.element);
     }
-    scenes.storefront.recipesList.appendChild(label);
-    scenes.storefront.recipesList.appendChild(ul);
+    ui.storefront.recipesList.appendChild(label);
+    ui.storefront.recipesList.appendChild(ul);
   }
 }
 
 function updateMinistockWindow() {
-  const ministock = scenes.storefront.ministock;
+  const ministock = ui.storefront.ministock;
 
   if (updateList(ministock, playerdata.inventory.list)) {
     for (let li of ministock.children) {
@@ -195,21 +200,21 @@ function updateLibrary() {
   let page = playerdata.library[playerdata.libraryIndex];
 
   if (page) {
-    scenes.kitchen.library.page.textContent = page.text;
+    ui.kitchen.library.page.textContent = page.text;
 
-    scenes.kitchen.library.pageContainer.classList.remove("gone");
-    scenes.kitchen.library.pageEmptyMessage.classList.add("gone");
+    ui.kitchen.library.pageContainer.classList.remove("gone");
+    ui.kitchen.library.pageEmptyMessage.classList.add("gone");
   } else {
-    scenes.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
+    ui.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
 
-    scenes.kitchen.library.pageContainer.classList.add("gone");
-    scenes.kitchen.library.pageEmptyMessage.classList.remove("gone");
+    ui.kitchen.library.pageContainer.classList.add("gone");
+    ui.kitchen.library.pageEmptyMessage.classList.remove("gone");
   }
 
-  scenes.kitchen.library.pagesTotal.textContent = playerdata.library.length;
-  scenes.kitchen.library.index.textContent = playerdata.libraryIndex + 1;
+  ui.kitchen.library.pagesTotal.textContent = playerdata.library.length;
+  ui.kitchen.library.index.textContent = playerdata.libraryIndex + 1;
 
-  let buttons = scenes.kitchen.library.nav.querySelectorAll("button");
+  let buttons = ui.kitchen.library.nav.querySelectorAll("button");
   buttons[0].classList.add("disabled");
   buttons[1].classList.add("disabled");
   if (playerdata.library.length > 1) {
@@ -260,7 +265,7 @@ function updateList(listElement, listObject) {
 class headline {
   constructor(line1, line2) {
     let div = divContainingTemplate("template-news-headline");
-    scenes.storefront.news.appendChild(div);
+    ui.storefront.news.appendChild(div);
 
     let l1 = div.querySelector("#line1");
     let l2 = div.querySelector("#line2");
@@ -285,7 +290,7 @@ class prices {
     let div = divContainingTemplate("template-news-prices");
     div.style.position = "relative";
 
-    scenes.storefront.news.appendChild(div);
+    ui.storefront.news.appendChild(div);
 
     //
 

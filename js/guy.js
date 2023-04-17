@@ -61,7 +61,7 @@ class guy {
     this.textElement = text;
     this.element = div;
 
-    scenes.storefront.day.guysContainer.appendChild(this.element);
+    ui.storefront.day.guysContainer.appendChild(this.element);
 
     //
 
@@ -239,8 +239,12 @@ class guy {
     this.soundId = sfx_talk(this.voice, this.soundId);
     let el = this.words.shift();
     el.classList.remove("gone");
-    this.currentTalkInterval = el.textContent.length * this.talkInterval;
-    if (scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition();
+    if (this.words.length > 0) {
+      this.currentTalkInterval = this.words[0].textContent.length * this.talkInterval;
+    } else {
+      this.currentTalkInterval = 0;
+    }
+    if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition();
   }
 
   draw() {
@@ -332,9 +336,9 @@ class guy {
 
       let div = divContainingTemplate("template-feedback-napkin");
       div.querySelector("[name='text']").textContent = text;
-      
-      // scenes.storefront.news.appendChild(div);
-      scenes.storefront.body.insertBefore(div, this.tray.element.nextSibling);
+
+      // ui.storefront.news.appendChild(div);
+      ui.storefront.body.insertBefore(div, this.tray.element.nextSibling);
 
       sfx("scrawl");
     }

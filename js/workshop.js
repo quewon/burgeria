@@ -1,11 +1,11 @@
 function init_workshop() {
-  const workshop = scenes.kitchen.workshop;
+  const workshop = ui.kitchen.workshop;
 
   function use_letter(letter) {
     let count = playerdata.letters[letter];
     if (count > 0) {
       playerdata.letters[letter]--;
-      updateList(scenes.kitchen.lettersList, playerdata.letters);
+      updateList(ui.kitchen.lettersList, playerdata.letters);
       return letter;
     } else {
       return false;
@@ -16,7 +16,7 @@ function init_workshop() {
       playerdata.letters[letter] = 0;
     }
     playerdata.letters[letter]++;
-    updateList(scenes.kitchen.lettersList, playerdata.letters);
+    updateList(ui.kitchen.lettersList, playerdata.letters);
   }
 
   function update_workshop(e) {

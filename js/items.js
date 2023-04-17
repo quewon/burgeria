@@ -104,34 +104,34 @@ class tray {
 
   deploy() {
     this.enabled = true;
-    scenes.storefront.body.appendChild(this.element);
+    ui.storefront.body.appendChild(this.element);
     this.resize_3d();
   }
 
   updateMinistockPosition() {
-    if (scenes.storefront.ministockTray != this) return;
+    if (ui.storefront.ministockTray != this) return;
 
     let rect = this.stockbutton.getBoundingClientRect();
-    const ministock = scenes.storefront.ministock;
+    const ministock = ui.storefront.ministock;
     ministock.style.left = rect.left+"px";
     ministock.style.top = (rect.bottom + window.scrollY)+"px";
   }
 
   toggleMinistockWindow() {
-    if (scenes.storefront.ministockTray != this) {
+    if (ui.storefront.ministockTray != this) {
       this.openMinistockWindow();
     } else {
-      const ministock = scenes.storefront.ministock;
+      const ministock = ui.storefront.ministock;
       ministock.classList.add("gone");
-      scenes.storefront.ministockTray = null;
+      ui.storefront.ministockTray = null;
     }
   }
 
   openMinistockWindow() {
-    scenes.storefront.ministockTray = this;
+    ui.storefront.ministockTray = this;
     updateMinistockWindow();
     this.updateMinistockPosition();
-    const ministock = scenes.storefront.ministock;
+    const ministock = ui.storefront.ministock;
     ministock.classList.remove("gone");
   }
 
@@ -246,7 +246,7 @@ class tray {
   send() {
     this.enabled = false;
 
-    if (scenes.storefront.ministockTray == this) {
+    if (ui.storefront.ministockTray == this) {
       this.toggleMinistockWindow();
     }
 
@@ -255,7 +255,7 @@ class tray {
     el.classList.add("sending");
 
     this.guy.receive();
-    
+
     el.addEventListener("animationend", function(e) {
       this.remove();
     });
@@ -459,7 +459,7 @@ class collection {
     this.items.push(item);
     this.addToList(item);
     if (this == playerdata.inventory) {
-      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
       updateMinistockWindow();
     }
 
@@ -523,7 +523,7 @@ class collection {
     }
 
     if (this == playerdata.inventory) {
-      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
       updateMinistockWindow();
     }
 
@@ -549,7 +549,7 @@ class collection {
     }
     this.element.classList.add("empty");
     if (this == playerdata.inventory) {
-      updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+      updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
       if (!dontUpdateMinistock) {
         updateMinistockWindow();
       }

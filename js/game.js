@@ -18,6 +18,11 @@ const _game = {
   config: {
     dayLength: 2000 * 10,
     init_playerdata: function() {
+      playerdata.tutorial = {};
+      for (let id in ui.tutorial) {
+        playerdata.tutorial[id] = false;
+      }
+
       playerdata.storetime = -1;
       playerdata.points = 100;
 
@@ -188,7 +193,7 @@ const _game = {
     //ui
     updatePoints();
     updateRecipes();
-    updateList(scenes.kitchen.lettersList, playerdata.letters);
+    updateList(ui.kitchen.lettersList, playerdata.letters);
     updateDayUI();
     playerdata.recipes[0].previewRecipe();
 
@@ -263,7 +268,7 @@ const _game = {
       }
     }
 
-    scenes.storefront.day.timer.style.height = (playerdata.storetime/_game.config.dayLength * 100)+"%";
+    ui.storefront.day.timer.style.height = (playerdata.storetime/_game.config.dayLength * 100)+"%";
 
     if (playerdata.storetime != -1) {
       playerdata.storetime++;
@@ -283,6 +288,8 @@ const _game = {
 }
 
 var playerdata = {
+  tutorial: {},
+
   daytime: true,
   storetime: null,
   prices: {},
@@ -399,10 +406,10 @@ class recipe {
     }
 
     this.button.classList.add("selected");
-    this.tray.resize_3d(scenes.storefront.recipePreviewContext);
+    this.tray.resize_3d(ui.storefront.recipePreviewContext);
     this.tray.resetMeshes();
 
-    const preview = scenes.storefront.recipePreview;
+    const preview = ui.storefront.recipePreview;
     for (let side in this.tray.collections) {
       const label = preview.querySelector("[placeholder='"+side+"']");
       const el = this.tray.collections[side].element;
@@ -489,7 +496,7 @@ class recipe {
   }
 
   draw() {
-    this.tray.draw(scenes.storefront.recipePreviewContext);
+    this.tray.draw(ui.storefront.recipePreviewContext);
   }
 }
 
@@ -501,7 +508,7 @@ class ingredient {
 
     let button = document.createElement("button");
     button.textContent = this.name;
-    scenes.kitchen.ingredientButtons.appendChild(button);
+    ui.kitchen.ingredientButtons.appendChild(button);
     button.dataset.ingredientName = this.name;
     button.onclick = function(e) {
       sfx("click");
@@ -547,7 +554,7 @@ class ingredient {
       }
     }
     page.text = pagetext;
-    scenes.kitchen.library.page.textContent = pagetext;
+    ui.kitchen.library.page.textContent = pagetext;
 
     this.addToInventory();
   }
@@ -555,7 +562,7 @@ class ingredient {
   addToInventory() {
     new item(this.name, playerdata.inventory);
 
-    updateList(scenes.kitchen.inventoryList, playerdata.inventory.list);
+    updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
   }
 }
 
@@ -575,6 +582,13 @@ class writingpiece {
       this.disintegrating = true;
       this.sfxId = sfx("disintegrate");
     }
+
+    if (!playerdata.tutorial["letterstock"]) {
+      ui.tutorial["letterstock"].classList.remove("gone");
+      playerdata.tutorial["letterstock"] = true;
+    }
+
+    sfx('click');
   }
 
   disintegrateFrame() {
@@ -591,7 +605,7 @@ class writingpiece {
           playerdata.letters[char] = 0;
         }
         playerdata.letters[char]++;
-        updateList(scenes.kitchen.lettersList, playerdata.letters);
+        updateList(ui.kitchen.lettersList, playerdata.letters);
       }
       setObjectTimeout(this, "disintegrateFrame", 2);
     } else {
@@ -610,7 +624,7 @@ class writingpieceAlert {
   constructor(title, string, cost, parent) {
     let div = divContainingTemplate("template-writing-alert");
     cost = cost || 0;
-    parent = parent || scenes.storefront.news;
+    parent = parent || ui.storefront.news;
     div.dataset.title = title;
     div.dataset.string = string;
     div.dataset.cost = cost;
@@ -621,7 +635,7 @@ class writingpieceAlert {
       const c = Number(p.dataset.cost);
 
       if (playerdata.points < c) {
-        alert("Not enough money!");
+        alert("Not enough points!");
         return;
       }
 
@@ -635,6 +649,7 @@ class writingpieceAlert {
       p.onanimationend = function() {
         this.remove();
       }
+
       this.onclick = null;
     }
 

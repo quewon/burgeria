@@ -68,19 +68,25 @@
 
       h1, h2 {
         pointer-events: none;
+        margin: 0;
       }
 
       h1 {
-        font-size: 50px;
+        font-family: serif;
+        font-size: 3.25em;
         font-weight: bold;
         transform: scaleY(1.7);
-        margin: 0;
         line-height: 1.2em;
         white-space: nowrap;
       }
 
+      @supports (-moz-appearance: none) {
+        h1 {
+          margin-top: .5rem;
+        }
+      }
+
       h2 {
-        margin: 0;
         line-height: 1em;
         font-weight: bold;
         font-size: 1rem;
@@ -380,6 +386,7 @@
       }
 
       canvas {
+        position: relative;
         display: block;
         width: 10rem;
         height: 10rem;
@@ -400,6 +407,9 @@
       }
       ul.flexbox > li {
         width: 30%;
+      }
+      #storefront-ministock li {
+        list-style: inside;
       }
 
       .prices-graph {
@@ -502,9 +512,11 @@
         margin-right: -.5rem;
         border-left: none;
         border-right: none;
+        /* border: none; */
         background: var(--newsgray);
         text-align: justify;
         white-space: pre-wrap;
+        font-size: inherit;
       }
 
       .lettericon {
@@ -568,7 +580,6 @@
         width: 100%;
         height: 100%;
         background: var(--lines);
-        opacity: .5;
       }
       #burgeria-timer.transition {
         animation: transition-up .5s ease-out;
@@ -580,6 +591,11 @@
         100% {
           height: 0%;
         }
+      }
+
+      #burgeria-day-icon {
+        color: white;
+        mix-blend-mode: exclusion;
       }
 
       @media (max-width: calc(1000px + 1rem)) {
@@ -700,6 +716,26 @@
         border-left: none;
       }
 
+      .flexbox {
+        position: relative;
+        display: flex;
+      }
+      .flexbox.centeraligned {
+        align-items: center;
+      }
+      .flexbox.wrap {
+        flex-wrap: wrap;
+      }
+      .flexbox.column {
+        flex-direction: column;
+      }
+      .flexbox.gap {
+        gap: .5rem;
+      }
+      .flexbox .grow {
+        flex-grow: 1;
+      }
+
       .top {
         position: absolute;
         top: 0;
@@ -721,25 +757,8 @@
         position: absolute;
         bottom: 0;
       }
-
-      .flexbox {
-        position: relative;
-        display: flex;
-      }
-      .flexbox.centeraligned {
-        align-items: center;
-      }
-      .flexbox.wrap {
-        flex-wrap: wrap;
-      }
-      .flexbox.column {
-        flex-direction: column;
-      }
-      .flexbox.gap {
-        gap: .5rem;
-      }
-      .flexbox .grow {
-        flex-grow: 1;
+      .front {
+        z-index: 1;
       }
 
       .centeroriginY {
@@ -761,14 +780,18 @@
   <body>
 
     <header>
-      <h1 onclick="scenes.switchLocation();">BURGERIA!</h1>
+      <h1 onclick="ui.switchLocation();">BURGERIA!</h1>
       <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
-      <button class="bottom right" onclick="toggleTheme(); sfx('click');" title="toggle theme" style="height: 1.5rem; border-right: 1px solid; border-color: var(--burgeria);"><span id="theme-name"></span></button>
+      <div class="flexbox bottom right" style="gap: 3px;">
+        <!-- <button onclick="toggleSound(); sfx('click');" title="toggle sound" style="border-bottom: none; border-color: var(--burgeria);">🔊</button> -->
+        <!-- <button onclick="toggleFont(); sfx('click');" title="toggle font" style="border-bottom: none; border-color: var(--burgeria);">Aa</button> -->
+        <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-bottom: none; border-color: var(--burgeria);"><span id="theme-name"></span></button>
+      </div>
     </header>
 
     <div id="navbar" class="block">
       <i>You are in the <b id="currentLocation">STOREFRONT</b>.</i>
-      <button onclick="scenes.switchLocation()">go to the <b id="otherLocation">KITCHEN</b></button>
+      <button onclick="ui.switchLocation()">go to the <b id="otherLocation">KITCHEN</b></button>
     </div>
 
     <div id="scene-storefront" class="scene">
@@ -807,8 +830,8 @@
 
         <div class="flexbox">
           <div class="block attached-right" style="width: 1rem; text-align: center;">
-            <span id="burgeria-day-icon"> </span>
             <div id="burgeria-timer"></div>
+            <span id="burgeria-day-icon"> </span>
           </div>
           <div class="block flexbox gap grow centeraligned">
             <div class="grow">
@@ -817,7 +840,7 @@
             <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
           </div>
         </div>
-        <div id="burgeria-overtime-message" class="block attached-above gone" onanimationend="if(scenes.storefront.ministockTray) scenes.storefront.ministockTray.updateMinistockPosition()">
+        <div id="burgeria-overtime-message" class="block attached-above gone" onanimationend="if(ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition()">
           <i>Overtime discount—All menu items are 50% off.</i>
         </div>
       </div>
@@ -839,12 +862,6 @@
           <ul id="inventory-list" class="flexbox">
           </ul>
         </div>
-        <div class="block" style="border-bottom: none;">
-          <h1>WORKSHOP</h1>
-        </div>
-        <div class="attached-above">
-          <textarea class="block" id="workshop-textarea" placeholder="click here to start typing..."></textarea>
-        </div>
       </div>
       <div>
         <div class="block dashed attached-below">
@@ -865,16 +882,21 @@
           <p id="library-page" class="block"></p>
           <footer class="flexbox">
             <div class="grow"></div>
-            <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate(); sfx('click');">disintegrate</button>
+            <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
           </footer>
         </div>
         <div id="library-page-empty" class="gone block attached-above">
           <i>There are no words here.</i>
         </div>
-        <div class="block attached-above">
-          <b>LETTERSTOCK</b>
-          <ul id="letters-list" class="flexbox">
-          </ul>
+        <div id="letterstock" class="gone">
+          <div class="block" style="border-bottom: none;">
+            <b>LETTERSTOCK</b>
+            <ul id="letters-list" class="flexbox">
+            </ul>
+          </div>
+          <div class="attached-above">
+            <textarea class="block" id="workshop-textarea" placeholder="click here to start writing..."></textarea>
+          </div>
         </div>
 
         <!-- this is for LATER game stuff -->
@@ -882,7 +904,7 @@
           <h1 class="marginbelow">R&D</h1>
           <div class="flexbox gap">
             <b>develop new ingredient</b>
-            <input type="text" name="" value="" placeholder="click here to start typing...">
+            <input type="text" name="" value="" placeholder="click here to start developing...">
           </div>
         </div> -->
       </div>
@@ -932,7 +954,7 @@
 
     <template id="template-news-prices">
       <div class="news block slide-down">
-        <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
+        <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div style="margin-bottom: .5rem;">
           <b>Letter Prices</b>—<i>your daily ABC's</i>
         </div>
