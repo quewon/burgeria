@@ -10,9 +10,9 @@ Silent, athwart my soul, moves the symphony true.`,
 
 Hello! I see you've found your way to the kitchen. That's very promising!
 
-In here you can check your balance, stock, and even CREATE NEW INGREDIENTS out of the text in your library.
+In here you can check your balance, stock, and even "create ingredient[s]" out of the text in your library.
 
-Then, if you haven't already, you can go back to the storefront and OPEN THE STORE to start serving customers :)
+Then, if you haven't already, you can go back to the storefront and "open [the] store" to start serving customers :)
 
 Don't worry if it seems like time is running out—Burgeria customers are a patient bunch.
 

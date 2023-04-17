@@ -1,8 +1,8 @@
-var _renderer;
+var renderer;
 function init_3d() {
-  _renderer = new THREE.WebGLRenderer({ alpha: true });
-  _renderer.setPixelRatio( window.devicePixelRatio );
-  _renderer.setSize(150, 150);
+  renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize(150, 150);
 }
 
 class tray {
@@ -239,8 +239,8 @@ class tray {
 
     this.mesh.rotation.y += .01;
 
-    _renderer.render(this.scene, this.camera);
-    context.drawImage(_renderer.domElement, 0, 0);
+    renderer.render(this.scene, this.camera);
+    context.drawImage(renderer.domElement, 0, 0);
   }
 
   send() {

@@ -273,13 +273,14 @@ class guy {
         for (let guy of playerdata.guys) {
           if (!guy.served) return;
         }
-        _game.beginDay();
+        game.beginDay();
       }
     });
 
     const feedback = this.tray.requestFeedback(this.desiredMenu);
     if (feedback.tray_is_perfect) {
       var points = playerdata.storetime == -1 ? Math.ceil(this.desiredMenu.cost/2) : this.desiredMenu.cost;
+      playerdata.unbankedPoints += points;
       for (let i=0; i<points; i++) {
         setTimeout(burgerpointParticle, Math.random() * 100 * points);
       }
@@ -360,7 +361,5 @@ function burgerpointParticle() {
   };
 
   document.body.appendChild(div);
-  playerdata.points++;
-  updatePoints();
   sfx("burgerpoints");
 }

@@ -1,4 +1,4 @@
-function _animate() {
+function animate() {
   for (let guy of playerdata.guys) {
     if (!guy.served) guy.draw();
   }
@@ -11,199 +11,19 @@ function _animate() {
     if (recipe.visible) recipe.draw();
   }
 
-  requestAnimationFrame(_animate);
+  requestAnimationFrame(animate);
 }
 
-const _game = {
+const game = {
   config: {
     dayLength: 2000 * 10,
-    init_playerdata: function() {
-      playerdata.tutorial = {};
-      for (let id in ui.tutorial) {
-        playerdata.tutorial[id] = false;
-      }
-
-      playerdata.storetime = -1;
-      playerdata.points = 100;
-
-      playerdata.themes = {
-        index: 0,
-        order: ["☼", "☁︎", "☾"],
-        "☼": {
-          "burgeria": "red",
-          "burgeria-bg": "pink",
-          "newsgray": "#dcdcdc",
-          "lines": "black",
-          "bg": "white",
-          "graph-neutral": "var(--lines)",
-          "graph-negative": "var(--burgeria)",
-          "graph-positive": "blue",
-        },
-        "☁︎": {
-          "burgeria": "#E03616",
-          "bg": "#FDF0D5",
-          "lines": "#3A3335",
-          "newsgray": "#C6CFD2",
-          "graph-positive": "#5B7553"
-        },
-        "☾": {
-          "burgeria": "black",
-          "burgeria-bg": "#e3e3e3",
-          "bg": "#e3e3e3",
-          "newsgray": "#c7c7c7",
-          "lines": "black",
-        }
-      };
-
-      playerdata.inventory = new collection();
-
-      let abc = "abcdefghijklmnopqrstuvwxyz";
-      for (let char of abc) {
-        playerdata.prices[char] = [];
-        playerdata.prices[char].push(Math.ceil(Math.random() * 100));
-      }
-
-      new ingredient({
-        name: "top bun",
-        geometry: "bun",
-        color: 0xFFE4B5
-      });
-      new ingredient({
-        name: "bottom bun",
-        geometry: "bun",
-        rx: 1,
-        color: 0xFFE4B5
-      });
-      new ingredient({
-        name: "patty",
-        geometry: "patty",
-        color: 0x8b4513
-      });
-      new ingredient({
-        name: "ketchup",
-        geometry: "condiment",
-        color: 0xff0000
-      });
-      new ingredient({
-        name: "pickle",
-        geometry: "pickle",
-        color: 0x3CB371
-      });
-      new ingredient({
-        name: "onion",
-        geometry: "onion",
-        color: 0xffffe0,
-      });
-      new ingredient({
-        name: "cheese",
-        geometry: "cheese",
-        color: 0xffd700
-      });
-      new ingredient({
-        name: "tomato",
-        geometry: "tomato",
-        color: 0xff0000
-      });
-      new ingredient({
-        name: "lettuce",
-        geometry: "lettuce",
-        color: 0x90ee90
-      });
-      new ingredient({
-        name: "mayo",
-        geometry: "condiment",
-        color: 0xffffe0
-      });
-
-      new ingredient({
-        name: "fries",
-        geometry: "fries",
-        color: 0xFFA500
-      });
-      new ingredient({
-        name: "coke",
-        geometry: "can",
-        color: 0xff0000
-      });
-
-      for (let name of ["top bun", "bottom bun", "patty", "fries", "coke"]) {
-        new item(name, playerdata.inventory);
-      }
-
-      new recipe({
-        name: "Burgeria Special",
-        cost: 10,
-        construction: {
-          burger: ["bottom bun", "patty", "top bun"]
-        },
-        addToMenu: true
-      });
-      new recipe({
-        name: "Onions",
-        cost: 5,
-        construction: {
-          burger: ["onion", "onion", "onion"],
-          side: ["onion"],
-          drink: ["onion"]
-        },
-        addToMenu: true
-      });
-      new recipe({
-        name: "Deluxe Burger",
-        cost: 30,
-        construction: {
-          burger: ["bottom bun", "mayo", "lettuce", "tomato", "patty", "cheese", "onion", "pickle", "ketchup", "top bun"]
-        },
-        addToMenu: true
-      });
-      new recipe({
-        name: "Burgeria Set",
-        cost: 15,
-        construction: {
-          burger: ["bottom bun", "patty", "top bun"],
-          drink: ["coke"],
-          side: ["fries"]
-        },
-        addToMenu: true
-      });
-      new recipe({
-        name: "Weird Set",
-        cost: 10,
-        construction: {
-          drink: ["coke"],
-          side: ["fries"]
-        },
-        addToMenu: true
-      });
-
-      // there should be a bank for the writing the player collects
-      // and a separate one for the player's writing
-      // but i don't want the first bank to be tied to the writingbank
-
-      new writingpiece("moby dick", WRITINGBANK["moby dick"]);
-      new writingpiece("after the dazzle of day", WRITINGBANK["after the dazzle of day"]);
-
-      new writingpieceAlert("burgerman's welcome", WRITINGBANK["burgerman's welcome"]);
-    },
-  },
-  init: function() {
-    init_workshop();
-    init_3d();
-
-    //ui
-    updatePoints();
-    updateRecipes();
-    updateList(ui.kitchen.lettersList, playerdata.letters);
-    updateDayUI();
-    playerdata.recipes[0].previewRecipe();
-
-    playerdata.themes.index--;
-    toggleTheme();
-
-    _animate();
   },
 
   beginDay: function() {
+    bankPoints(playerdata.unbankedPoints, "BURGERIA");
+    playerdata.unbankedPoints = 0;
+
+    playerdata.day++;
     playerdata.daytime = true;
 
     for (let i=playerdata.guys.length-1; i>=0; i--) {
@@ -227,15 +47,16 @@ const _game = {
 
     updateRecipes();
     updateDayUI();
+    updateBankbook();
   },
 
   openStore: function() {
     playerdata.storetime = 0;
-    _game.updateStore();
+    game.updateStore();
     updateDayUI();
   },
   closeStore: function() {
-    if (playerdata.storetime < _game.config.dayLength) {
+    if (playerdata.storetime < game.config.dayLength) {
       if (!confirm("Are you sure you want to end the day now?\n\n(Once your store closes, the overtime discount will be activated.)")) {
         return;
       }
@@ -251,7 +72,7 @@ const _game = {
       }
     }
     if (everyoneserved) {
-      _game.beginDay();
+      game.beginDay();
     } else {
       sfx("close_store");
       playerdata.daytime = false;
@@ -260,15 +81,15 @@ const _game = {
     }
   },
   updateStore: function() {
-    if (playerdata.storetime >= _game.config.dayLength) {
-      _game.closeStore();
+    if (playerdata.storetime >= game.config.dayLength) {
+      game.closeStore();
     } else {
       if (playerdata.storetime % 4000 == 0) {
         new guy();
       }
     }
 
-    ui.storefront.day.timer.style.height = (playerdata.storetime/_game.config.dayLength * 100)+"%";
+    ui.storefront.day.timer.style.height = (playerdata.storetime/game.config.dayLength * 100)+"%";
 
     if (playerdata.storetime != -1) {
       playerdata.storetime++;
@@ -279,34 +100,13 @@ const _game = {
   // day toggle action
   burgeria: function() {
     if (playerdata.storetime != -1) {
-      _game.closeStore();
+      game.closeStore();
     } else {
       console.clear();
-      _game.openStore();
+      game.openStore();
     }
   }
 }
-
-var playerdata = {
-  tutorial: {},
-
-  daytime: true,
-  storetime: null,
-  prices: {},
-  recipes: [],
-  trays: [],
-  guys: [],
-
-  points: null,
-  inventory: null,
-  letters: {},
-  ingredients: {},
-  workshop: "",
-  library: [],
-  libraryIndex: 0,
-
-  themes: {},
-};
 
 class recipe {
   constructor(p) {
@@ -639,8 +439,7 @@ class writingpieceAlert {
         return;
       }
 
-      playerdata.points -= c;
-      updatePoints();
+      bankPoints(-c, "WWW");
 
       new writingpiece(p.dataset.title, p.dataset.string);
       sfx('click');

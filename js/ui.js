@@ -50,7 +50,7 @@ var ui = {
     lettersList: document.getElementById("letters-list"),
     workshop: document.getElementById("workshop-textarea"),
     pointsCounter: document.getElementById("points-counter"),
-    burgermanSpawnpoint: document.getElementById("burgerman-spawnpoint"),
+    bankbook: document.getElementById("bankbook"),
   },
   switchLocation: function() {
     let current = ui.current;
@@ -258,6 +258,34 @@ function updateList(listElement, listObject) {
   }
 
   return true;
+}
+
+function updateBankbook() {
+  const table = ui.kitchen.bankbook;
+  const bankbook = playerdata.bankbook;
+
+  while (table.lastElementChild) {
+    table.lastElementChild.remove();
+  }
+
+  let keys = ["day", "description", "withdrawals", "deposits", "balance"];
+  let keysElement = document.createElement("tr");
+  for (let key of keys) {
+    let th = document.createElement("th");
+    th.textContent = key;
+    keysElement.appendChild(th);
+  }
+  table.appendChild(keysElement);
+
+  for (let line of bankbook) {
+    let tr = document.createElement("tr");
+    for (let v of line) {
+      let td = document.createElement("td");
+      td.textContent = v;
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
 }
 
 // news

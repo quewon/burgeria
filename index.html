@@ -690,6 +690,34 @@
         }
       }
 
+      table, th, td {
+        border-collapse: collapse;
+      }
+      table {
+        font-family: monospace;
+        width: 100%;
+      }
+      th:nth-child(2n), td:nth-child(2n) {
+        border-right: 1px solid var(--lines);
+      }
+      th {
+        text-transform: uppercase;
+        background: var(--newsgray);
+        font-weight: normal;
+      }
+      th, td {
+        padding: .2rem;
+        white-space: nowrap;
+        text-align: center;
+      }
+      td:nth-child(n+3) {
+        text-align: right;
+      }
+      td:nth-child(n+3):not(:empty)::before {
+        content: "✸";
+        font-family: serif;
+      }
+
       /*  */
 
       .marginbelow {
@@ -837,7 +865,7 @@
             <div class="grow">
               <i>The store is <b id="day-state"> </b>.</i>
             </div>
-            <button onclick="_game.burgeria();" id="day-toggle-button"> </button>
+            <button onclick="game.burgeria();" id="day-toggle-button"> </button>
           </div>
         </div>
         <div id="burgeria-overtime-message" class="block attached-above gone" onanimationend="if(ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition()">
@@ -854,9 +882,11 @@
             You have <span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span>.
           </div>
         </div>
-        <div id="burgerman-spawnpoint">
-
+        <div class="block attached-above">
+          <h1 class="marginbelow">BANKBOOK</h1>
+          <table id="bankbook"></table>
         </div>
+
         <div class="block">
           <h1 class="marginbelow">STOCK</h1>
           <ul id="inventory-list" class="flexbox">
@@ -1024,12 +1054,27 @@
   <script type="text/javascript" src="js/workshop.js"></script>
   <script type="text/javascript" src="js/guy.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
+  <script type="text/javascript" src="js/data.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
     // console.clear();
 
-    _game.config.init_playerdata();
+    init_default_playerdata();
 
-    _game.init();
+    init_workshop();
+    init_3d();
+
+    //ui
+    updatePoints();
+    updateBankbook();
+    updateRecipes();
+    updateList(ui.kitchen.lettersList, playerdata.letters);
+    updateDayUI();
+    playerdata.recipes[0].previewRecipe();
+
+    playerdata.themes.index--;
+    toggleTheme();
+
+    animate();
   </script>
 </html>
