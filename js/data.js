@@ -38,6 +38,10 @@ function init_default_playerdata() {
     [0, "BURGERMAN", "", "100", "100"]
   ];
 
+  for (let char of "abcdefghijklmnopqrstuvwxyz") {
+    playerdata.letters[char] = 2;
+  }
+
   playerdata.themes = {
     index: 0,
     order: ["☼", "☁︎"], //,"☾"

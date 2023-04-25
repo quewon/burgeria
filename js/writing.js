@@ -134,44 +134,71 @@ function init_workshop() {
     let prevtext = playerdata.workshop;
     let text = this.value;
 
-    let added;
-    let addedIndex;
-    let deleted;
-    let deletedIndex;
-    let caretPosition = ui.workshop.textarea.selectionEnd;
+    let added, deleted;
+    let addedIndex, deletedIndex;
+    let caretPosition = this.selectionStart;
+    let letterRejected = false;
 
     added = text;
     for (let char of prevtext) {
       added = added.replace(char, "");
     }
-    addedIndex = caretPosition - added.length;
+    addedIndex = this.selectionStart - added.length;
 
     deleted = prevtext;
     for (let char of text) {
       deleted = deleted.replace(char, "");
     }
-    deletedIndex = caretPosition + deleted.length;
+    deletedIndex = this.selectionEnd + deleted.length;
+
+    console.log(prevtext, text);
+    console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
 
     let output = prevtext;
-    if (added) {
-      let addable = "";
-      for (let char of added) {
-        if (abcs.includes(char)) {
-          let letter = use_letter(char.toLowerCase());
-          if (letter) addable += char;
-        } else {
-          addable += char;
-        }
-      }
-      output = output.slice(0, addedIndex) + addable + output.slice(addedIndex + 1);
-    } else if (deleted) {
+    if (deleted) {
       for (let char of deleted) {
         if (abcs.includes(char)) unuse_letter(char.toLowerCase());
       }
       output = output.substring(0, caretPosition) + output.substring(deletedIndex);
+
+      if (addedIndex >= deletedIndex) {
+        addedIndex -= deleted.length;
+      }
     }
 
-    playerdata.workshop = ui.workshop.textarea.value = output;
+    let addable = "";
+    if (added) {
+      addable;
+      for (let char of added) {
+        if (abcs.includes(char)) {
+          let letter = use_letter(char.toLowerCase());
+          if (letter) {
+            addable += char;
+          } else {
+            letterRejected = true;
+          }
+        } else {
+          addable += char;
+        }
+      }
+      output = output.slice(0, addedIndex) + addable + output.slice(addedIndex);
+
+      if (letterRejected) {
+        this.classList.remove("rejected");
+        this.classList.add("rejected");
+        this.dataset.index = addedIndex + addable.length;
+        this.onanimationend = function() {
+          this.classList.remove("rejected");
+          this.selectionStart = this.selectionEnd = this.dataset.index;
+        }
+        this.selectionStart = this.selectionEnd = this.dataset.index;
+      }
+    }
+
+    if (output != prevtext) {
+      playerdata.workshop = this.value;
+    }
+    this.value = output;
   }
 
   workshop.addEventListener("input", update_workshop);

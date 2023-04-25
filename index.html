@@ -153,16 +153,18 @@
         width: 100%;
         padding: 0;
       }
-      .tray::after {
-        content: attr(name);
+
+      .label {
         position: absolute;
-        line-height: 1px;
         top: 0;
         left: 0;
         transform: translate(1rem, calc(-50% - .5px));
         padding-left: .25rem;
         padding-right: .25rem;
         background: var(--bg);
+      }
+      .tray .label {
+        line-height: 1px;
       }
 
       .has-footer {
@@ -789,6 +791,18 @@
         margin-bottom: 0;
       }
 
+      #workshop-textarea {
+      }
+      #workshop-textarea.rejected {
+        color: var(--burgeria);
+        outline-style: solid;
+        outline-color: var(--burgeria);
+        border-color: var(--burgeria);
+        background: transparent;
+        animation: rejection 30ms;
+      }
+      @keyframes rejection { }
+
       /*  */
 
       .marginbelow {
@@ -857,7 +871,7 @@
         bottom: 0;
       }
       .front {
-        z-index: 1;
+        z-index: 10;
       }
 
       .block.transparent {
@@ -1031,10 +1045,7 @@
 
     <div id="scene-workshop" class="scene">
       <div class="block transparent">
-        <div>
-          window
-        </div>
-        <img src="img/window/1.png" alt="eating burgers in the field under the sun" title="eating burgers in the field under the sun">
+        <img src="img/window.png" alt="eating burgers in the field under the sun" title="eating burgers in the field under the sun">
       </div>
       <div style="flex-grow: 1;">
         <div class="marginbelow">
@@ -1068,7 +1079,8 @@
     <template id="template-tray">
       <div class="flexbox">
         <div name="number" class="block top right">99</div>
-        <div class="tray block has-footer" name="tray">
+        <div class="tray block has-footer">
+          <span class="label">tray</span>
           <main>
             <div class="container">
               <div class="collection empty" placeholder="burger" data-capacity="-1">
@@ -1096,7 +1108,7 @@
 
     <template id="template-news-headline">
       <div class="news block slide-down">
-        <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
+        <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div class="centeroriginY">
           <h1 id="line1">BIG BURGERS...</h1>
         </div>
@@ -1129,7 +1141,7 @@
 
     <template id="template-feedback-napkin">
       <div class="block dashed slide-down">
-        <button class="top right" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
+        <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
         <div class="marginbelow">
           <i>Someone left a note on a napkin...</i>
         </div>
