@@ -235,12 +235,26 @@
         color: inherit;
         font-style: inherit;
       }
-      footer button {
-        border-bottom: none;
-        border-right: 1px solid var(--lines);
+
+      footer {
+        display: flex;
       }
+      footer button {
+        border-left: none;
+        border-bottom: none;
+      }
+      footer button:first-child {
+        border-left: 1px solid var(--lines);
+      }
+
       .block footer button {
         border-top: none;
+        border-right: 1px solid var(--lines);
+        border-left: none;
+      }
+      .block footer button:last-child {
+        border-left: 1px solid var(--lines);
+        border-right: none;
       }
       s {
         opacity: .5;
@@ -634,14 +648,6 @@
         mix-blend-mode: exclusion;
       }
 
-      .block footer button {
-        border-left: none;
-      }
-      .block footer button:last-child {
-        border-left: 1px solid var(--lines);
-        border-right: none;
-      }
-
       #guys-container {
         column-gap: .5rem;
         /* justify-content: flex-end; */
@@ -916,7 +922,7 @@
                 </div>
               </div>
             </div>
-            <footer class="flexbox">
+            <footer>
               <button name="clear">clear</button>
               <div class="grow"></div>
               <button name="stock">stock ☰</button>
@@ -998,13 +1004,18 @@
             <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
           </nav>
           <p id="library-page" class="block"></p>
-          <footer class="flexbox">
+          <footer>
             <div class="grow"></div>
             <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
           </footer>
         </div>
         <div id="library-page-empty" class="block attached-above">
           <i>Your library is empty.</i>
+        </div>
+        <div id="kitchen-letterstock" class="block attached-above">
+          <b>LETTERSTOCK</b>
+          <ul id="kitchen-letters-list" class="flexbox">
+          </ul>
         </div>
 
         <!-- this is for LATER game stuff -->
@@ -1029,8 +1040,9 @@
         <div class="marginbelow">
           <footer>
             <button>publish</button>
+            <button>clear</button>
           </footer>
-          <div id="letterstock">
+          <div>
             <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
           </div>
         </div>
@@ -1047,7 +1059,7 @@
       <div>
         <div class="block transparent">
           <b>LETTERSTOCK</b>
-          <ul id="letters-list" class="flexbox">
+          <ul id="workshop-letters-list" class="flexbox">
           </ul>
         </div>
       </div>
@@ -1166,6 +1178,9 @@
 
     setScene("workshop");
 
+    // workshop
+    updateList(ui.workshop.lettersList, playerdata.letters);
+
     // storefront
 
     init_3d();
@@ -1188,5 +1203,7 @@
     //
 
     animate();
+
+    console.clear();
   </script>
 </html>

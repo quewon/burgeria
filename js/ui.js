@@ -1,7 +1,4 @@
 var ui = {
-  tutorial: {
-    "letterstock": document.getElementById("letterstock")
-  },
   templates: {
     "template-tray": document.getElementById("template-tray"),
     "template-news-headline": document.getElementById("template-news-headline"),
@@ -50,15 +47,17 @@ var ui = {
       pageEmptyMessage: document.getElementById("library-page-empty")
     },
     inventoryList: document.getElementById("inventory-list"),
-    lettersList: document.getElementById("letters-list"),
-    workshop: document.getElementById("workshop-textarea"),
+    lettersList: document.getElementById("kitchen-letters-list"),
+    lettersContainer: document.getElementById("kitchen-letterstock"),
     pointsCounter: document.getElementById("points-counter"),
     bankbook: document.getElementById("bankbook"),
   },
   "workshop": {
+    textarea: document.getElementById("workshop-textarea"),
     sceneButton: document.getElementById("workshop-scene-button"),
     market: document.getElementById("market"),
     marketEmptyMessage: document.getElementById("market-empty"),
+    lettersList: document.getElementById("workshop-letters-list"),
   },
   switchLocation: function() {
     let current = ui.current;
@@ -90,6 +89,10 @@ function setScene(name) {
   }
   ui.currentScene = name;
   ui.currentSceneLabel.textContent = name;
+
+  if (name == "kitchen") {
+    ui.kitchen.lettersContainer.classList.add("gone");
+  }
 }
 
 // utility functions
@@ -290,6 +293,10 @@ function updateList(listElement, listObject) {
     span.textContent = "It's empty...";
     listElement.appendChild(span);
     return false;
+  }
+
+  if (ui.currentScene == "kitchen" && listElement == ui.kitchen.lettersList) {
+    ui.kitchen.lettersContainer.classList.remove("gone");
   }
 
   return true;

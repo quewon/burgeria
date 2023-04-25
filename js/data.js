@@ -1,6 +1,4 @@
 var playerdata = {
-  tutorial: {},
-
   daytime: true,
   day: 1,
   storetime: -1,
@@ -39,11 +37,6 @@ function init_default_playerdata() {
   playerdata.bankbook = [
     [0, "BURGERMAN", "", "100", "100"]
   ];
-
-  playerdata.tutorial = {};
-  for (let id in ui.tutorial) {
-    playerdata.tutorial[id] = false;
-  }
 
   playerdata.themes = {
     index: 0,
