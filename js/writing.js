@@ -64,6 +64,7 @@ class PieceAlert {
     readbutton.onclick = function() {
       const p = this.parentNode.parentNode;
       const text = p.dataset.text;
+      sfx("click");
       alert(text);
     }
 
@@ -168,7 +169,6 @@ function init_workshop() {
 
     let addable = "";
     if (added) {
-      addable;
       for (let char of added) {
         if (abcs.includes(char)) {
           let letter = use_letter(char.toLowerCase());
@@ -197,6 +197,9 @@ function init_workshop() {
 
     if (output != prevtext) {
       playerdata.workshop = this.value;
+      sfx("type");
+    } else if (letterRejected) {
+      sfx("error");
     }
     this.value = output;
   }

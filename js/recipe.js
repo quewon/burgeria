@@ -201,8 +201,12 @@ class Ingredient {
     ui.kitchen.ingredientButtons.appendChild(button);
     button.dataset.ingredientName = this.name;
     button.onclick = function(e) {
-      sfx("click");
-      playerdata.ingredients[this.dataset.ingredientName].create();
+      let success = playerdata.ingredients[this.dataset.ingredientName].create();
+      if (success) {
+        sfx("click");
+      } else {
+        sfx("error");
+      }
     };
     this.button = button;
 
@@ -224,7 +228,7 @@ class Ingredient {
     let page = playerdata.library[playerdata.libraryIndex];
     if (!page) {
       alert("There are no pages to work with.");
-      return;
+      return false;
     }
 
     let pagetext = page.text;
@@ -240,13 +244,15 @@ class Ingredient {
         pagetext = pagetext.replace(pagetext[index], "");
       } else {
         alert("There are not enough letters on the open page.");
-        return;
+        return false;
       }
     }
     page.text = pagetext;
     ui.kitchen.library.page.textContent = pagetext;
 
     this.addToInventory();
+
+    return true;
   }
 
   addToInventory() {

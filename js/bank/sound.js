@@ -1,13 +1,11 @@
 var _sounds = {
-  // click: [
-  //   new Howl({ src: "sound/click/1.wav" }),
-  //   new Howl({ src: "sound/click/2.wav" })
-  // ],
-  // type: [
-  //   new Howl({ src: "sound/click/1.wav" }),
-  //   new Howl({ src: "sound/click/2.wav" }),
-  //   new Howl({ src: "sound/click/3.wav" })
-  // ],
+  click: new Howl({ src: "sound/click/lowpip.mp3" }),
+  type: [
+    new Howl({ src: "sound/click/1.wav" }),
+    new Howl({ src: "sound/click/2.wav" }),
+    new Howl({ src: "sound/click/3.wav" })
+  ],
+  error: new Howl({ src: "sound/click/lowerpip.mp3" }),
   disintegrate: new Howl({ src: "sound/disintegrate.wav", loop: true }),
   chime: [
     new Howl({ src: "sound/chime/1.wav" }),
@@ -65,8 +63,6 @@ function sfx_talk(name, id) {
 }
 
 function sfx(name, fadetime) {
-  if (name == "click") return;
-
   let sound = _sounds[name];
   if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
   const id = sound.play();
