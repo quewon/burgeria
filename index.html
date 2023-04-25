@@ -29,7 +29,7 @@
         margin: auto;
         margin-top: 1rem;
         margin-bottom: 1rem;
-        max-width: calc(1000px + 1rem);
+        max-width: 1000px;
 
         background-color: var(--bg);
         background-image: radial-gradient(var(--burgeria-bg) 1px, transparent 0);
@@ -51,6 +51,33 @@
         }
       }
 
+      .scene {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+      }
+      .scene > div {
+        width: calc(50% - .5rem);
+      }
+      #scene-workshop > div {
+        width: calc(25% - 2rem/3);
+      }
+
+      @media (max-width: 1000px) {
+        body {
+          max-width: 500px;
+        }
+        .scene {
+          flex-direction: column;
+          align-items: center;
+          gap: 0;
+        }
+        .scene > div {
+          width: inherit !important;
+        }
+      }
+
       header {
         padding: 0;
         border-bottom: 1px solid var(--burgeria);
@@ -58,6 +85,10 @@
         margin-top: 1rem;
         color: var(--burgeria);
         position: relative;
+      }
+
+      #current-scene-label {
+        text-transform: uppercase;
       }
 
       header h1 {
@@ -205,9 +236,11 @@
         font-style: inherit;
       }
       footer button {
-        border-top: none;
         border-bottom: none;
         border-right: 1px solid var(--lines);
+      }
+      .block footer button {
+        border-top: none;
       }
       s {
         opacity: .5;
@@ -412,6 +445,15 @@
         list-style: inside;
       }
 
+      .prices-title {
+        position: relative;
+        margin-bottom: .5rem;
+        z-index: 1;
+      }
+      .prices-title * {
+        background: var(--newsgray);
+      }
+
       .prices-graph {
         display: grid;
         width: 100%;
@@ -485,28 +527,21 @@
         background: var(--bg);
         padding: .5rem;
         margin: 0;
-        width: 100%;
         box-sizing: border-box;
         resize: none;
       }
       textarea {
         min-height: 5rem;
+        width: 100%;
+        height: 15rem;
       }
       input::placeholder, textarea::placeholder {
         font-style: italic;
       }
 
-      .scene {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-      }
-      .scene > div {
-        width: 500px;
-      }
-
       p.block {
+        padding-left: 3rem;
+        padding-right: 3rem;
         margin: 0;
         margin-left: -.5rem;
         margin-right: -.5rem;
@@ -536,6 +571,7 @@
         /* height: 1rem; */
         position: relative;
         vertical-align: top;
+        font-family: serif;
       }
       .burgerpoints::after {
         content: "✸";
@@ -596,18 +632,6 @@
       #burgeria-day-icon {
         color: white;
         mix-blend-mode: exclusion;
-      }
-
-      @media (max-width: calc(1000px + 1rem)) {
-        body {
-          max-width: 500px;
-        }
-        .scene {
-          display: block;
-        }
-        .scene > div {
-          width: inherit;
-        }
       }
 
       .block footer button {
@@ -672,6 +696,24 @@
         flex-direction: column;
         width: 50%;
       }
+      #recipe-preview footer {
+        display: none;
+      }
+      .editmode, .editmode button {
+        border-color: var(--burgeria) !important;
+      }
+      .editmode {
+        border-style: dashed;
+        background: transparent;
+        padding-bottom: 2rem;
+      }
+      .editmode canvas {
+        opacity: .5;
+      }
+      #recipe-preview.editmode footer {
+        display: flex;
+        border-color: var(--burgeria);
+      }
 
       #burgeria-overtime-message {
         animation: open 1s ease-in-out;
@@ -697,25 +739,48 @@
         font-family: monospace;
         width: 100%;
       }
-      th:nth-child(2n), td:nth-child(2n) {
+      #bankbook th:nth-child(2n), #bankbook td:nth-child(2n) {
         border-right: 1px solid var(--lines);
       }
       th {
         text-transform: uppercase;
-        background: var(--newsgray);
         font-weight: normal;
       }
+      #bankbook th {
+        background: var(--newsgray);
+      }
       th, td {
+        padding-left: .5rem;
+      }
+      #bankbook th, #bankbook td {
         padding: .2rem;
         white-space: nowrap;
         text-align: center;
       }
-      td:nth-child(n+3) {
+      #bankbook td:nth-child(n+3) {
         text-align: right;
       }
       td:nth-child(n+3):not(:empty)::before {
         content: "✸";
         font-family: serif;
+      }
+
+      span[name="title"] {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      #scene-workshop img {
+        width: 100%;
+        object-fit: scale-down;
+      }
+      #scene-workshop > div {
+        height: fit-content;
+      }
+
+      #market:last-child div {
+        margin-bottom: 0;
       }
 
       /*  */
@@ -789,6 +854,12 @@
         z-index: 1;
       }
 
+      .block.transparent {
+        border: none;
+        background: transparent;
+        padding: 0;
+      }
+
       .centeroriginY {
         transform-origin: 0 50%;
       }
@@ -808,29 +879,30 @@
   <body>
 
     <header>
-      <h1 onclick="ui.switchLocation();">BURGERIA!</h1>
+      <h1 onclick="setScene('storefront');">BURGERIA!</h1>
       <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
       <div class="flexbox bottom right" style="gap: 3px;">
         <!-- <button onclick="toggleSound(); sfx('click');" title="toggle sound" style="border-bottom: none; border-color: var(--burgeria);">🔊</button> -->
         <!-- <button onclick="toggleFont(); sfx('click');" title="toggle font" style="border-bottom: none; border-color: var(--burgeria);">Aa</button> -->
-        <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-bottom: none; border-color: var(--burgeria);"><span id="theme-name"></span></button>
+        <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-bottom: none; border-color: var(--burgeria);"><span id="theme-name">☼</span></button>
       </div>
     </header>
 
     <div id="navbar" class="block">
-      <i>You are in the <b id="currentLocation">STOREFRONT</b>.</i>
-      <button onclick="ui.switchLocation()">go to the <b id="otherLocation">KITCHEN</b></button>
+      <i>You are in the <b id="current-scene-label">WORKSHOP</b>.</i>
+      <span style="text-align: right;"> go to the... <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button> <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button> <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button></span>
     </div>
 
-    <div id="scene-storefront" class="scene">
+    <div id="scene-storefront" class="scene hidden">
       <div class="">
         <div class="menu flexbox">
-          <div class="block grow">
+          <div class="block grow attached-right">
             <h1 class="marginbelow">MENU</h1>
             <div id="scene-recipes">
             </div>
           </div>
-          <div id="recipe-preview" class="block attached-left">
+          <div id="recipe-preview" class="block">
+            <button id="menu-edit-button" class="top right" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
             <canvas width="300" height="300"></canvas>
             <div class="flexbox">
               <div class="container">
@@ -844,6 +916,11 @@
                 </div>
               </div>
             </div>
+            <footer class="flexbox">
+              <button name="clear">clear</button>
+              <div class="grow"></div>
+              <button name="stock">stock ☰</button>
+            </footer>
           </div>
         </div>
         <div id="guys-container" class="flexbox wrap attached-above marginbelow">
@@ -876,15 +953,26 @@
 
     <div id="scene-kitchen" class="scene hidden">
       <div>
-        <div class="flexbox">
-          <div class="block attached-right"><b>BurgerPoints</b></div>
-          <div class="block grow">
-            You have <span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span>.
+        <div class="block">
+          <div class="flexbox">
+            <h1 class="marginbelow grow">BANKBOOK</h1>
+            <div style="text-align: right; float: right; font-family: monospace;">
+              <table>
+                <tr>
+                  <th>day</th>
+                  <td><span id="day-counter"></span></td>
+                </tr>
+                <tr>
+                  <th>burgerpoints</th>
+                  <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
+                </tr>
+              </table>
+            </div>
           </div>
-        </div>
-        <div class="block attached-above">
-          <h1 class="marginbelow">BANKBOOK</h1>
+
           <table id="bankbook"></table>
+          <br>
+          <div style="font-family: monospace; text-align: right;">NOTE: Profits are logged at the end of the day.</div>
         </div>
 
         <div class="block">
@@ -915,18 +1003,8 @@
             <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
           </footer>
         </div>
-        <div id="library-page-empty" class="gone block attached-above">
-          <i>There are no words here.</i>
-        </div>
-        <div id="letterstock" class="gone">
-          <div class="block" style="border-bottom: none;">
-            <b>LETTERSTOCK</b>
-            <ul id="letters-list" class="flexbox">
-            </ul>
-          </div>
-          <div class="attached-above">
-            <textarea class="block" id="workshop-textarea" placeholder="click here to start writing..."></textarea>
-          </div>
+        <div id="library-page-empty" class="block attached-above">
+          <i>Your library is empty.</i>
         </div>
 
         <!-- this is for LATER game stuff -->
@@ -937,6 +1015,41 @@
             <input type="text" name="" value="" placeholder="click here to start developing...">
           </div>
         </div> -->
+      </div>
+    </div>
+
+    <div id="scene-workshop" class="scene">
+      <div class="block transparent">
+        <div>
+          window
+        </div>
+        <img src="img/window/1.png" alt="eating burgers in the field under the sun" title="eating burgers in the field under the sun">
+      </div>
+      <div style="flex-grow: 1;">
+        <div class="marginbelow">
+          <footer>
+            <button>publish</button>
+          </footer>
+          <div id="letterstock">
+            <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
+          </div>
+        </div>
+
+        <div class="block">
+          <h1>MARKET</h1><br>
+          <div id="market">
+            <i id="market-empty">
+              The market is empty.
+            </i>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="block transparent">
+          <b>LETTERSTOCK</b>
+          <ul id="letters-list" class="flexbox">
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -985,7 +1098,7 @@
     <template id="template-news-prices">
       <div class="news block slide-down">
         <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove(); sfx('click');">x</button>
-        <div style="margin-bottom: .5rem;">
+        <div class="prices-title">
           <b>Letter Prices</b>—<i>your daily ABC's</i>
         </div>
         <div class="prices-graph">
@@ -997,7 +1110,7 @@
     <template id="template-guy">
       <div class="guy flexbox column">
         <div name="number" class="block top left">99</div>
-        <img src="img/cat.png" alt="cat" title="cat">
+        <img src="" alt="" title="">
         <div name="text" class="block attached-top"></div>
       </div>
     </template>
@@ -1018,62 +1131,61 @@
           <span class="lettericon"></span>
         </span>
         <span name="title" class="grow"></span>
-        <button>add to library <span name="nonzerocost">(<span style="color: var(--burgeria)"><span class="burgerpoints">–</span><span name="cost">0</span></span>)</span></button>
+        <button>read</button>
+        <button style="min-width: fit-content;">add to library <span name="nonzerocost">(<span style="color: var(--burgeria)"><span class="burgerpoints">–</span><span name="cost">0</span></span>)</span></button>
+      </div>
+    </template>
+
+    <template id="template-popup">
+      <div class="block">
+        <div name="content">
+
+        </div>
+        <div class="">
+          <button>close</button>
+        </div>
       </div>
     </template>
 
   </body>
-  <script type="text/javascript">
-    var _objectTimeouts = [];
-    function setObjectTimeout(object, func, time) {
-      _objectTimeouts.push({
-        object: object,
-        func: func,
-        time: time,
-      });
-    }
-    function _objectTimeoutUpdate() {
-      for (let i=_objectTimeouts.length-1; i>=0; i--) {
-        let timeout = _objectTimeouts[i];
-        timeout.time--;
-        if (timeout.time <= 0) {
-          timeout.object[timeout.func]();
-          _objectTimeouts.splice(i, 1);
-        }
-      }
-    }
-    setInterval(_objectTimeoutUpdate, 1);
-  </script>
   <script type="text/javascript" src="js/lib/howler.core.js"></script>
   <script type="text/javascript" src="js/lib/three.min.js"></script>
   <script type="text/javascript" src="js/bank/geometries.js"></script>
   <script type="text/javascript" src="js/bank/sound.js"></script>
   <script type="text/javascript" src="js/bank/writing.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
-  <script type="text/javascript" src="js/items.js"></script>
-  <script type="text/javascript" src="js/workshop.js"></script>
+  <script type="text/javascript" src="js/recipe.js"></script>
+  <script type="text/javascript" src="js/tray.js"></script>
+  <script type="text/javascript" src="js/writing.js"></script>
   <script type="text/javascript" src="js/guy.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/data.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
-    // console.clear();
-
     init_default_playerdata();
 
-    init_workshop();
+    setScene("workshop");
+
+    // storefront
+
     init_3d();
 
-    //ui
+    playerdata.themes.index--;
+    toggleTheme();
+
+    playerdata.recipes[0].previewRecipe();
+    updateDayUI();
+
+    // kitchen
+
+    init_workshop();
+    updateLibrary();
     updatePoints();
     updateBankbook();
     updateRecipes();
     updateList(ui.kitchen.lettersList, playerdata.letters);
-    updateDayUI();
-    playerdata.recipes[0].previewRecipe();
 
-    playerdata.themes.index--;
-    toggleTheme();
+    //
 
     animate();
   </script>

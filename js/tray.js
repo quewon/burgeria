@@ -5,7 +5,7 @@ function init_3d() {
   renderer.setSize(150, 150);
 }
 
-class tray {
+class Tray {
   constructor(guy) {
     this.id = playerdata.trays.length;
     this.guy = guy;
@@ -26,7 +26,7 @@ class tray {
     for (let con of cons) {
       let sidename = con.getAttribute("placeholder");
       this.collections[sidename] = [];
-      let col = new collection(this, con, sidename);
+      let col = new Collection(this, con, sidename);
       col.capacity = Number(con.dataset.capacity);
       con.dataset.containerValue = 2;
       con.dataset.trayId = this.id;
@@ -102,7 +102,7 @@ class tray {
     }
   }
 
-  deploy() {
+  sendToStorefront() {
     this.enabled = true;
     ui.storefront.body.appendChild(this.element);
     this.resize_3d();
@@ -431,7 +431,7 @@ class tray {
   }
 }
 
-class collection {
+class Collection {
   constructor(tray, element, side) {
     this.element = element;
     this.side = side;
@@ -561,7 +561,7 @@ class collection {
   }
 }
 
-class item {
+class Item {
   constructor(name, collection) {
     this.name = name;
 
@@ -606,6 +606,8 @@ class item {
 
     const geo = ing.mesh.geometry;
     const material = new THREE.MeshStandardMaterial({ color: ing.mesh.color });
+    material.shading = THREE.SmoothShading;
+    geo.computeVertexNormals(true);
 
     this.mesh = new THREE.Mesh(geo, material);
 

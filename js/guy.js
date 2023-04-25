@@ -1,4 +1,4 @@
-class guy {
+class Guy {
   constructor() {
     this.id = playerdata.guys.length;
 
@@ -75,8 +75,8 @@ class guy {
     this.voice = arch.voice;
     this.soundId = null;
 
-    this.tray = new tray(this);
-    this.tray.deploy();
+    this.tray = new Tray(this);
+    this.tray.sendToStorefront();
     _sounds.chime[arch.chime].play();
 
     playerdata.guys.push(this);

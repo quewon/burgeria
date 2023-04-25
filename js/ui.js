@@ -10,14 +10,16 @@ var ui = {
     "template-feedback-napkin": document.getElementById("template-feedback-napkin"),
     "template-writing-alert": document.getElementById("template-writing-alert"),
   },
-  currentLocationElement: document.getElementById("currentLocation"),
-  otherLocationElement: document.getElementById("otherLocation"),
-  current: "storefront",
-  other: "kitchen",
+  scenes: {
+    "storefront": document.getElementById("scene-storefront"),
+    "kitchen": document.getElementById("scene-kitchen"),
+    "workshop": document.getElementById("scene-workshop")
+  },
+  currentScene: "storefront",
+  currentSceneLabel: document.getElementById("current-scene-label"),
   themeName: document.getElementById("theme-name"),
   "storefront": {
-    name: "STOREFRONT",
-    element: document.getElementById("scene-storefront"),
+    sceneButton: document.getElementById("storefront-scene-button"),
     body: document.getElementById("scene-storefront-body"),
     news: document.getElementById("scene-storefront-news"),
     recipesList: document.getElementById("scene-recipes"),
@@ -25,18 +27,19 @@ var ui = {
     ministockTray: null,
     recipePreview: document.getElementById("recipe-preview"),
     recipePreviewContext: document.getElementById("recipe-preview").querySelector("canvas").getContext("2d"),
+    menuEditButton: document.getElementById("menu-edit-button"),
     day: {
       toggleButton: document.getElementById("day-toggle-button"),
       state: document.getElementById("day-state"),
       timer: document.getElementById("burgeria-timer"),
       icon: document.getElementById("burgeria-day-icon"),
       guysContainer: document.getElementById("guys-container"),
-      overtimeMessage: document.getElementById("burgeria-overtime-message")
+      overtimeMessage: document.getElementById("burgeria-overtime-message"),
+      counter: document.getElementById("day-counter"),
     },
   },
   "kitchen": {
-    name: "KITCHEN",
-    element: document.getElementById("scene-kitchen"),
+    sceneButton: document.getElementById("kitchen-scene-button"),
     ingredientButtons: document.getElementById("ingredient-buttons"),
     library: {
       page: document.getElementById("library-page"),
@@ -51,6 +54,11 @@ var ui = {
     workshop: document.getElementById("workshop-textarea"),
     pointsCounter: document.getElementById("points-counter"),
     bankbook: document.getElementById("bankbook"),
+  },
+  "workshop": {
+    sceneButton: document.getElementById("workshop-scene-button"),
+    market: document.getElementById("market"),
+    marketEmptyMessage: document.getElementById("market-empty"),
   },
   switchLocation: function() {
     let current = ui.current;
@@ -68,6 +76,21 @@ var ui = {
     sfx("click");
   }
 };
+
+function setScene(name) {
+  for (let scenename in ui.scenes) {
+    const scene = ui.scenes[scenename];
+    if (name != scenename) {
+      scene.classList.add("hidden");
+      ui[scenename].sceneButton.classList.remove("selected");
+    } else {
+      scene.classList.remove("hidden");
+      ui[scenename].sceneButton.classList.add("selected");
+    }
+  }
+  ui.currentScene = name;
+  ui.currentSceneLabel.textContent = name;
+}
 
 // utility functions
 
@@ -90,6 +113,16 @@ function divContainingPerfectClone(element) {
 
 // update functions
 
+function toggleMenuEditMode() {
+  const preview = ui.storefront.recipePreview;
+  const button = ui.storefront.menuEditButton;
+
+  preview.classList.toggle("editmode");
+  if (preview.classList.contains("editmode")) {
+
+  }
+}
+
 function toggleTheme(button) {
   playerdata.themes.index++;
   if (playerdata.themes.index > playerdata.themes.order.length - 1) playerdata.themes.index = 0;
@@ -110,6 +143,7 @@ function updateDayUI() {
   let timer = ui.storefront.day.timer;
   let state = ui.storefront.day.state;
   let overtime = ui.storefront.day.overtimeMessage;
+  let counter = ui.storefront.day.counter;
 
   if (playerdata.storetime == -1) {
     let all_served = true;
@@ -130,6 +164,7 @@ function updateDayUI() {
       ui.storefront.ministock.classList.add("gone");
     }
 
+    counter.textContent = playerdata.day;
     dtb.textContent = "open store";
     timer.style.height = "100%";
     state.textContent = "CLOSED";
@@ -260,6 +295,14 @@ function updateList(listElement, listObject) {
   return true;
 }
 
+function addEmptyLabel(element) {
+  if (!market.lastElementChild) {
+    let span = document.createElement("i");
+    span.textContent = "It's empty...";
+    market.appendChild(span);
+  }
+}
+
 function updateBankbook() {
   const table = ui.kitchen.bankbook;
   const bankbook = playerdata.bankbook;
@@ -290,7 +333,7 @@ function updateBankbook() {
 
 // news
 
-class headline {
+class Headline {
   constructor(line1, line2) {
     let div = divContainingTemplate("template-news-headline");
     ui.storefront.news.appendChild(div);
@@ -313,7 +356,7 @@ class headline {
   }
 }
 
-class prices {
+class Prices {
   constructor() {
     let div = divContainingTemplate("template-news-prices");
     div.style.position = "relative";

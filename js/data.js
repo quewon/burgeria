@@ -26,7 +26,7 @@ function bankPoints(value, description) {
   if (value == 0) return;
 
   playerdata.points += value;
-  playerdata.bankbook.push([playerdata.day, description || "BURG", value < 0 ? value : "", value > 0 ? value : "", playerdata.points]);
+  playerdata.bankbook.push([playerdata.day, description || "BURG", value < 0 ? Math.abs(value) : "", value > 0 ? value : "", playerdata.points]);
 
   updateBankbook();
   updatePoints();
@@ -47,7 +47,7 @@ function init_default_playerdata() {
 
   playerdata.themes = {
     index: 0,
-    order: ["☼", "☁︎", "☾"],
+    order: ["☼", "☁︎"], //,"☾"
     "☼": {
       "burgeria": "red",
       "burgeria-bg": "pink",
@@ -65,13 +65,13 @@ function init_default_playerdata() {
       "newsgray": "#C6CFD2",
       "graph-positive": "#5B7553"
     },
-    "☾": {
-      "burgeria": "black",
-      "burgeria-bg": "#e3e3e3",
-      "bg": "#e3e3e3",
-      "newsgray": "#c7c7c7",
-      "lines": "black",
-    }
+    // "☾": {
+    //   "burgeria": "black",
+    //   "burgeria-bg": "#e3e3e3",
+    //   "bg": "#e3e3e3",
+    //   "newsgray": "#c7c7c7",
+    //   "lines": "black",
+    // }
   };
 
   let abc = "abcdefghijklmnopqrstuvwxyz";
@@ -80,75 +80,75 @@ function init_default_playerdata() {
     playerdata.prices[char].push(Math.ceil(Math.random() * 100));
   }
 
-  new ingredient({
+  new Ingredient({
     name: "top bun",
     geometry: "bun",
     color: 0xFFE4B5
   });
-  new ingredient({
+  new Ingredient({
     name: "bottom bun",
     geometry: "bun",
     rx: 1,
     color: 0xFFE4B5
   });
-  new ingredient({
+  new Ingredient({
     name: "patty",
     geometry: "patty",
     color: 0x8b4513
   });
-  new ingredient({
+  new Ingredient({
     name: "ketchup",
     geometry: "condiment",
     color: 0xff0000
   });
-  new ingredient({
+  new Ingredient({
     name: "pickle",
     geometry: "pickle",
     color: 0x3CB371
   });
-  new ingredient({
+  new Ingredient({
     name: "onion",
     geometry: "onion",
     color: 0xffffe0,
   });
-  new ingredient({
+  new Ingredient({
     name: "cheese",
     geometry: "cheese",
     color: 0xffd700
   });
-  new ingredient({
+  new Ingredient({
     name: "tomato",
     geometry: "tomato",
     color: 0xff0000
   });
-  new ingredient({
+  new Ingredient({
     name: "lettuce",
     geometry: "lettuce",
     color: 0x90ee90
   });
-  new ingredient({
+  new Ingredient({
     name: "mayo",
     geometry: "condiment",
     color: 0xffffe0
   });
 
-  new ingredient({
+  new Ingredient({
     name: "fries",
     geometry: "fries",
     color: 0xFFA500
   });
-  new ingredient({
+  new Ingredient({
     name: "coke",
     geometry: "can",
     color: 0xff0000
   });
 
-  playerdata.inventory = new collection();
+  playerdata.inventory = new Collection();
   for (let name of ["top bun", "bottom bun", "patty", "fries", "coke"]) {
-    new item(name, playerdata.inventory);
+    new Item(name, playerdata.inventory);
   }
 
-  new recipe({
+  new Recipe({
     name: "Burgeria Special",
     cost: 10,
     construction: {
@@ -156,7 +156,7 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new recipe({
+  new Recipe({
     name: "Onions",
     cost: 5,
     construction: {
@@ -166,7 +166,7 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new recipe({
+  new Recipe({
     name: "Deluxe Burger",
     cost: 30,
     construction: {
@@ -174,7 +174,7 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new recipe({
+  new Recipe({
     name: "Burgeria Set",
     cost: 15,
     construction: {
@@ -184,7 +184,7 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new recipe({
+  new Recipe({
     name: "Weird Set",
     cost: 10,
     construction: {
@@ -198,8 +198,5 @@ function init_default_playerdata() {
   // and a separate one for the player's writing
   // but i don't want the first bank to be tied to the writingbank
 
-  new writingpiece("moby dick", WRITINGBANK["moby dick"]);
-  new writingpiece("after the dazzle of day", WRITINGBANK["after the dazzle of day"]);
-
-  new writingpieceAlert("burgerman's welcome", WRITINGBANK["burgerman's welcome"]);
+  new PieceAlert(WRITINGBANK[4]);
 }

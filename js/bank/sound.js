@@ -1,13 +1,13 @@
 var _sounds = {
-  click: [
-    new Howl({ src: "sound/click/1.wav" }),
-    new Howl({ src: "sound/click/2.wav" })
-  ],
-  type: [
-    new Howl({ src: "sound/click/1.wav" }),
-    new Howl({ src: "sound/click/2.wav" }),
-    new Howl({ src: "sound/click/3.wav" })
-  ],
+  // click: [
+  //   new Howl({ src: "sound/click/1.wav" }),
+  //   new Howl({ src: "sound/click/2.wav" })
+  // ],
+  // type: [
+  //   new Howl({ src: "sound/click/1.wav" }),
+  //   new Howl({ src: "sound/click/2.wav" }),
+  //   new Howl({ src: "sound/click/3.wav" })
+  // ],
   disintegrate: new Howl({ src: "sound/disintegrate.wav", loop: true }),
   chime: [
     new Howl({ src: "sound/chime/1.wav" }),
@@ -15,26 +15,31 @@ var _sounds = {
     new Howl({ src: "sound/chime/3.wav" }),
     new Howl({ src: "sound/chime/4.wav" })
   ],
-  talk: {
-    "wa": [
-      new Howl({ src: "sound/talk/wa/wa.wav" }),
-      new Howl({ src: "sound/talk/wa/we.wav" }),
-      new Howl({ src: "sound/talk/wa/wi.wav" }),
-      new Howl({ src: "sound/talk/wa/wo.wav" })
-    ],
-    "pa": [
-      new Howl({ src: "sound/talk/pa/pa.wav" }),
-      new Howl({ src: "sound/talk/pa/pe.wav" }),
-      new Howl({ src: "sound/talk/pa/pi.wav" }),
-      new Howl({ src: "sound/talk/pa/po.wav" })
-    ],
-    "ka": [
-      new Howl({ src: "sound/talk/ka/ka.wav" }),
-      new Howl({ src: "sound/talk/ka/ke.wav" }),
-      new Howl({ src: "sound/talk/ka/ki.wav" }),
-      new Howl({ src: "sound/talk/ka/ko.wav" })
-    ],
-  },
+  // talk: {
+  //   "wa": [
+  //     new Howl({ src: "sound/talk/wa/wa.wav" }),
+  //     new Howl({ src: "sound/talk/wa/we.wav" }),
+  //     new Howl({ src: "sound/talk/wa/wi.wav" }),
+  //     new Howl({ src: "sound/talk/wa/wo.wav" })
+  //   ],
+  //   "pa": [
+  //     new Howl({ src: "sound/talk/pa/pa.wav" }),
+  //     new Howl({ src: "sound/talk/pa/pe.wav" }),
+  //     new Howl({ src: "sound/talk/pa/pi.wav" }),
+  //     new Howl({ src: "sound/talk/pa/po.wav" })
+  //   ],
+  //   "ka": [
+  //     new Howl({ src: "sound/talk/ka/ka.wav" }),
+  //     new Howl({ src: "sound/talk/ka/ke.wav" }),
+  //     new Howl({ src: "sound/talk/ka/ki.wav" }),
+  //     new Howl({ src: "sound/talk/ka/ko.wav" })
+  //   ],
+  // },
+  talk: [
+    new Howl({ src: "sound/click/1.wav" }),
+    new Howl({ src: "sound/click/2.wav" }),
+    new Howl({ src: "sound/click/3.wav" })
+  ],
   close_store: new Howl({ src: "sound/click/3.wav" }),
   begin_day: new Howl({ src: "sound/click/3.wav" }),
   burgerpoints: [
@@ -52,18 +57,16 @@ var _sounds = {
 };
 
 function sfx_talk(name, id) {
-  let sound = _sounds.talk[name][_sounds.talk[name].length * Math.random() | 0];
-  // if (id) {
-  //   sound.stop(id);
-  //   sound.play(id);
-  // } else {
-  //   return sound.play();
-  // }
+  // let sound = _sounds.talk[name][_sounds.talk[name].length * Math.random() | 0];
+  let sound = _sounds["talk"][_sounds["talk"].length * Math.random() | 0];
+
   if (id) sound.stop(id);
   return sound.play();
 }
 
 function sfx(name, fadetime) {
+  if (name == "click") return;
+
   let sound = _sounds[name];
   if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
   const id = sound.play();

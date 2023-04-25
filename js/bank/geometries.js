@@ -42,18 +42,18 @@ var _geobank = {
   }
 };
 
-function _geo(name, rx) {
-  const geo = _geobank[name];
-  if (!geo) {
-    console.error(name+" does not exist in geobank.");
-    return;
-  }
-  rx = rx || 0;
-  rx += 'rx' in geo ? geo.rx : 0;
+class Geometry {
+  constructor(name, rx) {
+    const geo = _geobank[name];
+    if (!geo) {
+      console.error(name+" does not exist in geobank.");
+      return;
+    }
+    rx = rx || 0;
+    rx += 'rx' in geo ? geo.rx : 0;
 
-  return {
-    geometry: geo.geometry,
-    height: geo.height,
-    rx: rx
+    this.geometry = geo.geometry;
+    this.height = geo.height;
+    this.rx = rx;
   }
 }
