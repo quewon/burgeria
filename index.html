@@ -7,6 +7,8 @@
     <style media="screen">
       :root {
         --line-height: 1.1rem;
+        --padding: .5rem;
+        --gap: .5rem;
 
         --burgeria: red;
         --burgeria-bg: pink;
@@ -16,6 +18,17 @@
         --graph-neutral: var(--lines);
         --graph-negative: var(--burgeria);
         --graph-positive: blue;
+
+        --block-bg: var(--bg);
+        --block-bg-filter: none;
+        --borders: var(--lines);
+        --block-border-radius: 0;
+
+        /* for when im bored of the ui */
+        /* --block-bg: rgba(255, 255, 255, .3); */
+        /* --block-bg-filter: blur(5px); */
+        /* --borders: white; */
+        /* --block-border-radius: 5px; */
       }
 
       body.grabbing, body.grabbing * {
@@ -54,11 +67,11 @@
       .scene {
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: var(--gap);
         width: 100%;
       }
       .scene > div {
-        width: calc(50% - .5rem);
+        width: calc(50% - var(--gap)/2);
       }
       #scene-workshop > div {
         width: calc(25% - 2rem/3);
@@ -81,8 +94,7 @@
       header {
         padding: 0;
         border-bottom: 1px solid var(--burgeria);
-        margin-bottom: 1rem;
-        margin-top: 1rem;
+        margin-bottom: var(--gap);
         color: var(--burgeria);
         position: relative;
       }
@@ -121,15 +133,23 @@
         line-height: 1em;
         font-weight: bold;
         font-size: 1rem;
-        margin-bottom: .5rem;
+        margin-bottom: var(--gap);
       }
 
       .block {
         border: 1px solid var(--lines);
-        padding: .5rem;
-        margin-bottom: 1rem;
-        background: var(--bg);
+        padding: var(--padding);
+        margin-bottom: var(--gap);
+        background: var(--block-bg);
         position: relative;
+      }
+
+      .block, input, textarea {
+        border-color: var(--borders);
+        background: var(--block-bg);
+        border-radius: var(--block-border-radius);
+        backdrop-filter: var(--block-bg-filter);
+        -webkit-backdrop-filter: var(--block-bg-filter);
       }
 
       .news {
@@ -142,6 +162,8 @@
         justify-content: space-between;
         height: fit-content;
         align-items: center;
+        margin-bottom: calc(var(--gap) * 2);
+        /* margin-bottom: min(calc(var(--gap) * 2), 1rem); */
       }
 
       .menu b {
@@ -149,7 +171,8 @@
       }
 
       .tray {
-        border: 1px solid var(--lines);
+        border: 1px solid var(--borders);
+        border-bottom-color: var(--lines);
         width: 100%;
         padding: 0;
       }
@@ -158,7 +181,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        transform: translate(1rem, calc(-50% - .5px));
+        transform: translate(var(--gap), calc(-50% - .5px));
         padding-left: .25rem;
         padding-right: .25rem;
         background: var(--bg);
@@ -190,12 +213,12 @@
         /* height: 100%; */
         display: flex;
         flex-direction: column;
-        gap: .5rem;
+        gap: var(--gap);
         padding: 0;
         box-sizing: border-box;
       }
       .tray .container {
-        padding: .5rem;
+        padding: var(--padding);
       }
       .container:first-child {
         padding-right: .25rem;
@@ -363,7 +386,7 @@
       }
       .collection:hover .item:first-child, .collection:active .item:first-child {
         background: var(--burgeria);
-        color: var(--bg);
+        color: var(--block-bg);
       }
 
       .collection.empty {
@@ -389,7 +412,7 @@
       }
       .collection.at-capacity.draghover .item:first-child {
         color: var(--lines);
-        background: var(--bg);
+        background: var(--block-bg);
         font-style: normal;
       }
 
@@ -404,8 +427,8 @@
       .collection .item {
         border: none;
         max-width: 70%;
-        padding-left: .5rem;
-        padding-right: .5rem;
+        padding-left: var(--padding);
+        padding-right: var(--padding);
       }
 
       .draggable {
@@ -420,7 +443,7 @@
         color: var(--bg);
       }
       .collection.draggable {
-        background: var(--bg);
+        background: transparent;
         color: var(--lines);
       }
       .dragghost {
@@ -463,7 +486,7 @@
 
       .prices-title {
         position: relative;
-        margin-bottom: .5rem;
+        margin-bottom: var(--gap);
         z-index: 1;
       }
       .prices-title * {
@@ -495,7 +518,7 @@
         left: 0;
         top: 0;
         z-index: 0;
-        transform: translate(0, .4rem);
+        transform: translate(0, calc(var(--padding) * 3 - .05rem));
       }
 
       .graphbar {
@@ -526,7 +549,7 @@
         position: absolute;
         border: 1px solid var(--lines);
         background: var(--newsgray);
-        padding: .5rem;
+        padding: var(--padding);
         padding-top: 0;
         pointer-events: none;
         top: calc(100% - 1rem);
@@ -539,12 +562,11 @@
       input, textarea {
         font-family: inherit;
         font-size: inherit;
-        border: 1px solid var(--lines);
-        background: var(--bg);
-        padding: .5rem;
+        padding: var(--padding);
         margin: 0;
         box-sizing: border-box;
         resize: none;
+        vertical-align: top;
       }
       textarea {
         min-height: 5rem;
@@ -559,8 +581,8 @@
         padding-left: 3rem;
         padding-right: 3rem;
         margin: 0;
-        margin-left: -.5rem;
-        margin-right: -.5rem;
+        margin-left: calc(-1 * var(--padding));
+        margin-right: calc(-1 * var(--padding));
         border-left: none;
         border-right: none;
         /* border: none; */
@@ -651,7 +673,7 @@
       }
 
       #guys-container {
-        column-gap: .5rem;
+        column-gap: var(--gap);
         /* justify-content: flex-end; */
         /* flex-direction: row-reverse; */
       }
@@ -693,7 +715,7 @@
       }
 
       #scene-recipes b {
-        margin-top: 1rem;
+        margin-top: var(--gap);
       }
       #scene-recipes b:first-child {
         margin-top: 0;
@@ -709,6 +731,8 @@
       }
       .editmode, .editmode button {
         border-color: var(--burgeria) !important;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
       }
       .editmode {
         border-style: dashed;
@@ -735,8 +759,8 @@
         }
         100% {
           max-height: 2rem;
-          padding-top: .5rem;
-          padding-bottom: .5rem;
+          padding-top: var(--padding);
+          padding-bottom: var(--padding);
         }
       }
 
@@ -758,7 +782,7 @@
         background: var(--newsgray);
       }
       th, td {
-        padding-left: .5rem;
+        padding-left: var(--padding);
       }
       #bankbook th, #bankbook td {
         padding: .2rem;
@@ -806,16 +830,16 @@
       /*  */
 
       .marginbelow {
-        margin-bottom: 1rem;
+        margin-bottom: var(--gap);
       }
       .margintop {
-        margin-top: 1rem;
+        margin-top: var(--gap);
       }
       .dashed {
         border-style: dashed;
       }
       .attached-above {
-        margin-top: -1rem;
+        margin-top: calc(-1 * var(--gap));
         border-top: none;
       }
       .attached-below {
@@ -843,7 +867,7 @@
         flex-direction: column;
       }
       .flexbox.gap {
-        gap: .5rem;
+        gap: var(--gap);
       }
       .flexbox .grow {
         flex-grow: 1;
@@ -1004,7 +1028,7 @@
       <div>
         <div class="block dashed attached-below">
           <span id="ingredient-buttons" class="flexbox gap wrap centeraligned">
-            <b style="margin-right: .5rem;">create ingredient</b>
+            <b style="margin-right: var(--padding);">create ingredient</b>
           </span>
         </div>
         <div class="block" style="border-bottom: none;">
@@ -1012,7 +1036,7 @@
         </div>
 
         <div class="block attached-above has-footer" id="library-page-container">
-          <nav id="library-nav" style="text-align: center; margin-bottom: .5rem;">
+          <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
             <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
             <span id="library-index"></span>/<span id="library-pages-total"></span>
             <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
@@ -1044,18 +1068,14 @@
     </div>
 
     <div id="scene-workshop" class="scene">
-      <div class="block transparent">
-        <img src="img/window.png" alt="window overlooking the field" title="window overlooking the field">
-      </div>
+      <div class="block transparent" style="line-height: 0;"><img src="img/window.png" alt="window overlooking the field" title="window overlooking the field"></div>
       <div style="flex-grow: 1;">
         <div class="marginbelow">
           <footer>
             <button>publish</button>
             <button>clear</button>
           </footer>
-          <div>
-            <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
-          </div>
+          <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
         </div>
 
         <div class="block">
@@ -1112,7 +1132,7 @@
         <div class="centeroriginY">
           <h1 id="line1">BIG BURGERS...</h1>
         </div>
-        <div class="flexbox centeroriginY" style="margin-top: .5rem; align-items: flex-start; justify-content: space-between;">
+        <div class="flexbox centeroriginY" style="margin-top: var(--padding); align-items: flex-start; justify-content: space-between;">
           <div><i>The Journal</i></div>
           <h1 id="line2" style="text-align: right;">... ARE IN!</h1>
         </div>
@@ -1197,7 +1217,7 @@
 
     init_3d();
 
-    playerdata.themes.index--;
+    // playerdata.themes.index--;
     toggleTheme();
 
     playerdata.recipes[0].previewRecipe();
