@@ -17,6 +17,8 @@ var playerdata = {
   library: [],
   libraryIndex: 0,
 
+  toggledBooks: {},
+
   themes: {},
 };
 
@@ -195,5 +197,18 @@ function init_default_playerdata() {
   // and a separate one for the player's writing
   // but i don't want the first bank to be tied to the writingbank
 
-  new PieceAlert(WRITINGBANK[4]);
+  new PieceAlert(`Dear New-owner-insert-name-here, Hello! I see you've found your way to the kitchen. That's very promising!
+
+In here you can check your balance, stock, and even create new ingredients out of the text in your library.
+
+Then, if you haven't already, you can go back to the storefront and open the store to start serving customers :)
+
+Don't worry if it seems like time is running out—Burgeria customers are a patient bunch.
+
+Good luck stacking burgers!
+Love,
+Burgerman`);
+  new PieceAlert(`to anyone whom this letter reaches,
+i am stuck in a prison where there is little light.
+i’m bored to tears. please, tell me a story.`, 5);
 }

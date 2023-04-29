@@ -70,7 +70,7 @@
         gap: var(--gap);
         width: 100%;
       }
-      .scene > div {
+      .scene .column {
         width: calc(50% - var(--gap)/2);
       }
       #scene-workshop > div {
@@ -86,15 +86,15 @@
           align-items: center;
           gap: 0;
         }
-        .scene > div {
+        .scene > div, .scene .column {
           width: inherit !important;
         }
       }
 
       header {
         padding: 0;
-        border-bottom: 1px solid var(--burgeria);
-        margin-bottom: var(--gap);
+        /* border-bottom: 1px solid var(--burgeria); */
+        /* margin-bottom: var(--gap); */
         color: var(--burgeria);
         position: relative;
       }
@@ -158,12 +158,22 @@
 
       #navbar {
         border-color: var(--burgeria);
-        display: flex;
-        justify-content: space-between;
+        /* display: flex;
+        justify-content: space-between; */
         height: fit-content;
         align-items: center;
         margin-bottom: calc(var(--gap) * 2);
         /* margin-bottom: min(calc(var(--gap) * 2), 1rem); */
+        padding: 0;
+      }
+      #navbar button {
+        border-color: var(--burgeria);
+        border-top: none;
+        border-bottom: none;
+        border-right: none;
+      }
+      #navbar > div button:last-child {
+        border-right: 1px solid var(--burgeria);
       }
 
       .menu b {
@@ -326,7 +336,7 @@
         pointer-events: none;
       }
       .send-library .block {
-        animation: send-library .5s;
+        animation: send-library 0s;
       }
       @keyframes send-library {
         0% {
@@ -815,7 +825,7 @@
         height: fit-content;
       }
 
-      #market:last-child div {
+      #market div:last-child .block {
         margin-bottom: 0;
       }
 
@@ -830,6 +840,41 @@
         animation: rejection 30ms;
       }
       @keyframes rejection { }
+
+      #bookshelf {
+        border-bottom: 1px solid var(--lines);
+        width: 100%;
+        gap: 1px;
+        background: var(--newsgray);
+        flex-wrap: wrap;
+        margin-bottom: var(--gap);
+      }
+      .book {
+        color: var(--newsgray);
+        background: var(--lines);
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+        padding: .25rem;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: -.25rem;
+        height: 10rem;
+        max-width: 4rem;
+        overflow: hidden;
+        line-height: 1rem;
+      }
+      .book::before {
+        content: attr(name);
+        display: inline-block;
+        height: 1rem;
+        margin-bottom: var(--gap);
+      }
+      .system.book {
+        background: var(--burgeria);
+      }
+      .book:active, .book.selected {
+        transform: translate(0, var(--gap));
+      }
 
       /*  */
 
@@ -866,9 +911,6 @@
       }
       .flexbox.wrap {
         flex-wrap: wrap;
-      }
-      .flexbox.column {
-        flex-direction: column;
       }
       .flexbox.gap {
         gap: var(--gap);
@@ -929,20 +971,26 @@
     <header>
       <h1 onclick="setScene('storefront');">BURGERIA!</h1>
       <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
-      <div class="flexbox bottom right" style="gap: 3px;">
-        <!-- <button onclick="toggleSound(); sfx('click');" title="toggle sound" style="border-bottom: none; border-color: var(--burgeria);">🔊</button> -->
-        <!-- <button onclick="toggleFont(); sfx('click');" title="toggle font" style="border-bottom: none; border-color: var(--burgeria);">Aa</button> -->
-        <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-bottom: none; border-color: var(--burgeria);"><span id="theme-name">☼</span></button>
-      </div>
     </header>
 
     <div id="navbar" class="block">
-      <i>You are in the <b id="current-scene-label">WORKSHOP</b>.</i>
-      <span style="text-align: right;"> go to the... <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button> <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button> <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button></span>
+      <div class="flexbox gap">
+        <div class="flexbox grow">
+        </div>
+        <div class="flexbox" style="text-align: center;">
+          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button><button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button><button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
+        </div>
+        <div class="grow" style="text-align: right;">
+          <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-right: none;"><span id="theme-name">☼</span></button>
+        </div>
+      </div>
+      <div class="gone">
+        <i>You are in the <b id="current-scene-label">WORKSHOP</b>.</i>
+      </div>
     </div>
 
     <div id="scene-storefront" class="scene hidden">
-      <div class="">
+      <div class="column">
         <div class="menu flexbox">
           <div class="block grow attached-right">
             <h1 class="marginbelow">MENU</h1>
@@ -978,7 +1026,7 @@
 
         </div>
       </div>
-      <div id="scene-storefront-body" style="padding-bottom: 10rem;">
+      <div id="scene-storefront-body" class="column" style="padding-bottom: 10rem;">
         <div id="storefront-ministock" class="block gone" style="position: absolute; z-index: 10;"></div>
 
         <div class="flexbox">
@@ -1000,80 +1048,85 @@
     </div>
 
     <div id="scene-kitchen" class="scene hidden">
-      <div>
-        <div class="block">
-          <div class="flexbox">
-            <h1 class="marginbelow grow">BANKBOOK</h1>
-            <div style="text-align: right; float: right; font-family: monospace;">
-              <table>
-                <tr>
-                  <th>day</th>
-                  <td><span id="day-counter"></span></td>
-                </tr>
-                <tr>
-                  <th>burgerpoints</th>
-                  <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
-                </tr>
-              </table>
+      <div id="bookshelf" class="flexbox"></div>
+      <div class="flexbox gap wrap" style="width:100%;">
+        <div class="column">
+          <div class="block gone" id="bankbook-block">
+            <div class="flexbox">
+              <h1 class="marginbelow grow">BANKBOOK</h1>
+              <div style="text-align: right; float: right; font-family: monospace;">
+                <table>
+                  <tr>
+                    <th>day</th>
+                    <td><span id="day-counter"></span></td>
+                  </tr>
+                  <tr>
+                    <th>burgerpoints</th>
+                    <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <table id="bankbook"></table>
+            <br>
+            <div style="font-family: monospace; text-align: right;">NOTE: Profits are logged at the end of the day.</div>
+          </div>
+
+          <div class="block gone" id="inventory-block">
+            <h1 class="marginbelow">STOCK</h1>
+            <ul id="inventory-list" class="flexbox">
+            </ul>
+          </div>
+        </div>
+        <div class="column">
+          <div id="library-block">
+            <div class="block dashed attached-below">
+              <span id="ingredient-buttons" class="flexbox gap wrap centeraligned">
+                <b style="margin-right: var(--padding);">create ingredient</b>
+              </span>
+            </div>
+            <div class="block" style="border-bottom: none;">
+              <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
+            </div>
+
+            <div class="block attached-above has-footer" id="library-page-container">
+              <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
+                <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
+                <span id="library-index"></span>/<span id="library-pages-total"></span>
+                <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
+              </nav>
+              <p id="library-page" class="block"></p>
+              <footer>
+                <div class="grow"></div>
+                <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
+              </footer>
+            </div>
+            <div id="library-page-empty" class="block attached-above">
+              <i>Your library is empty.</i>
+            </div>
+            <div id="kitchen-letterstock" class="block attached-above">
+              <b>LETTERSTOCK</b>
+              <ul id="kitchen-letters-list" class="flexbox">
+              </ul>
             </div>
           </div>
 
-          <table id="bankbook"></table>
-          <br>
-          <div style="font-family: monospace; text-align: right;">NOTE: Profits are logged at the end of the day.</div>
+          <!-- this is for LATER game stuff -->
+          <!-- <div class="block">
+            <h1 class="marginbelow">R&D</h1>
+            <div class="flexbox gap">
+              <b>develop new ingredient</b>
+              <input type="text" name="" value="" placeholder="click here to start developing...">
+            </div>
+          </div> -->
         </div>
-
-        <div class="block">
-          <h1 class="marginbelow">STOCK</h1>
-          <ul id="inventory-list" class="flexbox">
-          </ul>
-        </div>
-      </div>
-      <div>
-        <div class="block dashed attached-below">
-          <span id="ingredient-buttons" class="flexbox gap wrap centeraligned">
-            <b style="margin-right: var(--padding);">create ingredient</b>
-          </span>
-        </div>
-        <div class="block" style="border-bottom: none;">
-          <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
-        </div>
-
-        <div class="block attached-above has-footer" id="library-page-container">
-          <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
-            <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
-            <span id="library-index"></span>/<span id="library-pages-total"></span>
-            <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
-          </nav>
-          <p id="library-page" class="block"></p>
-          <footer>
-            <div class="grow"></div>
-            <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
-          </footer>
-        </div>
-        <div id="library-page-empty" class="block attached-above">
-          <i>Your library is empty.</i>
-        </div>
-        <div id="kitchen-letterstock" class="block attached-above">
-          <b>LETTERSTOCK</b>
-          <ul id="kitchen-letters-list" class="flexbox">
-          </ul>
-        </div>
-
-        <!-- this is for LATER game stuff -->
-        <!-- <div class="block">
-          <h1 class="marginbelow">R&D</h1>
-          <div class="flexbox gap">
-            <b>develop new ingredient</b>
-            <input type="text" name="" value="" placeholder="click here to start developing...">
-          </div>
-        </div> -->
       </div>
     </div>
 
     <div id="scene-workshop" class="scene">
-      <div class="block transparent" style="line-height: 0;"><img src="img/window.png" alt="window overlooking the field" title="window overlooking the field"></div>
-      <div style="flex-grow: 1;">
+      <div class="column block transparent" style="line-height: 0;"><img src="img/window.png" alt="window overlooking the field" title="window overlooking the field"></div>
+      <div class="column" style="flex-grow: 1;">
         <div class="marginbelow">
           <footer>
             <button>publish</button>
@@ -1091,7 +1144,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div class="column">
         <div class="block transparent">
           <b>LETTERSTOCK</b>
           <ul id="workshop-letters-list" class="flexbox">
@@ -1156,7 +1209,7 @@
     </template>
 
     <template id="template-guy">
-      <div class="guy flexbox column">
+      <div class="guy flexbox" style="flex-direction: column;">
         <div name="number" class="block top left">99</div>
         <img src="" alt="" title="">
         <div name="text" class="block attached-top"></div>
@@ -1235,6 +1288,7 @@
     updateBankbook();
     updateRecipes();
     updateList(ui.kitchen.lettersList, playerdata.letters);
+    updateBookshelf();
 
     //
 

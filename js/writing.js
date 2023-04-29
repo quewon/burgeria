@@ -1,10 +1,12 @@
 class Piece {
   constructor(text) {
+    this.title = text.split("\n")[0];
     this.text = text;
     this.disintegrated = false;
     playerdata.libraryIndex = playerdata.library.length;
     playerdata.library.push(this);
-    updateLibrary();
+    updateBookshelf();
+    selectBook(ui.kitchen.bookshelf.lastElementChild, playerdata.libraryIndex);
   }
 
   disintegrate() {
@@ -54,9 +56,11 @@ class Piece {
 
 class PieceAlert {
   constructor(text, cost) {
+    this.title = text.split("\n")[0];
+
     let div = divContainingTemplate("template-writing-alert");
     cost = cost || 0;
-    div.dataset.title = text.split("\n")[0];
+    div.dataset.title = this.title;
     div.dataset.text = text;
     div.dataset.cost = cost;
 

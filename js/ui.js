@@ -46,11 +46,15 @@ var ui = {
       pageContainer: document.getElementById("library-page-container"),
       pageEmptyMessage: document.getElementById("library-page-empty")
     },
+    libraryBlock: document.getElementById("library-block"),
     inventoryList: document.getElementById("inventory-list"),
+    inventoryBlock: document.getElementById("inventory-block"),
     lettersList: document.getElementById("kitchen-letters-list"),
     lettersContainer: document.getElementById("kitchen-letterstock"),
     pointsCounter: document.getElementById("points-counter"),
     bankbook: document.getElementById("bankbook"),
+    bankbookBlock: document.getElementById("bankbook-block"),
+    bookshelf: document.getElementById("bookshelf"),
   },
   "workshop": {
     textarea: document.getElementById("workshop-textarea"),
@@ -115,6 +119,47 @@ function divContainingPerfectClone(element) {
 }
 
 // update functions
+
+function selectBook(el, index) {
+  el.classList.toggle("selected");
+
+  console.log(el, el.classList.contains("selected"));
+
+  if (el.classList.contains("selected")) {
+    const books = document.querySelectorAll("[type='book']");
+    for (let book of books) {
+      book.classList.remove("selected");
+    }
+    el.classList.add("selected");
+    playerdata.libraryIndex = index;
+    updateLibrary();
+  } else {
+    ui.kitchen.libraryBlock.classList.add("gone");
+  }
+}
+
+function updateBookshelf() {
+  const bookshelf = ui.kitchen.bookshelf;
+
+  bookshelf.innerHTML = "";
+
+  if (ui.kitchen.bankbookBlock.classList.contains("gone")) {
+    bookshelf.innerHTML += `<div class="system book" onclick="this.classList.toggle('selected'); ui.kitchen.bankbookBlock.classList.toggle('gone');" name="✸">bankbook</div>`;
+  } else {
+    bookshelf.innerHTML += `<div class="system book selected" onclick="this.classList.toggle('selected'); ui.kitchen.bankbookBlock.classList.toggle('gone');" name="✸">bankbook</div>`;
+  }
+
+  if (ui.kitchen.inventoryBlock.classList.contains("gone")) {
+    bookshelf.innerHTML += `<div onclick="this.classList.toggle('selected'); ui.kitchen.inventoryBlock.classList.toggle('gone');" class="system book" name="☰">stock</div>`;
+  } else {
+    bookshelf.innerHTML += `<div onclick="this.classList.toggle('selected'); ui.kitchen.inventoryBlock.classList.toggle('gone');" class="system book selected" name="☰">stock</div>`;
+  }
+
+  for (let index in playerdata.library) {
+    const book = playerdata.library[index];
+    bookshelf.innerHTML += `<div onclick="selectBook(this, `+index+`)" class="book" type="book">`+book.title+`</div>`;
+  }
+}
 
 function toggleMenuEditMode() {
   const preview = ui.storefront.recipePreview;
@@ -235,6 +280,12 @@ function updateMinistockWindow() {
 }
 
 function updateLibrary() {
+  if (playerdata.library.length == 0) {
+    ui.kitchen.libraryBlock.classList.add("gone");
+  } else {
+    ui.kitchen.libraryBlock.classList.remove("gone");
+  }
+
   let page = playerdata.library[playerdata.libraryIndex];
 
   if (page) {
@@ -269,7 +320,7 @@ function navigateLibrary(value) {
   playerdata.libraryIndex += value;
   if (playerdata.libraryIndex < 0) playerdata.libraryIndex = 0;
   if (playerdata.libraryIndex >= playerdata.library.length) playerdata.libraryIndex = playerdata.library.length - 1;
-  updateLibrary();
+  selectBook(document.querySelectorAll("[type='book']")[playerdata.libraryIndex], playerdata.libraryIndex);
 }
 
 function updateList(listElement, listObject) {

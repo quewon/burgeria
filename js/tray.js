@@ -113,7 +113,7 @@ class Tray {
 
     let rect = this.stockbutton.getBoundingClientRect();
     const ministock = ui.storefront.ministock;
-    ministock.style.left = rect.left+"px";
+    ministock.style.left = (rect.left + window.scrollX)+"px";
     ministock.style.top = (rect.bottom + window.scrollY)+"px";
   }
 
