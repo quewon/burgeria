@@ -123,8 +123,6 @@ function divContainingPerfectClone(element) {
 function selectBook(el, index) {
   el.classList.toggle("selected");
 
-  console.log(el, el.classList.contains("selected"));
-
   if (el.classList.contains("selected")) {
     const books = document.querySelectorAll("[type='book']");
     for (let book of books) {

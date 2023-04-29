@@ -16,11 +16,6 @@ class Piece {
       this.sfxId = sfx("disintegrate");
     }
 
-    if (!playerdata.tutorial["letterstock"]) {
-      ui.tutorial["letterstock"].classList.remove("gone");
-      playerdata.tutorial["letterstock"] = true;
-    }
-
     sfx('click');
   }
 
@@ -45,6 +40,7 @@ class Piece {
     } else {
       if (!this.disintegrated) {
         playerdata.library.splice(playerdata.library.indexOf(this), 1);
+        updateBookshelf();
         navigateLibrary(0);
         sfx_stop("disintegrate", null, this.sfxId);
       }
