@@ -58,10 +58,10 @@ function init_default_playerdata() {
       "graph-positive": "blue",
     },
     "☁︎": {
-      "burgeria": "#E03616",
-      "bg": "#FDF0D5",
-      "lines": "#3A3335",
-      "newsgray": "#C6CFD2",
+      "burgeria": "#c43d27",
+      "bg": "#f8eddb",
+      "lines": "#291e2c",
+      "newsgray": "#c0d0cf",
       "graph-positive": "#5B7553"
     },
     // "☾": {

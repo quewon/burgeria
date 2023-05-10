@@ -227,7 +227,7 @@ class Ingredient {
   create() {
     let page = playerdata.library[playerdata.libraryIndex];
     if (!page) {
-      alert("There are no pages to work with.");
+      ui.dialogs["no-pages"].showModal();
       return false;
     }
 
@@ -243,7 +243,7 @@ class Ingredient {
         lowercase = lowercase.replace(char, "");
         pagetext = pagetext.replace(pagetext[index], "");
       } else {
-        alert("There are not enough letters on the open page.");
+        ui.dialogs["no-letters"].showModal();
         return false;
       }
     }

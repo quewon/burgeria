@@ -1,4 +1,12 @@
 var ui = {
+  dialogs: {
+    "no-points": document.getElementById("dialog-no-points"),
+    "read-text": document.getElementById("dialog-read-text"),
+    "read-text-title": document.getElementById("dialog-read-text-title"),
+    "read-text-content": document.getElementById("dialog-read-text-content"),
+    "no-letters": document.getElementById("dialog-no-letters"),
+    "early-close": document.getElementById("dialog-early-close")
+  },
   templates: {
     "template-tray": document.getElementById("template-tray"),
     "template-news-headline": document.getElementById("template-news-headline"),
@@ -44,7 +52,7 @@ var ui = {
       index: document.getElementById("library-index"),
       nav: document.getElementById("library-nav"),
       pageContainer: document.getElementById("library-page-container"),
-      pageEmptyMessage: document.getElementById("library-page-empty")
+      // pageEmptyMessage: document.getElementById("library-page-empty")
     },
     libraryBlock: document.getElementById("library-block"),
     inventoryList: document.getElementById("inventory-list"),
@@ -136,26 +144,62 @@ function selectBook(el, index) {
   }
 }
 
+function createSystemBook(uiElement, title, icon) {
+  const bookshelf = ui.kitchen.bookshelf;
+  var book = document.createElement("button");
+  book.classList.add("system");
+  book.classList.add("book");
+  if (icon) book.setAttribute("name", icon);
+  if (!uiElement.classList.contains("gone")) {
+    book.classList.add("selected");
+  }
+
+  createBookLabel(book, title);
+
+  book.onclick = function() {
+    this.classList.toggle("selected"); uiElement.classList.toggle("gone");
+  };
+
+  bookshelf.appendChild(book);
+}
+
+function createBookLabel(parent, text) {
+  for (let char of text) {
+    var div = document.createElement("div");
+    div.textContent = char;
+    parent.appendChild(div);
+  }
+  parent.style.width=Math.ceil(text.length / 10)+"rem";
+}
+
+function createBook(title, index) {
+  const bookshelf = ui.kitchen.bookshelf;
+
+  var book = document.createElement("button");
+  book.classList.add("book");
+  book.setAttribute("type", "book");
+  book.dataset.index = index;
+  book.onclick = function() {
+    selectBook(this, Number(this.dataset.index));
+  };
+
+  createBookLabel(book, title);
+
+  bookshelf.appendChild(book);
+}
+
 function updateBookshelf() {
   const bookshelf = ui.kitchen.bookshelf;
 
   bookshelf.innerHTML = "";
 
-  if (ui.kitchen.bankbookBlock.classList.contains("gone")) {
-    bookshelf.innerHTML += `<div class="system book" onclick="this.classList.toggle('selected'); ui.kitchen.bankbookBlock.classList.toggle('gone');" name="✸">bankbook</div>`;
-  } else {
-    bookshelf.innerHTML += `<div class="system book selected" onclick="this.classList.toggle('selected'); ui.kitchen.bankbookBlock.classList.toggle('gone');" name="✸">bankbook</div>`;
-  }
-
-  if (ui.kitchen.inventoryBlock.classList.contains("gone")) {
-    bookshelf.innerHTML += `<div onclick="this.classList.toggle('selected'); ui.kitchen.inventoryBlock.classList.toggle('gone');" class="system book" name="☰">stock</div>`;
-  } else {
-    bookshelf.innerHTML += `<div onclick="this.classList.toggle('selected'); ui.kitchen.inventoryBlock.classList.toggle('gone');" class="system book selected" name="☰">stock</div>`;
-  }
+  createSystemBook(ui.kitchen.bankbookBlock, "bankbook", "✸");
+  createSystemBook(ui.kitchen.inventoryBlock, "stock", "☰");
+  // createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
 
   for (let index in playerdata.library) {
     const book = playerdata.library[index];
-    bookshelf.innerHTML += `<div onclick="selectBook(this, `+index+`)" class="book" type="book">`+book.title+`</div>`;
+    createBook(book.title, index);
   }
 }
 
@@ -290,12 +334,12 @@ function updateLibrary() {
     ui.kitchen.library.page.textContent = page.text;
 
     ui.kitchen.library.pageContainer.classList.remove("gone");
-    ui.kitchen.library.pageEmptyMessage.classList.add("gone");
+    // ui.kitchen.library.pageEmptyMessage.classList.add("gone");
   } else {
     ui.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
 
     ui.kitchen.library.pageContainer.classList.add("gone");
-    ui.kitchen.library.pageEmptyMessage.classList.remove("gone");
+    // ui.kitchen.library.pageEmptyMessage.classList.remove("gone");
   }
 
   ui.kitchen.library.pagesTotal.textContent = playerdata.library.length;
@@ -318,7 +362,8 @@ function navigateLibrary(value) {
   playerdata.libraryIndex += value;
   if (playerdata.libraryIndex < 0) playerdata.libraryIndex = 0;
   if (playerdata.libraryIndex >= playerdata.library.length) playerdata.libraryIndex = playerdata.library.length - 1;
-  selectBook(document.querySelectorAll("[type='book']")[playerdata.libraryIndex], playerdata.libraryIndex);
+  if (document.querySelectorAll("[type='book']").length > 0)
+    selectBook(document.querySelectorAll("[type='book']")[playerdata.libraryIndex], playerdata.libraryIndex);
 }
 
 function updateList(listElement, listObject) {

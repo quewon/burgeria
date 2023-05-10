@@ -78,12 +78,6 @@ const game = {
     updateDayUI();
   },
   closeStore: function() {
-    if (playerdata.storetime < game.config.dayLength) {
-      if (!confirm("Are you sure you want to end the day now?\n\n(Once your store closes, the overtime discount will be activated.)")) {
-        return;
-      }
-    }
-
     playerdata.storetime = -1;
 
     let everyoneserved = true;
@@ -122,7 +116,14 @@ const game = {
   // day toggle action
   burgeria: function() {
     if (playerdata.storetime != -1) {
-      game.closeStore();
+      //game.closeStore();
+
+      if (playerdata.storetime < game.config.dayLength) {
+        ui.dialogs["early-close"].showModal();
+      } else {
+        game.closeStore();
+      }
+
     } else {
       console.clear();
       game.openStore();

@@ -52,6 +52,8 @@
 
         animation: burgeria-bg 2s linear infinite;
 
+        font-weight: 400;
+        font-feature-settings: "kern";
         font-family: serif;
         word-break: keep-all;
       }
@@ -75,20 +77,6 @@
       }
       #scene-workshop > div {
         width: calc(25% - 2rem/3);
-      }
-
-      @media (max-width: 1000px) {
-        body {
-          max-width: 500px;
-        }
-        .scene {
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
-        }
-        .scene > div, .scene .column {
-          width: inherit !important;
-        }
       }
 
       header {
@@ -131,9 +119,9 @@
 
       h2 {
         line-height: 1em;
-        font-weight: bold;
         font-size: 1rem;
         margin-bottom: var(--gap);
+        font-weight: normal;
       }
 
       .block {
@@ -172,8 +160,8 @@
         border-bottom: none;
         border-right: none;
       }
-      #navbar > div button:last-child {
-        border-right: 1px solid var(--burgeria);
+      #workshop-scene-button {
+        border-right: 1px solid var(--burgeria) !important;
       }
 
       .menu b {
@@ -258,6 +246,9 @@
         background: var(--burgeria);
         color: var(--bg);
         font-style: italic;
+      }
+      button:active em {
+        color: var(--bg);
       }
       button.disabled {
         pointer-events: none;
@@ -581,6 +572,7 @@
         box-sizing: border-box;
         resize: none;
         vertical-align: top;
+        border: 1px solid var(--borders);
       }
       textarea {
         min-height: 5rem;
@@ -591,19 +583,21 @@
         font-style: italic;
       }
 
-      p.block {
+      p.block, #dialog-read-text-content {
         padding-left: 3rem;
         padding-right: 3rem;
+        background: var(--newsgray);
+        white-space: pre-wrap;
+        text-align: justify;
+      }
+      p.block {
         margin: 0;
         margin-left: calc(-1 * var(--padding));
         margin-right: calc(-1 * var(--padding));
         border-left: none;
         border-right: none;
         /* border: none; */
-        background: var(--newsgray);
-        text-align: justify;
-        white-space: pre-wrap;
-        font-size: inherit;
+        /* font-size: inherit; */
       }
 
       .lettericon {
@@ -825,7 +819,7 @@
         height: fit-content;
       }
 
-      #market div:last-child .block {
+      .block .block:last-child {
         margin-bottom: 0;
       }
 
@@ -851,29 +845,136 @@
       }
       .book {
         color: var(--newsgray);
-        background: var(--lines);
-        writing-mode: vertical-lr;
-        text-orientation: upright;
+        background: var(--burgeria);
         padding: .25rem;
         cursor: pointer;
         text-transform: uppercase;
-        letter-spacing: -.25rem;
         height: 10rem;
         max-width: 4rem;
         overflow: hidden;
+        border: none;
+        box-sizing: content-box;
+        display: flex;
+        flex-flow: column wrap;
         line-height: 1rem;
+      }
+      .book:not(.system) {
+        background: var(--lines);
+      }
+      .book.selected, .book:active {
+        color: var(--newsgray);
+        pointer-events: auto;
+      }
+      .book.selected:not(.system), .book:not(.system):active {
+        background: var(--lines);
+      }
+      .book div {
+        display: inline;
+        height: 1rem;
+        width: 1rem;
+        text-align: center;
+        font-style: normal;
+        writing-mode: vertical-lr;
+        text-orientation: upright;
       }
       .book::before {
         content: attr(name);
         display: inline-block;
         height: 1rem;
+        width: 1rem;
+        text-align: center;
         margin-bottom: var(--gap);
-      }
-      .system.book {
-        background: var(--burgeria);
+        font-style: normal;
       }
       .book:active, .book.selected {
         transform: translate(0, var(--gap));
+      }
+
+      dialog {
+        max-width: max(50%, 500px);
+        background: var(--bg);
+        border: 1px solid var(--borders);
+        padding: var(--padding);
+        box-sizing: border-box;
+        overflow: hidden;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      }
+      dialog > div:first-child {
+        user-select: none;
+      }
+      dialog::backdrop {
+        backdrop-filter: var(--block-bg-filter);
+      }
+      dialog .flexbox {
+        width: calc(100% + var(--padding) * 2);
+        position: relative;
+        top: calc(var(--padding) * -1);
+        left: calc(var(--padding) * -1);
+        border-bottom: 1px solid var(--borders);
+        background: var(--bg);
+      }
+      dialog .flexbox div {
+        text-align: center;
+        line-height: 1.5rem;
+      }
+      dialog .flexbox button {
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        color: var(--lines);
+      }
+      dialog .flexbox button:active {
+        color: var(--bg);
+      }
+
+      dialog.error, dialog.error .flexbox, dialog.error button {
+        border-color: var(--burgeria);
+      }
+      dialog.error .flexbox {
+        background: var(--burgeria);
+        color: var(--bg);
+      }
+
+      #dialog-read-text {
+        background: var(--newsgray);
+      }
+
+      #workshop-library {
+        margin-right: calc(-1 * var(--gap) - 1px);
+        max-width: 500px;
+      }
+      #workshop-library button {
+        display: block;
+        width: 100%;
+        text-align: start;
+        /* background: var(--bg); */
+        /* color: var(--lines); */
+        padding: var(--padding);
+        border: 1px dashed var(--borders);
+        margin-bottom: var(--gap);
+        border-style: dashed;
+      }
+      #workshop-library button:not(button:last-child) {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      #workshop-library button.selected {
+        border-style: solid;
+        pointer-events: auto;
+      }
+      #workshop-library button.selected + button {
+        border-top: 1px solid;
+      }
+      #workshop-library button:focus {
+        border-style: solid;
+      }
+      #workshop-library button:focus + button {
+        border-top-style: solid;
+      }
+      #workshop-library button:not(button:focus).selected {
+        background: var(--newsgray);
+        color: var(--lines);
       }
 
       /*  */
@@ -964,6 +1065,23 @@
       .gone {
         display: none !important;
       }
+
+      @media (max-width: 1000px) {
+        body {
+          max-width: 500px;
+        }
+        .scene {
+          flex-direction: column;
+          align-items: center;
+          gap: 0;
+        }
+        .scene > div, .scene .column {
+          width: inherit !important;
+        }
+        .scene > .flexbox.wrap {
+          gap: 0 !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -978,7 +1096,11 @@
         <div class="flexbox grow">
         </div>
         <div class="flexbox" style="text-align: center;">
-          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button><button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button><button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
+          <!-- <span style="color: var(--burgeria);">:&nbsp</span> -->
+          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button>
+          <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button>
+          <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
+          <!-- <span style="color: var(--burgeria);">&nbsp:</span> -->
         </div>
         <div class="grow" style="text-align: right;">
           <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-right: none;"><span id="theme-name">☼</span></button>
@@ -1102,9 +1224,9 @@
                 <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
               </footer>
             </div>
-            <div id="library-page-empty" class="block attached-above">
+            <!-- <div id="library-page-empty" class="block attached-above">
               <i>Your library is empty.</i>
-            </div>
+            </div> -->
             <div id="kitchen-letterstock" class="block attached-above">
               <b>LETTERSTOCK</b>
               <ul id="kitchen-letters-list" class="flexbox">
@@ -1113,19 +1235,44 @@
           </div>
 
           <!-- this is for LATER game stuff -->
-          <!-- <div class="block">
+          <div class="block">
             <h1 class="marginbelow">R&D</h1>
             <div class="flexbox gap">
               <b>develop new ingredient</b>
               <input type="text" name="" value="" placeholder="click here to start developing...">
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
 
     <div id="scene-workshop" class="scene">
-      <div class="column block transparent" style="line-height: 0;"><img src="img/window.png" alt="window overlooking the field" title="window overlooking the field"></div>
+      <div class="column">
+        <footer>
+          <button>new piece</button>
+          <button>delete</button>
+        </footer>
+
+        <div id="workshop-library">
+          <button class="selected">
+            hello
+          </button>
+          <button>
+            hello
+          </button>
+          <button>
+            hello
+          </button>
+          <button>
+            hello
+          </button>
+        </div>
+
+        <div class="block transparent" style="line-height: 0;">
+          <img src="img/window.png" alt="window overlooking the field" title="window overlooking the field">
+        </div>
+      </div>
+
       <div class="column" style="flex-grow: 1;">
         <div class="marginbelow">
           <footer>
@@ -1227,13 +1374,15 @@
     </template>
 
     <template id="template-writing-alert">
-      <div class="block flexbox centeraligned dashed gap slide-down">
+      <div class="block flexbox centeraligned gap slide-down dashed" style="padding: 0;">
         <span>
           <span class="lettericon"></span>
         </span>
         <span name="title" class="grow"></span>
-        <button>read</button>
-        <button style="min-width: fit-content;">add to library <span name="nonzerocost">(<span style="color: var(--burgeria)"><span class="burgerpoints">–</span><span name="cost">0</span></span>)</span></button>
+        <div class="flexbox">
+          <button style="border: none; border-left: 1px solid var(--lines);">read</button>
+          <button style="border: none; border-left: 1px solid var(--lines); min-width: fit-content;">add to library <span name="nonzerocost">(<em><span class="burgerpoints">–</span><span name="cost">0</span></em>)</span></button>
+        </div>
       </div>
     </template>
 
@@ -1247,6 +1396,53 @@
         </div>
       </div>
     </template>
+
+    <dialog id="dialog-no-points" class="error">
+      <div class="flexbox">
+        <div class="grow">!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      Not enough points!
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-read-text">
+      <div class="flexbox">
+        <div class="grow" id="dialog-read-text-title"></div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      <div id="dialog-read-text-content"></div>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-early-close" class="error">
+      <div class="flexbox">
+        <div class="grow" id="dialog-read-text-title"></div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      <div class="">
+        Are you sure you want to end the day now?<br><br>(Once your store closes, the overtime discount will be activated.)
+      </div>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>cancel</button>
+        <button onclick="game.closeStore(); this.parentNode.parentNode.close();">close store</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-no-letters" class="error">
+      <div class="flexbox">
+        <div class="grow">!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      There are not enough letters on the open page.
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
 
   </body>
   <script type="text/javascript" src="js/lib/howler.core.js"></script>

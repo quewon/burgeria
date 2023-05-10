@@ -52,35 +52,36 @@ class Piece {
 
 class PieceAlert {
   constructor(text, cost) {
-    this.title = text.split("\n")[0];
-
     let div = divContainingTemplate("template-writing-alert");
     cost = cost || 0;
-    div.dataset.title = this.title;
-    div.dataset.text = text;
-    div.dataset.cost = cost;
+    div.dataset.title = text.split("\n")[0];
+    div.className = "block transparent";
 
     let readbutton = div.querySelectorAll("button")[0];
+    readbutton.dataset.text = text;
+    readbutton.dataset.title = div.dataset.title;
     readbutton.onclick = function() {
-      const p = this.parentNode.parentNode;
-      const text = p.dataset.text;
       sfx("click");
-      alert(text);
+      ui.dialogs["read-text-title"].textContent = this.dataset.title;
+      ui.dialogs["read-text-content"].textContent = this.dataset.text;
+      ui.dialogs["read-text"].showModal();
     }
 
     let savebutton = div.querySelectorAll("button")[1];
+    savebutton.dataset.text = text;
+    savebutton.dataset.cost = cost;
     savebutton.onclick = function() {
-      const p = this.parentNode.parentNode;
-      const c = Number(p.dataset.cost);
+      const p = this.parentNode.parentNode.parentNode;
+      const cost = Number(this.dataset.cost);
 
-      if (playerdata.points < c) {
-        alert("Not enough points!");
+      if (playerdata.points < cost) {
+        ui.dialogs["no-points"].showModal();
         return;
       }
 
-      bankPoints(-c, "WWW");
+      bankPoints(-cost, "WWW");
 
-      new Piece(p.dataset.text);
+      new Piece(this.dataset.text);
       sfx('click');
 
       p.classList.add("send-library");
