@@ -70,25 +70,16 @@ var ui = {
     market: document.getElementById("market"),
     marketEmptyMessage: document.getElementById("market-empty"),
     lettersList: document.getElementById("workshop-letters-list"),
-  },
-  switchLocation: function() {
-    let current = ui.current;
-    ui.current = ui.other;
-    ui.other = current;
-
-    ui.currentLocationElement.textContent = ui[ui.current].name;
-    ui.otherLocationElement.textContent = ui[ui.other].name;
-
-    ui[ui.current].element.classList.remove("hidden");
-    ui[ui.other].element.classList.add("hidden");
-
-    if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition();
-
-    sfx("click");
+    library: document.getElementById("workshop-library")
   }
 };
 
 function setScene(name) {
+  let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
+  for (let anchor of dropdownAnchors) {
+    anchor.classList.remove("selected");
+  }
+
   for (let scenename in ui.scenes) {
     const scene = ui.scenes[scenename];
     if (name != scenename) {
@@ -429,6 +420,84 @@ function updateBankbook() {
       tr.appendChild(td);
     }
     table.appendChild(tr);
+  }
+}
+
+function deselectWorkshopLibraryButton() {
+  const og = ui.workshop.library.children[playerdata.workshopIndex];
+  if (!og) return;
+  og.classList.remove("selected");
+  og.classList.remove("focused");
+}
+
+function createWorkshopLibraryButton(i) {
+  const lib = ui.workshop.library;
+  const pieces = playerdata.workshop;
+
+  let button = document.createElement("button");
+  button.textContent = pieces[i].title;
+  button.dataset.index = i;
+  button.onclick = function() {
+    deselectWorkshopLibraryButton();
+    playerdata.workshopIndex = this.dataset.index;
+    this.classList.add("selected");
+    this.classList.add("focused");
+    ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
+  }
+  lib.appendChild(button);
+
+  if (i==playerdata.workshopIndex) {
+    button.classList.add("selected");
+    button.classList.add("focused");
+  }
+}
+
+function updateWorkshopLibrary() {
+  const lib = ui.workshop.library;
+  const pieces = playerdata.workshop;
+
+  while (lib.lastElementChild) {
+    lib.lastElementChild.remove();
+  }
+
+  for (let i=0; i<pieces.length; i++) {
+    createWorkshopLibraryButton(i);
+  }
+}
+
+function toggleDropdown(button) {
+  const right = button.classList.contains("right");
+  const parent = button.parentNode;
+  const dropdown = button.nextElementSibling;
+
+  if (!button.dataset.offset) {
+    for (let child of parent.children) {
+      child.classList.add("selected");
+    }
+    const prect = parent.getBoundingClientRect();
+    const brect = button.getBoundingClientRect();
+    button.dataset.offset = right ? brect.right - prect.right : brect.left - prect.left;
+    button.classList.remove("selected");
+    // button.onmouseleave = function(e) {
+    //   if (e.relatedTarget == dropdown || e.relatedTarget == parent) return;
+    //   if (this.classList.contains("selected")) toggleDropdown(this);
+    // }
+    dropdown.onmouseleave = function(e) {
+      if (e.relatedTarget == button) return;
+      toggleDropdown(button);
+    }
+  }
+
+  button.classList.toggle("selected");
+  for (let child of parent.children) {
+    if (child == button) continue;
+    child.classList.remove("selected");
+  }
+
+  if (right) {
+    dropdown.style.right = button.dataset.offset+"px";
+  } else {
+    dropdown.style.left = button.dataset.offset+"px";
   }
 }
 

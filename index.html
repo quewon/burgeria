@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>BURGERIA!</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style media="screen">
+    <style>
       :root {
         --line-height: 1.1rem;
         --padding: .5rem;
@@ -953,6 +953,7 @@
         border: 1px dashed var(--borders);
         margin-bottom: var(--gap);
         border-style: dashed;
+        min-height: 2.5rem;
       }
       #workshop-library button:not(button:last-child) {
         border-bottom: none;
@@ -961,20 +962,38 @@
 
       #workshop-library button.selected {
         border-style: solid;
-        pointer-events: auto;
       }
       #workshop-library button.selected + button {
-        border-top: 1px solid;
-      }
-      #workshop-library button:focus {
-        border-style: solid;
-      }
-      #workshop-library button:focus + button {
         border-top-style: solid;
       }
-      #workshop-library button:not(button:focus).selected {
+      #workshop-library button:not(button.focused).selected {
         background: var(--newsgray);
         color: var(--lines);
+      }
+
+      .dropdown-anchor {
+
+      }
+      .dropdown {
+        display: flex;
+        display: none;
+        flex-direction: column;
+        height: fit-content;
+        position: absolute;
+        top: 1.5rem;
+      }
+      .dropdown button {
+        border: 1px solid var(--borders);
+        text-align: left;
+      }
+      .dropdown-anchor.selected {
+        pointer-events: auto;
+      }
+      .dropdown button:not(button:last-child) {
+        border-bottom: none;
+      }
+      .dropdown-anchor.selected + .dropdown {
+        display: flex;
       }
 
       /*  */
@@ -1249,23 +1268,11 @@
     <div id="scene-workshop" class="scene">
       <div class="column">
         <footer>
-          <button>new piece</button>
-          <button>delete</button>
+          <button onclick="addPieceToWorkshop();">+ new piece</button>
+          <button onclick="removePieceFromWorkshop();">delete</button>
         </footer>
 
         <div id="workshop-library">
-          <button class="selected">
-            hello
-          </button>
-          <button>
-            hello
-          </button>
-          <button>
-            hello
-          </button>
-          <button>
-            hello
-          </button>
         </div>
 
         <div class="block transparent" style="line-height: 0;">
@@ -1275,9 +1282,41 @@
 
       <div class="column" style="flex-grow: 1;">
         <div class="marginbelow">
-          <footer>
-            <button>publish</button>
-            <button>clear</button>
+          <footer class="flexbox">
+            <button class="dropdown-anchor" onclick="toggleDropdown(this);">file</button>
+            <div class="dropdown">
+              <button>new piece</button>
+              <button>delete piece</button>
+            </div>
+
+            <button class="dropdown-anchor" onclick="toggleDropdown(this);">edit</button>
+            <div class="dropdown">
+              <button>undo</button>
+              <button>redo</button>
+              <button>clear piece</button>
+              <button>copy selected</button>
+              <button>cut selected</button>
+              <button>paste text in clipboard</button>
+            </div>
+
+            <button class="dropdown-anchor" onclick="toggleDropdown(this);">options</button>
+            <div class="dropdown">
+              <button>display word count</button>
+              <button>display character count</button>
+            </div>
+
+            <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
+            <div class="dropdown">
+              <button>publish to Market</button>
+              <button>release into the Wind</button>
+            </div>
+
+            <div class="grow"></div>
+
+            <button style="border: 1px solid var(--borders); border-bottom: none;" class="dropdown-anchor right" onclick="toggleDropdown(this);">help</button>
+            <div class="dropdown">
+              <button>Burgeria!</button>
+            </div>
           </footer>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
         </div>
@@ -1464,6 +1503,7 @@
     setScene("workshop");
 
     // workshop
+    updateWorkshopLibrary();
     updateList(ui.workshop.lettersList, playerdata.letters);
 
     // storefront

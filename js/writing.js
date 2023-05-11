@@ -1,8 +1,17 @@
 class Piece {
   constructor(text) {
-    this.title = text.split("\n")[0];
-    this.text = text;
+    text = text || "";
+    this.update(text);
     this.disintegrated = false;
+  }
+
+  update(text) {
+    const title = text.split("\n")[0];
+    this.title = title == "" ? "Empty note" : title;
+    this.text = text;
+  }
+
+  addToLibrary() {
     playerdata.libraryIndex = playerdata.library.length;
     playerdata.library.push(this);
     updateBookshelf();
@@ -81,7 +90,8 @@ class PieceAlert {
 
       bankPoints(-cost, "WWW");
 
-      new Piece(this.dataset.text);
+      const piece = new Piece(this.dataset.text);
+      piece.addToLibrary();
       sfx('click');
 
       p.classList.add("send-library");
@@ -107,33 +117,43 @@ class PieceAlert {
   }
 }
 
+function use_letter(letter) {
+  let count = playerdata.letters[letter];
+  if (count > 0) {
+    playerdata.letters[letter]--;
+    updateList(ui.kitchen.lettersList, playerdata.letters);
+    updateList(ui.workshop.lettersList, playerdata.letters);
+    return letter;
+  } else {
+    return false;
+  }
+}
+function unuse_letter(letter) {
+  if (!(letter in playerdata.letters)) {
+    playerdata.letters[letter] = 0;
+  }
+  playerdata.letters[letter]++;
+  updateList(ui.kitchen.lettersList, playerdata.letters);
+  updateList(ui.workshop.lettersList, playerdata.letters);
+}
+
 function init_workshop() {
   const workshop = ui.workshop.textarea;
 
-  function update_workshop(e) {
-    function use_letter(letter) {
-      let count = playerdata.letters[letter];
-      if (count > 0) {
-        playerdata.letters[letter]--;
-        updateList(ui.kitchen.lettersList, playerdata.letters);
-        updateList(ui.workshop.lettersList, playerdata.letters);
-        return letter;
-      } else {
-        return false;
-      }
-    }
-    function unuse_letter(letter) {
-      if (!(letter in playerdata.letters)) {
-        playerdata.letters[letter] = 0;
-      }
-      playerdata.letters[letter]++;
-      updateList(ui.kitchen.lettersList, playerdata.letters);
-      updateList(ui.workshop.lettersList, playerdata.letters);
-    }
+  workshop.addEventListener("focus", function() {
+    const button = ui.workshop.library.children[playerdata.workshopIndex];
+    button.classList.remove("focused");
+  });
+  workshop.addEventListener("blur", function() {
+    const button = ui.workshop.library.children[playerdata.workshopIndex];
+    button.classList.add("focused");
+  });
 
+  function update_workshop(e) {
     let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    let prevtext = playerdata.workshop;
+    const piece = playerdata.workshop[playerdata.workshopIndex];
+    let prevtext = piece.text;
     let text = this.value;
 
     let added, deleted;
@@ -197,7 +217,10 @@ function init_workshop() {
     }
 
     if (output != prevtext) {
-      playerdata.workshop = this.value;
+      piece.update(this.value);
+      const lib = ui.workshop.library;
+      lib.children[playerdata.workshopIndex].textContent = piece.title;
+
       sfx("type");
     } else if (letterRejected) {
       sfx("error");
@@ -206,4 +229,41 @@ function init_workshop() {
   }
 
   workshop.addEventListener("input", update_workshop);
+}
+
+function addPieceToWorkshop() {
+  deselectWorkshopLibraryButton();
+  playerdata.workshop.push(new Piece());
+  playerdata.workshopIndex = playerdata.workshop.length - 1;
+  createWorkshopLibraryButton(playerdata.workshopIndex);
+
+  const piece = playerdata.workshop[playerdata.workshopIndex];
+  ui.workshop.textarea.value = piece.text;
+}
+
+function removePieceFromWorkshop() {
+  for (let char of playerdata.workshop[playerdata.workshopIndex].text) {
+    unuse_letter(char);
+  }
+
+  playerdata.workshop.splice(playerdata.workshopIndex, 1);
+  const lib = ui.workshop.library;
+  for (let i=lib.children.length - 1; i>=0; i--) {
+    if (i > playerdata.workshopIndex) {
+      lib.children[i].dataset.index = i-1;
+    } else if (i == playerdata.workshopIndex) {
+      lib.children[i].remove();
+      break;
+    }
+  }
+  if (playerdata.workshopIndex >= playerdata.workshop.length) playerdata.workshopIndex--;
+  if (playerdata.workshop.length <= 0) {
+    addPieceToWorkshop();
+  } else {
+    lib.children[playerdata.workshopIndex].classList.add("selected");
+    lib.children[playerdata.workshopIndex].classList.add("focused");
+  }
+
+  const piece = playerdata.workshop[playerdata.workshopIndex];
+  ui.workshop.textarea.value = piece.text;
 }

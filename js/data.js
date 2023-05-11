@@ -13,7 +13,8 @@ var playerdata = {
   inventory: null,
   letters: {},
   ingredients: {},
-  workshop: "",
+  workshop: [],
+  workshopIndex: 0,
   library: [],
   libraryIndex: 0,
 
@@ -78,6 +79,10 @@ function init_default_playerdata() {
     playerdata.prices[char] = [];
     playerdata.prices[char].push(Math.ceil(Math.random() * 100));
   }
+
+  playerdata.workshop = [];
+  playerdata.workshopIndex = -1;
+  addPieceToWorkshop();
 
   new Ingredient({
     name: "top bun",
