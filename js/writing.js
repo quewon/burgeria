@@ -1,14 +1,54 @@
 class Piece {
   constructor(text) {
     text = text || "";
-    this.update(text);
+    this.history = [];
+    this.redoText = null;
     this.disintegrated = false;
+    this.update(text);
   }
 
   update(text) {
     const title = text.split("\n")[0];
     this.title = title == "" ? "Empty note" : title;
     this.text = text;
+    this.history.push(text);
+  }
+
+  hasUndo() {
+    return this.history.length > 1;
+  }
+
+  hasRedo() {
+    return this.redoText != null;
+  }
+
+  undo() {
+    if (this.history.length <= 1) return;
+
+    this.redoText = this.text;
+    this.history.pop();
+    this.text = this.history[this.history.length - 1];
+
+    const title = this.text.split("\n")[0];
+    this.title = title == "" ? "Empty note" : title;
+
+    const piece = playerdata.workshop[playerdata.workshopIndex];
+    if (this.text == piece.text)
+      ui.workshop.textarea.value = this.text;
+
+    console.log(this.history);
+  }
+
+  redo() {
+    if (!this.redoText) return;
+
+    this.update(this.redoText);
+
+    this.redoText = null;
+
+    const piece = playerdata.workshop[playerdata.workshopIndex];
+    if (this.text == piece.text)
+      ui.workshop.textarea.value = this.text;
   }
 
   addToLibrary() {
@@ -207,12 +247,14 @@ function init_workshop() {
       if (letterRejected) {
         this.classList.remove("rejected");
         this.classList.add("rejected");
-        this.dataset.index = addedIndex + addable.length;
+        this.dataset.endOffset = output.length - addedIndex + addable.length;
+        setTimeout(function() {
+          const workshop = ui.workshop.textarea;
+          workshop.selectionStart = workshop.selectionEnd = workshop.value.length - Number(workshop.dataset.endOffset);
+        }, 0);
         this.onanimationend = function() {
           this.classList.remove("rejected");
-          this.selectionStart = this.selectionEnd = this.dataset.index;
         }
-        this.selectionStart = this.selectionEnd = this.dataset.index;
       }
     }
 
@@ -225,6 +267,7 @@ function init_workshop() {
     } else if (letterRejected) {
       sfx("error");
     }
+
     this.value = output;
   }
 

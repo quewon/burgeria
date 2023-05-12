@@ -95,6 +95,8 @@ function setScene(name) {
 
   if (name == "kitchen") {
     ui.kitchen.lettersContainer.classList.add("gone");
+  } else if (name == "workshop") {
+    ui.workshop.textarea.focus();
   }
 }
 

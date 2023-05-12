@@ -63,7 +63,7 @@ function sfx_talk(name, id) {
 }
 
 function sfx(name, fadetime) {
-  // if (name == "click") return;
+  if (name == "click") return;
 
   let sound = _sounds[name];
   if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];

@@ -42,7 +42,7 @@ function init_default_playerdata() {
   ];
 
   for (let char of "abcdefghijklmnopqrstuvwxyz") {
-    playerdata.letters[char] = 2;
+    playerdata.letters[char] = 1;
   }
 
   playerdata.themes = {
