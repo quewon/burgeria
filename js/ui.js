@@ -61,6 +61,7 @@ var ui = {
     lettersContainer: document.getElementById("kitchen-letterstock"),
     pointsCounter: document.getElementById("points-counter"),
     bankbook: document.getElementById("bankbook"),
+    bankbookLabel: document.getElementById("bankbook-label"),
     bankbookBlock: document.getElementById("bankbook-block"),
     bookshelf: document.getElementById("bookshelf"),
   },
@@ -95,6 +96,7 @@ function setScene(name) {
 
   if (name == "kitchen") {
     ui.kitchen.lettersContainer.classList.add("gone");
+    ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.offsetWidth+"px";
   } else if (name == "workshop") {
     ui.workshop.textarea.focus();
   }

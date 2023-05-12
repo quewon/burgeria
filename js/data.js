@@ -57,13 +57,15 @@ function init_default_playerdata() {
       "graph-neutral": "var(--lines)",
       "graph-negative": "var(--burgeria)",
       "graph-positive": "blue",
+      "block-bg": "var(--bg)"
     },
     "☁︎": {
       "burgeria": "#c43d27",
       "bg": "#f8eddb",
       "lines": "#291e2c",
       "newsgray": "#c0d0cf",
-      "graph-positive": "#5B7553"
+      "graph-positive": "#5B7553",
+      "block-bg": "#ebddc8",
     },
     // "☾": {
     //   "burgeria": "black",

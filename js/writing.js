@@ -2,16 +2,20 @@ class Piece {
   constructor(text) {
     text = text || "";
     this.history = [];
-    this.redoText = null;
+    this.redoState = null;
     this.disintegrated = false;
     this.update(text);
   }
 
-  update(text) {
+  update(text, selectionStart, selectionEnd) {
     const title = text.split("\n")[0];
     this.title = title == "" ? "Empty note" : title;
     this.text = text;
-    this.history.push(text);
+    this.history.push({
+      text: text,
+      selectionStart: selectionStart,
+      selectionEnd: selectionEnd
+    });
   }
 
   hasUndo() {
@@ -19,36 +23,40 @@ class Piece {
   }
 
   hasRedo() {
-    return this.redoText != null;
+    return this.redoState != null;
   }
 
   undo() {
     if (this.history.length <= 1) return;
 
-    this.redoText = this.text;
-    this.history.pop();
-    this.text = this.history[this.history.length - 1];
+    this.redoState = this.history.pop();
+
+    const workshop = ui.workshop.textarea;
+    const prev = this.history[this.history.length - 1];
+    this.text = prev.text;
+    workshop.selectionStart = prev.selectionStart;
+    workshop.selectionEnd = prev.selectionEnd;
 
     const title = this.text.split("\n")[0];
     this.title = title == "" ? "Empty note" : title;
 
-    const piece = playerdata.workshop[playerdata.workshopIndex];
-    if (this.text == piece.text)
-      ui.workshop.textarea.value = this.text;
-
-    console.log(this.history);
+    this.displayInWorkshopTextarea();
   }
 
   redo() {
-    if (!this.redoText) return;
+    if (!this.redoState) return;
 
-    this.update(this.redoText);
+    this.update(this.redoState.text, this.redoState.selectionStart, this.redoState.selectionEnd);
+    this.redoState = null;
 
-    this.redoText = null;
+    this.displayInWorkshopTextarea();
+  }
 
-    const piece = playerdata.workshop[playerdata.workshopIndex];
-    if (this.text == piece.text)
-      ui.workshop.textarea.value = this.text;
+  displayInWorkshopTextarea() {
+    const state = this.history[this.history.length - 1];
+    const workshop = ui.workshop.textarea;
+
+    workshop.value = state.text;
   }
 
   addToLibrary() {
@@ -188,44 +196,60 @@ function init_workshop() {
     const button = ui.workshop.library.children[playerdata.workshopIndex];
     button.classList.add("focused");
   });
+  document.addEventListener("selectionchange", function(e) {
+    const workshop = ui.workshop.textarea;
+    if (e.target.activeElement != workshop) return;
+
+    const piece = playerdata.workshop[playerdata.workshopIndex];
+    const currentState = piece.history[piece.history.length - 1];
+    currentState.selectionStart = workshop.selectionStart;
+    currentState.selectionEnd = workshop.selectionEnd;
+  });
 
   function update_workshop(e) {
     let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     const piece = playerdata.workshop[playerdata.workshopIndex];
-    let prevtext = piece.text;
+    const prevState = piece.history[piece.history.length - 1];
+
+    let prevtext = prevState.text;
     let text = this.value;
 
     let added, deleted;
-    let addedIndex, deletedIndex;
+    let addedIndex = prevState.selectionStart;
+    let deletedIndex = prevState.selectionEnd;
+    let selWidth = prevState.selectionEnd - prevState.selectionStart;
     let caretPosition = this.selectionStart;
     let letterRejected = false;
 
+    if (selWidth > 0) {
+      deleted = prevtext.substring(addedIndex, deletedIndex);
+    } else {
+      deleted = prevtext;
+      for (let char of text) {
+        deleted = deleted.replace(char, "");
+      }
+    }
+
     added = text;
-    for (let char of prevtext) {
+    let tempPrev = prevtext;
+    if (selWidth > 0) {
+      tempPrev = prevtext.substring(0, addedIndex) + prevtext.substring(deletedIndex);
+    }
+    for (let char of tempPrev) {
       added = added.replace(char, "");
     }
-    addedIndex = this.selectionStart - added.length;
 
-    deleted = prevtext;
-    for (let char of text) {
-      deleted = deleted.replace(char, "");
-    }
-    deletedIndex = this.selectionEnd + deleted.length;
-
-    console.log(prevtext, text);
-    console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
+    // console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
 
     let output = prevtext;
-    if (deleted) {
-      for (let char of deleted) {
-        if (abcs.includes(char)) unuse_letter(char.toLowerCase());
-      }
+    for (let char of deleted) {
+      if (abcs.includes(char)) unuse_letter(char.toLowerCase());
+    }
+    if (selWidth <= 0) {
       output = output.substring(0, caretPosition) + output.substring(deletedIndex);
-
-      if (addedIndex >= deletedIndex) {
-        addedIndex -= deleted.length;
-      }
+    } else {
+      output = output.substring(0, addedIndex) + output.substring(deletedIndex);
     }
 
     let addable = "";
@@ -242,15 +266,24 @@ function init_workshop() {
           addable += char;
         }
       }
-      output = output.slice(0, addedIndex) + addable + output.slice(addedIndex);
+
+      console.log(addable, output);
+
+      output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
+
+      console.log(output);
 
       if (letterRejected) {
         this.classList.remove("rejected");
         this.classList.add("rejected");
-        this.dataset.endOffset = output.length - addedIndex + addable.length;
+        this.dataset.caretIndex = addedIndex;
         setTimeout(function() {
+          const piece = playerdata.workshop[playerdata.workshopIndex];
+          const currentState = piece.history[piece.history.length - 1];
           const workshop = ui.workshop.textarea;
-          workshop.selectionStart = workshop.selectionEnd = workshop.value.length - Number(workshop.dataset.endOffset);
+          workshop.selectionStart = workshop.selectionEnd =
+          currentState.selectionStart = currentState.selectionEnd =
+            Number(workshop.dataset.caretIndex);
         }, 0);
         this.onanimationend = function() {
           this.classList.remove("rejected");
@@ -258,8 +291,10 @@ function init_workshop() {
       }
     }
 
+    this.value = output;
+
     if (output != prevtext) {
-      piece.update(this.value);
+      piece.update(output, this.selectionStart, this.selectionEnd);
       const lib = ui.workshop.library;
       lib.children[playerdata.workshopIndex].textContent = piece.title;
 
@@ -267,10 +302,7 @@ function init_workshop() {
     } else if (letterRejected) {
       sfx("error");
     }
-
-    this.value = output;
   }
-
   workshop.addEventListener("input", update_workshop);
 }
 

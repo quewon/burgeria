@@ -779,25 +779,25 @@
         font-family: monospace;
         width: 100%;
       }
-      #bankbook th:nth-child(2n), #bankbook td:nth-child(2n) {
+      .bankbook th:nth-child(2n), .bankbook td:nth-child(2n) {
         border-right: 1px solid var(--lines);
       }
       th {
         text-transform: uppercase;
         font-weight: normal;
       }
-      #bankbook th {
+      .bankbook th {
         background: var(--newsgray);
       }
       th, td {
         padding-left: var(--padding);
       }
-      #bankbook th, #bankbook td {
+      .bankbook th, .bankbook td {
         padding: .2rem;
         white-space: nowrap;
         text-align: center;
       }
-      #bankbook td:nth-child(n+3) {
+      .bankbook td:nth-child(n+3) {
         text-align: right;
       }
       td:nth-child(n+3):not(:empty)::before {
@@ -1211,7 +1211,18 @@
               </div>
             </div>
 
-            <table id="bankbook"></table>
+            <table class="bankbook" id="bankbook-label" style="position: absolute;">
+              <tr>
+                <th>day</th>
+                <th>description</th>
+                <th>withdrawals</th>
+                <th>deposits</th>
+                <th>balance</th>
+              </tr>
+            </table>
+            <div style="max-height: 15rem; overflow-y: scroll;">
+              <table class="bankbook" id="bankbook"></table>
+            </div>
             <br>
             <div style="font-family: monospace; text-align: right;">NOTE: Profits are logged at the end of the day.</div>
           </div>
@@ -1504,38 +1515,40 @@
   <script type="text/javascript" src="js/data.js"></script>
   <script type="text/javascript" src="js/game.js"></script>
   <script type="text/javascript">
-    init_default_playerdata();
+    window.onload = function() {
+      console.clear();
 
-    // workshop
-    updateWorkshopLibrary();
-    updateList(ui.workshop.lettersList, playerdata.letters);
+      init_default_playerdata();
 
-    // storefront
+      // workshop
+      updateWorkshopLibrary();
+      updateList(ui.workshop.lettersList, playerdata.letters);
 
-    init_3d();
+      // storefront
 
-    playerdata.themes.index--;
-    toggleTheme();
+      init_3d();
 
-    playerdata.recipes[0].previewRecipe();
-    updateDayUI();
+      playerdata.themes.index--;
+      toggleTheme();
 
-    // kitchen
+      playerdata.recipes[0].previewRecipe();
+      updateDayUI();
 
-    init_workshop();
-    updateLibrary();
-    updatePoints();
-    updateBankbook();
-    updateRecipes();
-    updateList(ui.kitchen.lettersList, playerdata.letters);
-    updateBookshelf();
+      // kitchen
 
-    //
+      init_workshop();
+      updateLibrary();
+      updatePoints();
+      updateBankbook();
+      updateRecipes();
+      updateList(ui.kitchen.lettersList, playerdata.letters);
+      updateBookshelf();
 
-    animate();
+      //
 
-    setScene("workshop");
+      animate();
 
-    console.clear();
+      setScene("workshop");
+    }
   </script>
 </html>
