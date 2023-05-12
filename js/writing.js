@@ -240,13 +240,13 @@ function init_workshop() {
       added = added.replace(char, "");
     }
 
-    // console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
+    console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
 
     let output = prevtext;
     for (let char of deleted) {
       if (abcs.includes(char)) unuse_letter(char.toLowerCase());
     }
-    if (selWidth <= 0) {
+    if (selWidth == 0) {
       output = output.substring(0, caretPosition) + output.substring(deletedIndex);
     } else {
       output = output.substring(0, addedIndex) + output.substring(deletedIndex);
@@ -267,11 +267,11 @@ function init_workshop() {
         }
       }
 
-      console.log(addable, output);
-
-      output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
-
-      console.log(output);
+      if (selWidth == 0) {
+        output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
+      } else {
+        output = output.substring(0, addedIndex) + addable + output.substring(addedIndex);
+      }
 
       if (letterRejected) {
         this.classList.remove("rejected");
