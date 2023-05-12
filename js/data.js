@@ -83,7 +83,6 @@ function init_default_playerdata() {
   }
 
   playerdata.workshop = [];
-  playerdata.workshopIndex = -1;
   addPieceToWorkshop();
 
   new Ingredient({

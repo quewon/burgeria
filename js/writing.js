@@ -23,12 +23,48 @@ class Piece {
     this.updateState();
   }
 
+  wordsCount() {
+    let words = 0;
+    let array = this.text.split(" ");
+    for (let potentialWord of array) {
+      if (/[a-zA-Z]/g.test(potentialWord)) {
+        words++;
+      }
+    }
+    return words;
+  }
+
+  lettersCount() {
+    let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let letters = 0;
+    for (let char of this.text) {
+      if (abcs.includes(char)) {
+        letters++;
+      }
+    }
+    return letters;
+  }
+
   hasUndo() {
-    return this.history.length > 1;
+    return this.historyIndex > 0;
   }
 
   hasRedo() {
     return this.historyIndex < this.history.length - 1;
+  }
+
+  clear() {
+    let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let deleting = "";
+    for (let char of this.text) {
+      if (abcs.includes(char)) {
+        unuse_letter(char.toLowerCase());
+        deleting += char.toLowerCase();
+      }
+    }
+
+    this.update("", 0, 0, "", deleting);
+    this.displayInWorkshopTextarea();
   }
 
   undo() {
@@ -47,7 +83,6 @@ class Piece {
 
     this.historyIndex--;
     this.updateState();
-
     this.displayInWorkshopTextarea();
   }
 
@@ -67,7 +102,6 @@ class Piece {
       playerdata.letters[char]--;
     }
     updateList(ui.workshop.lettersList, playerdata.letters);
-
     this.displayInWorkshopTextarea();
   }
 
@@ -315,6 +349,7 @@ function update_workshop() {
 
   if (output != prevtext) {
     piece.update(output, workshop.selectionStart, workshop.selectionEnd, charsAdded, charsDeleted);
+    piece.displayInWorkshopTextarea();
 
     sfx("type");
   } else if (letterRejected) {
@@ -348,12 +383,12 @@ function init_workshop() {
 
 function addPieceToWorkshop() {
   deselectWorkshopLibraryButton();
+  playerdata.workshopIndex = playerdata.workshop.length;
   playerdata.workshop.push(new Piece());
-  playerdata.workshopIndex = playerdata.workshop.length - 1;
   createWorkshopLibraryButton(playerdata.workshopIndex);
 
   const piece = playerdata.workshop[playerdata.workshopIndex];
-  ui.workshop.textarea.value = piece.text;
+  piece.displayInWorkshopTextarea();
 }
 
 function removePieceFromWorkshop() {

@@ -71,7 +71,9 @@ var ui = {
     market: document.getElementById("market"),
     marketEmptyMessage: document.getElementById("market-empty"),
     lettersList: document.getElementById("workshop-letters-list"),
-    library: document.getElementById("workshop-library")
+    library: document.getElementById("workshop-library"),
+    wordsCount: document.getElementById("workshop-words"),
+    lettersCount: document.getElementById("workshop-letters")
   }
 };
 
@@ -427,6 +429,14 @@ function updateBankbook() {
   }
 }
 
+function updateWorkshopLetterCount() {
+  const words = ui.workshop.wordsCount;
+  const letters = ui.workshop.lettersCount;
+  const piece = playerdata.workshop[playerdata.workshopIndex];
+  words.textContent = piece.wordsCount();
+  letters.textContent = piece.lettersCount();
+}
+
 function deselectWorkshopLibraryButton() {
   const og = ui.workshop.library.children[playerdata.workshopIndex];
   if (!og) return;
@@ -447,6 +457,7 @@ function createWorkshopLibraryButton(i) {
     this.classList.add("selected");
     this.classList.add("focused");
     ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
+    updateWorkshopLetterCount();
   }
   lib.appendChild(button);
 

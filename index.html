@@ -1306,16 +1306,18 @@
             <div class="dropdown">
               <button onclick="playerdata.workshop[playerdata.workshopIndex].undo();">undo</button>
               <button onclick="playerdata.workshop[playerdata.workshopIndex].redo();">redo</button>
-              <button>clear piece</button>
-              <button>copy selected</button>
-              <button>cut selected</button>
-              <button>paste text in clipboard</button>
+              <button onclick="playerdata.workshop[playerdata.workshopIndex].clear();">clear piece</button>
+              <!-- <button>copy selected</button> -->
+              <!-- <button>cut selected</button> -->
+              <!-- <button>paste text in clipboard</button> -->
             </div>
 
-            <button class="dropdown-anchor" onclick="toggleDropdown(this);">options</button>
+            <button class="dropdown-anchor" onclick="updateWorkshopLetterCount(); toggleDropdown(this);">count</button>
             <div class="dropdown">
-              <button>display word count</button>
-              <button>display character count</button>
+              <div class="block">
+                <i>words: <span id="workshop-words">0</span></i><br>
+                <i>letters: <span id="workshop-letters">0</span></i>
+              </div>
             </div>
 
             <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
@@ -1332,10 +1334,6 @@
             </div>
           </footer>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
-          <!-- <div class="block flexbox gap" style="padding: 0; border-top: none;">
-            <span class="grow" style="text-align: right;">🍔 written with burgeria</span>
-            <button style="border-right: none; border-bottom: none;">share!</button>
-          </div> -->
         </div>
 
         <div class="block">
