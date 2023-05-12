@@ -2,20 +2,25 @@ class Piece {
   constructor(text) {
     text = text || "";
     this.history = [];
-    this.redoState = null;
+    this.historyIndex = -1;
     this.disintegrated = false;
-    this.update(text);
+    this.update(text, text.length - 1, text.length - 1, "", "");
   }
 
-  update(text, selectionStart, selectionEnd) {
-    const title = text.split("\n")[0];
-    this.title = title == "" ? "Empty note" : title;
-    this.text = text;
+  update(text, selectionStart, selectionEnd, added, deleted) {
+    if (this.historyIndex < this.history.length - 1) {
+      this.history = this.history.slice(0, this.historyIndex + 1);
+    }
     this.history.push({
       text: text,
       selectionStart: selectionStart,
-      selectionEnd: selectionEnd
+      selectionEnd: selectionEnd,
+      added: added,
+      deleted: deleted
     });
+    this.historyIndex = this.history.length - 1;
+
+    this.updateState();
   }
 
   hasUndo() {
@@ -23,37 +28,66 @@ class Piece {
   }
 
   hasRedo() {
-    return this.redoState != null;
+    return this.historyIndex < this.history.length - 1;
   }
 
   undo() {
-    if (this.history.length <= 1) return;
+    if (this.historyIndex <= 0) return;
 
-    this.redoState = this.history.pop();
+    const state = this.history[this.historyIndex];
+    const deleted = state.deleted;
+    const added = state.added;
+    for (let char of deleted) {
+      playerdata.letters[char]--;
+    }
+    for (let char of added) {
+      playerdata.letters[char]++;
+    }
+    updateList(ui.workshop.lettersList, playerdata.letters);
 
-    const workshop = ui.workshop.textarea;
-    const prev = this.history[this.history.length - 1];
-    this.text = prev.text;
-    workshop.selectionStart = prev.selectionStart;
-    workshop.selectionEnd = prev.selectionEnd;
-
-    const title = this.text.split("\n")[0];
-    this.title = title == "" ? "Empty note" : title;
+    this.historyIndex--;
+    this.updateState();
 
     this.displayInWorkshopTextarea();
   }
 
   redo() {
-    if (!this.redoState) return;
+    if (this.historyIndex == this.history.length - 1) return;
 
-    this.update(this.redoState.text, this.redoState.selectionStart, this.redoState.selectionEnd);
-    this.redoState = null;
+    this.historyIndex++;
+    this.updateState();
+
+    const state = this.history[this.historyIndex];
+    const deleted = state.deleted;
+    const added = state.added;
+    for (let char of deleted) {
+      playerdata.letters[char]++;
+    }
+    for (let char of added) {
+      playerdata.letters[char]--;
+    }
+    updateList(ui.workshop.lettersList, playerdata.letters);
 
     this.displayInWorkshopTextarea();
   }
 
+  updateState() {
+    const workshop = ui.workshop.textarea;
+    const state = this.history[this.historyIndex];
+    this.text = state.text;
+    workshop.selectionStart = state.selectionStart;
+    workshop.selectionEnd = state.selectionEnd;
+
+    const title = this.text.split("\n")[0];
+    this.title = title == "" ? "Empty note" : title;
+
+    const lib = ui.workshop.library;
+    if (playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length)
+      lib.children[playerdata.workshopIndex].textContent = this.title;
+  }
+
   displayInWorkshopTextarea() {
-    const state = this.history[this.history.length - 1];
+    const state = this.history[this.historyIndex];
     const workshop = ui.workshop.textarea;
 
     workshop.value = state.text;
@@ -185,6 +219,109 @@ function unuse_letter(letter) {
   updateList(ui.workshop.lettersList, playerdata.letters);
 }
 
+function update_workshop() {
+  const workshop = ui.workshop.textarea;
+  let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  const piece = playerdata.workshop[playerdata.workshopIndex];
+  const prevState = piece.history[piece.historyIndex];
+
+  let prevtext = prevState.text;
+  let text = workshop.value;
+
+  let added, deleted;
+  let addedIndex = prevState.selectionStart;
+  let deletedIndex = prevState.selectionEnd;
+  let selWidth = prevState.selectionEnd - prevState.selectionStart;
+  let caretPosition = workshop.selectionStart;
+  let letterRejected = false;
+
+  if (selWidth > 0) {
+    deleted = prevtext.substring(addedIndex, deletedIndex);
+  } else {
+    deleted = prevtext;
+    for (let char of text) {
+      deleted = deleted.replace(char, "");
+    }
+  }
+
+  added = text;
+  let tempPrev = prevtext;
+  if (selWidth > 0) {
+    tempPrev = prevtext.substring(0, addedIndex) + prevtext.substring(deletedIndex);
+  }
+  for (let char of tempPrev) {
+    added = added.replace(char, "");
+  }
+
+  // console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
+
+  let output = prevtext;
+  let charsDeleted = "";
+  for (let char of deleted) {
+    if (abcs.includes(char)) {
+      unuse_letter(char.toLowerCase());
+      charsDeleted += char.toLowerCase();
+    }
+  }
+  if (selWidth == 0) {
+    output = output.substring(0, caretPosition) + output.substring(deletedIndex);
+  } else {
+    output = output.substring(0, addedIndex) + output.substring(deletedIndex);
+  }
+
+  let addable = "";
+  let charsAdded = "";
+  if (added) {
+    for (let char of added) {
+      if (abcs.includes(char)) {
+        let letter = use_letter(char.toLowerCase());
+        if (letter) {
+          addable += char;
+          charsAdded += letter;
+        } else {
+          letterRejected = true;
+        }
+      } else {
+        addable += char;
+      }
+    }
+
+    if (selWidth == 0) {
+      output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
+    } else {
+      output = output.substring(0, addedIndex) + addable + output.substring(addedIndex);
+    }
+
+    if (letterRejected) {
+      workshop.classList.remove("rejected");
+      workshop.classList.add("rejected");
+      workshop.dataset.caretIndex = addedIndex;
+      setTimeout(function() {
+        const piece = playerdata.workshop[playerdata.workshopIndex];
+        const currentState = piece.history[piece.history.length - 1];
+        const workshop = ui.workshop.textarea;
+        workshop.selectionStart = workshop.selectionEnd =
+        currentState.selectionStart = currentState.selectionEnd =
+          Number(workshop.dataset.caretIndex);
+      }, 0);
+      workshop.onanimationend = function() {
+        this.classList.remove("rejected");
+      }
+    }
+  }
+
+  workshop.value = output;
+
+  if (output != prevtext) {
+    piece.update(output, workshop.selectionStart, workshop.selectionEnd, charsAdded, charsDeleted);
+
+    sfx("type");
+  } else if (letterRejected) {
+    sfx("error");
+  }
+}
+
 function init_workshop() {
   const workshop = ui.workshop.textarea;
 
@@ -206,103 +343,6 @@ function init_workshop() {
     currentState.selectionEnd = workshop.selectionEnd;
   });
 
-  function update_workshop(e) {
-    let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    const piece = playerdata.workshop[playerdata.workshopIndex];
-    const prevState = piece.history[piece.history.length - 1];
-
-    let prevtext = prevState.text;
-    let text = this.value;
-
-    let added, deleted;
-    let addedIndex = prevState.selectionStart;
-    let deletedIndex = prevState.selectionEnd;
-    let selWidth = prevState.selectionEnd - prevState.selectionStart;
-    let caretPosition = this.selectionStart;
-    let letterRejected = false;
-
-    if (selWidth > 0) {
-      deleted = prevtext.substring(addedIndex, deletedIndex);
-    } else {
-      deleted = prevtext;
-      for (let char of text) {
-        deleted = deleted.replace(char, "");
-      }
-    }
-
-    added = text;
-    let tempPrev = prevtext;
-    if (selWidth > 0) {
-      tempPrev = prevtext.substring(0, addedIndex) + prevtext.substring(deletedIndex);
-    }
-    for (let char of tempPrev) {
-      added = added.replace(char, "");
-    }
-
-    console.log("added: "+added+" \nindex: "+addedIndex+"\ndeleted: "+deleted+"\nindex: "+deletedIndex+"\ncaret: "+caretPosition);
-
-    let output = prevtext;
-    for (let char of deleted) {
-      if (abcs.includes(char)) unuse_letter(char.toLowerCase());
-    }
-    if (selWidth == 0) {
-      output = output.substring(0, caretPosition) + output.substring(deletedIndex);
-    } else {
-      output = output.substring(0, addedIndex) + output.substring(deletedIndex);
-    }
-
-    let addable = "";
-    if (added) {
-      for (let char of added) {
-        if (abcs.includes(char)) {
-          let letter = use_letter(char.toLowerCase());
-          if (letter) {
-            addable += char;
-          } else {
-            letterRejected = true;
-          }
-        } else {
-          addable += char;
-        }
-      }
-
-      if (selWidth == 0) {
-        output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
-      } else {
-        output = output.substring(0, addedIndex) + addable + output.substring(addedIndex);
-      }
-
-      if (letterRejected) {
-        this.classList.remove("rejected");
-        this.classList.add("rejected");
-        this.dataset.caretIndex = addedIndex;
-        setTimeout(function() {
-          const piece = playerdata.workshop[playerdata.workshopIndex];
-          const currentState = piece.history[piece.history.length - 1];
-          const workshop = ui.workshop.textarea;
-          workshop.selectionStart = workshop.selectionEnd =
-          currentState.selectionStart = currentState.selectionEnd =
-            Number(workshop.dataset.caretIndex);
-        }, 0);
-        this.onanimationend = function() {
-          this.classList.remove("rejected");
-        }
-      }
-    }
-
-    this.value = output;
-
-    if (output != prevtext) {
-      piece.update(output, this.selectionStart, this.selectionEnd);
-      const lib = ui.workshop.library;
-      lib.children[playerdata.workshopIndex].textContent = piece.title;
-
-      sfx("type");
-    } else if (letterRejected) {
-      sfx("error");
-    }
-  }
   workshop.addEventListener("input", update_workshop);
 }
 

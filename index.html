@@ -160,7 +160,7 @@
         border-bottom: none;
         border-right: none;
       }
-      #workshop-scene-button {
+      #storefront-scene-button {
         border-right: 1px solid var(--burgeria) !important;
       }
 
@@ -1108,7 +1108,7 @@
   <body>
 
     <header>
-      <h1 onclick="setScene('storefront');">BURGERIA!</h1>
+      <h1 onclick="setScene('workshop');">BURGERIA!</h1>
       <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
     </header>
 
@@ -1118,9 +1118,9 @@
         </div>
         <div class="flexbox" style="text-align: center;">
           <!-- <span style="color: var(--burgeria);">:&nbsp</span> -->
-          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button>
-          <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button>
           <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
+          <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button>
+          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button>
           <!-- <span style="color: var(--burgeria);">&nbsp:</span> -->
         </div>
         <div class="grow" style="text-align: right;">
