@@ -1330,7 +1330,8 @@
 
             <button style="border: 1px solid var(--borders); border-bottom: none;" class="dropdown-anchor right" onclick="toggleDropdown(this);">help</button>
             <div class="dropdown">
-              <button>Burgeria!</button>
+              <button style="text-align: right;" onclick="ui.dialogs['help-burgeria'].showModal()">about <em>Burgeria!</em></button>
+              <!-- <button style="text-align: right;" onclick="ui.dialogs['help-burgeria'].showModal()">tip</button> -->
             </div>
           </footer>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
@@ -1450,6 +1451,24 @@
         </div>
       </div>
     </template>
+
+    <dialog id="dialog-help-burgeria">
+      <div class="flexbox">
+        <div class="grow">Welcome to Burgeria!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+
+      <div style="text-align: center;">
+        <img src="img/burger.png" alt="a deluxe burger" title="a Deluxe Burger" style="width: 70px; margin: auto;">
+      </div>
+      <em>Burgeria!</em> is your very own word-processing burger spot.
+      <br><br>
+      Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...
+
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
 
     <dialog id="dialog-no-points" class="error">
       <div class="flexbox">
