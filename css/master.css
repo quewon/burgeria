@@ -86,6 +86,7 @@ header h1 {
   display: inline-block;
   pointer-events: unset;
   cursor: pointer;
+  margin-bottom: calc(var(--gap) / 2);
 }
 
 h1, h2 {
@@ -98,7 +99,7 @@ h1 {
   font-size: 3.25em;
   font-weight: bold;
   transform: scaleY(1.7);
-  line-height: 1.2em;
+  /* line-height: 1.3em; */
   white-space: nowrap;
 }
 
@@ -319,7 +320,7 @@ li button {
   pointer-events: none;
 }
 .send-library .block {
-  animation: send-library 0s;
+  animation: send-library 0.1ms;
 }
 @keyframes send-library {
   0% {

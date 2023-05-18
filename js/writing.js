@@ -216,6 +216,7 @@ class PieceAlert {
 
       p.classList.add("send-library");
       p.onanimationend = function() {
+        console.log(this);
         this.remove();
         if (ui.workshop.market.lastElementChild == ui.workshop.marketEmptyMessage) {
           ui.workshop.marketEmptyMessage.classList.remove("gone");
