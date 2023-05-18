@@ -74,7 +74,8 @@ var ui = {
     lettersList: document.getElementById("workshop-letters-list"),
     library: document.getElementById("workshop-library"),
     wordsCount: document.getElementById("workshop-words"),
-    lettersCount: document.getElementById("workshop-letters")
+    lettersCount: document.getElementById("workshop-letters"),
+    kitchenLibraryButton: document.getElementById("market-library-button")
   }
 };
 
@@ -89,9 +90,11 @@ function setScene(name) {
     if (name != scenename) {
       scene.classList.add("hidden");
       ui[scenename].sceneButton.classList.remove("selected");
+      ui[scenename].sceneButton.removeAttribute("disabled");
     } else {
       scene.classList.remove("hidden");
       ui[scenename].sceneButton.classList.add("selected");
+      ui[scenename].sceneButton.setAttribute("disabled", true);
     }
   }
   ui.currentScene = name;
@@ -100,6 +103,7 @@ function setScene(name) {
   if (name == "kitchen") {
     ui.kitchen.lettersContainer.classList.add("gone");
     ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.offsetWidth+"px";
+    ui.kitchen.bankbook.parentNode.scrollTop = ui.kitchen.bankbook.parentNode.scrollHeight;
   } else if (name == "workshop") {
     ui.workshop.textarea.focus();
   }
@@ -242,11 +246,11 @@ function updateDayUI() {
       }
     }
     if (!all_served) {
-      dtb.classList.add("disabled");
+      dtb.setAttribute("disabled", true);
       di.textContent = "☾";
       overtime.classList.remove("gone");
     } else {
-      dtb.classList.remove("disabled");
+      dtb.removeAttribute("disabled");
       di.textContent = "☼";
       overtime.classList.add("gone");
       ui.storefront.ministock.classList.add("gone");
@@ -321,8 +325,10 @@ function updateMinistockWindow() {
 
 function updateLibrary() {
   if (playerdata.library.length == 0) {
+    ui.workshop.kitchenLibraryButton.setAttribute("disabled", true);
     ui.kitchen.libraryBlock.classList.add("gone");
   } else {
+    ui.workshop.kitchenLibraryButton.removeAttribute("disabled");
     ui.kitchen.libraryBlock.classList.remove("gone");
   }
 
@@ -344,14 +350,14 @@ function updateLibrary() {
   ui.kitchen.library.index.textContent = playerdata.libraryIndex + 1;
 
   let buttons = ui.kitchen.library.nav.querySelectorAll("button");
-  buttons[0].classList.add("disabled");
-  buttons[1].classList.add("disabled");
+  buttons[0].setAttribute("disabled", true);
+  buttons[1].setAttribute("disabled", true);
   if (playerdata.library.length > 1) {
     if (playerdata.libraryIndex > 0) {
-      buttons[0].classList.remove("disabled");
+      buttons[0].removeAttribute("disabled");
     }
     if (playerdata.libraryIndex < playerdata.library.length - 1) {
-      buttons[1].classList.remove("disabled");
+      buttons[1].removeAttribute("disabled");
     }
   }
 }
@@ -443,6 +449,7 @@ function deselectWorkshopLibraryButton() {
   if (!og) return;
   og.classList.remove("selected");
   og.classList.remove("focused");
+  og.removeAttribute("disabled");
 }
 
 function createWorkshopLibraryButton(i) {
@@ -457,6 +464,7 @@ function createWorkshopLibraryButton(i) {
     playerdata.workshopIndex = this.dataset.index;
     this.classList.add("selected");
     this.classList.add("focused");
+    this.setAttribute("disabled", true);
     ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
     updateWorkshopLetterCount();
   }
@@ -465,6 +473,7 @@ function createWorkshopLibraryButton(i) {
   if (i==playerdata.workshopIndex) {
     button.classList.add("selected");
     button.classList.add("focused");
+    button.setAttribute("disabled", true);
   }
 }
 

@@ -65,7 +65,6 @@ class Recipe {
     button.onclick = function(e) {
       const recipe = playerdata.recipes[this.dataset.id];
       recipe.previewRecipe();
-      sfx("click");
     }
     this.element.appendChild(button);
     this.button = button;
@@ -96,6 +95,7 @@ class Recipe {
     }
 
     this.button.classList.add("selected");
+    this.button.setAttribute("disabled", true);
     this.tray.resize_3d(ui.storefront.recipePreviewContext);
     this.tray.resetMeshes();
 
@@ -113,6 +113,7 @@ class Recipe {
   closePreview() {
     this.visible = false;
     this.button.classList.remove("selected");
+    this.button.removeAttribute("disabled");
   }
 
   deviate() {

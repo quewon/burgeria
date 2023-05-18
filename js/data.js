@@ -1,27 +1,4 @@
-var playerdata = {
-  daytime: true,
-  day: 1,
-  storetime: -1,
-  prices: {},
-  recipes: [],
-  trays: [],
-  guys: [],
-
-  points: 100,
-  unbankedPoints: 0,
-  bankbook: [],
-  inventory: null,
-  letters: {},
-  ingredients: {},
-  workshop: [],
-  workshopIndex: 0,
-  library: [],
-  libraryIndex: 0,
-
-  toggledBooks: {},
-
-  themes: {},
-};
+var playerdata;
 
 function bankPoints(value, description) {
   if (value == 0) return;
@@ -34,47 +11,61 @@ function bankPoints(value, description) {
 }
 
 function init_default_playerdata() {
-  playerdata.day = 1;
-  playerdata.storetime = -1;
-  playerdata.points = 100;
-  playerdata.bankbook = [
-    [0, "BURGERMAN", "", "100", "100"]
-  ];
+  playerdata = {
+    daytime: true,
+    day: 1,
+    storetime: -1,
+    prices: {},
+    recipes: [],
+    trays: [],
+    guys: [],
 
-  for (let char of "abcdefghijklmnopqrstuvwxyz") {
-    playerdata.letters[char] = 1;
+    points: 0,
+    unbankedPoints: 0,
+    bankbook: [],
+    inventory: new Collection(),
+    letters: {},
+    ingredients: {},
+    workshop: [],
+    workshopIndex: 0,
+    library: [],
+    libraryIndex: 0,
+
+    toggledBooks: {},
+
+    themes: {
+      index: 0,
+      order: ["☼", "☁︎"], //,"☾"
+      "☼": {
+        "burgeria": "red",
+        "burgeria-bg": "pink",
+        "newsgray": "#dcdcdc",
+        "lines": "black",
+        "bg": "white",
+        "graph-neutral": "var(--lines)",
+        "graph-negative": "var(--burgeria)",
+        "graph-positive": "blue",
+      },
+      "☁︎": {
+        "burgeria": "#c43d27",
+        "bg": "#f8eddb",
+        "lines": "#291e2c",
+        "newsgray": "#c0d0cf",
+        "graph-positive": "#5B7553",
+      }
+    },
   }
 
-  playerdata.themes = {
-    index: 0,
-    order: ["☼", "☁︎"], //,"☾"
-    "☼": {
-      "burgeria": "red",
-      "burgeria-bg": "pink",
-      "newsgray": "#dcdcdc",
-      "lines": "black",
-      "bg": "white",
-      "graph-neutral": "var(--lines)",
-      "graph-negative": "var(--burgeria)",
-      "graph-positive": "blue",
-      "block-bg": "var(--bg)"
-    },
-    "☁︎": {
-      "burgeria": "#c43d27",
-      "bg": "#f8eddb",
-      "lines": "#291e2c",
-      "newsgray": "#c0d0cf",
-      "graph-positive": "#5B7553",
-      "block-bg": "#ebddc8",
-    },
-    // "☾": {
-    //   "burgeria": "black",
-    //   "burgeria-bg": "#e3e3e3",
-    //   "bg": "#e3e3e3",
-    //   "newsgray": "#c7c7c7",
-    //   "lines": "black",
-    // }
-  };
+  // playerdata.points = 100;
+  // playerdata.bankbook.push([0, "BURGERMAN", "", "100", "100"]);
+  // for (let i=0; i<100; i++) {
+  //   playerdata.bankbook.push([0, "WWW", "", "100", "100"]);
+  // }
+  // playerdata.bankbook.push([0, "END", "", "100", "100"]);
+
+  for (let char of "abcde") {
+    playerdata.letters[char] = 1;
+  }
 
   let abc = "abcdefghijklmnopqrstuvwxyz";
   for (let char of abc) {
@@ -82,7 +73,6 @@ function init_default_playerdata() {
     playerdata.prices[char].push(Math.ceil(Math.random() * 100));
   }
 
-  playerdata.workshop = [];
   addPieceToWorkshop();
 
   new Ingredient({
@@ -148,7 +138,6 @@ function init_default_playerdata() {
     color: 0xff0000
   });
 
-  playerdata.inventory = new Collection();
   for (let name of ["top bun", "bottom bun", "patty", "fries", "coke"]) {
     new Item(name, playerdata.inventory);
   }

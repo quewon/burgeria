@@ -116,7 +116,10 @@ class Piece {
     this.title = title == "" ? "Empty note" : title;
 
     const lib = ui.workshop.library;
-    if (playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length)
+    if (
+      playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length &&
+      playerdata.workshop[playerdata.workshopIndex] == this
+    )
       lib.children[playerdata.workshopIndex].textContent = this.title;
   }
 
@@ -200,6 +203,7 @@ class PieceAlert {
       const cost = Number(this.dataset.cost);
 
       if (playerdata.points < cost) {
+        sfx("error");
         ui.dialogs["no-points"].showModal();
         return;
       }
