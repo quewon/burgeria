@@ -12,16 +12,16 @@ function bankPoints(value, description) {
 
 function init_default_playerdata() {
   playerdata = {
-    daytime: true,
+    // daytime: true, //
     day: 1,
-    storetime: -1,
+    // storetime: -1, //
     prices: {},
     recipes: [],
-    trays: [],
-    guys: [],
+    // trays: [], //
+    // guys: [], //
 
     points: 0,
-    unbankedPoints: 0,
+    // unbankedPoints: 0, //
     bankbook: [],
     inventory: new Collection(),
     letters: {},
@@ -31,29 +31,7 @@ function init_default_playerdata() {
     library: [],
     libraryIndex: 0,
 
-    toggledBooks: {},
-
-    themes: {
-      index: 0,
-      order: ["☼", "☁︎"], //,"☾"
-      "☼": {
-        "burgeria": "red",
-        "burgeria-bg": "pink",
-        "newsgray": "#dcdcdc",
-        "lines": "black",
-        "bg": "white",
-        "graph-neutral": "var(--lines)",
-        "graph-negative": "var(--burgeria)",
-        "graph-positive": "blue",
-      },
-      "☁︎": {
-        "burgeria": "#c43d27",
-        "bg": "#f8eddb",
-        "lines": "#291e2c",
-        "newsgray": "#c0d0cf",
-        "graph-positive": "#5B7553",
-      }
-    },
+    themeIndex: 0,
   }
 
   // playerdata.points = 100;
@@ -187,26 +165,4 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-
-  // there should be a bank for the writing the player collects
-  // and a separate one for the player's writing
-  // but i don't want the first bank to be tied to the writingbank
-
-  new PieceAlert(`Dear New-owner-insert-name-here,
-
-Hello! I see you've found your way to the kitchen. That's very promising!
-
-In here you can check your balance, stock, and even create new ingredients out of the text in your library.
-
-Then, if you haven't already, you can go back to the storefront and open the store to start serving customers :)
-
-Don't worry if it seems like time is running out—Burgeria customers are a patient bunch.
-
-Good luck stacking burgers!
-
-Love,
-Burgerman`);
-  new PieceAlert(`to anyone whom this letter reaches,
-i am stuck in a prison where there is little light.
-i’m bored to tears. please, tell me a story.`, 5);
 }

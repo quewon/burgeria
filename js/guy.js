@@ -1,6 +1,6 @@
 class Guy {
   constructor() {
-    this.id = playerdata.guys.length;
+    this.id = game.guys.length;
 
     const archs = [
       {
@@ -64,6 +64,17 @@ class Guy {
     ui.storefront.day.guysContainer.appendChild(this.element);
     updateGuysList();
 
+    // this is only necessary if scrolling happens
+    // wish there was a 'did the scrollbar appear/disappear' event listener in js
+    if (ui.storefront.guysListTray) {
+      const tray = ui.storefront.guysListTray;
+      tray.updateGlobalBlockPosition("guysList", tray.sendbutton);
+    }
+    if (ui.storefront.ministockTray) {
+      const tray = ui.storefront.ministockTray;
+      tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
+    }
+
     //
 
     this.generateDesiredMenu(arch.complexity);
@@ -80,7 +91,7 @@ class Guy {
     tray.sendToStorefront();
     _sounds.chime[arch.chime].play();
 
-    playerdata.guys.push(this);
+    game.guys.push(this);
     updateGuysList();
   }
 
@@ -268,13 +279,13 @@ class Guy {
     this.element.dataset.id = this.id;
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
-      let guy = playerdata.guys[this.dataset.id];
+      let guy = game.guys[this.dataset.id];
       guy.element.remove();
 
       // check: am i done serving everybody?
       // if so, allow player to start the day up again!
-      if (playerdata.storetime == -1) {
-        for (let guy of playerdata.guys) {
+      if (game.storetime == -1) {
+        for (let guy of game.guys) {
           if (!guy.served) return;
         }
         game.beginDay();
@@ -283,8 +294,8 @@ class Guy {
 
     const feedback = tray.requestFeedback(this.desiredMenu);
     if (feedback.tray_is_perfect) {
-      var points = playerdata.storetime == -1 ? Math.ceil(this.desiredMenu.cost/2) : this.desiredMenu.cost;
-      playerdata.unbankedPoints += points;
+      var points = game.storetime == -1 ? Math.ceil(this.desiredMenu.cost/2) : this.desiredMenu.cost;
+      game.unbankedPoints += points;
       for (let i=0; i<points; i++) {
         setTimeout(burgerpointParticle, Math.random() * 100 * points);
       }

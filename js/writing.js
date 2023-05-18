@@ -189,7 +189,6 @@ class PieceAlert {
     readbutton.dataset.text = text;
     readbutton.dataset.title = div.dataset.title;
     readbutton.onclick = function() {
-      sfx("click");
       ui.dialogs["read-text-title"].textContent = this.dataset.title;
       ui.dialogs["read-text-content"].textContent = this.dataset.text;
       ui.dialogs["read-text"].showModal();

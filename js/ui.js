@@ -218,10 +218,10 @@ function toggleMenuEditMode() {
 }
 
 function toggleTheme(button) {
-  playerdata.themes.index++;
-  if (playerdata.themes.index > playerdata.themes.order.length - 1) playerdata.themes.index = 0;
-  let name = playerdata.themes.order[playerdata.themes.index];
-  let theme = playerdata.themes[name];
+  playerdata.themeIndex++;
+  if (playerdata.themeIndex > game.themes.order.length - 1) playerdata.themeIndex = 0;
+  let name = game.themes.order[playerdata.themeIndex];
+  let theme = game.themes[name];
 
   for (let key in theme) {
     let value = theme[key];
@@ -239,9 +239,20 @@ function updateDayUI() {
   let overtime = ui.storefront.day.overtimeMessage;
   let counter = ui.storefront.day.counter;
 
-  if (playerdata.storetime == -1) {
+  overtime.onanimationend = function() {
+    if (ui.storefront.guysListTray) {
+      const tray = ui.storefront.guysListTray;
+      tray.updateGlobalBlockPosition("guysList", tray.sendbutton);
+    }
+    if (ui.storefront.ministockTray) {
+      const tray = ui.storefront.ministockTray;
+      tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
+    }
+  }
+
+  if (game.storetime == -1) {
     let all_served = true;
-    for (let guy of playerdata.guys) {
+    for (let guy of game.guys) {
       if (!guy.served) {
         all_served = false;
         break;
@@ -291,7 +302,7 @@ function updateRecipes() {
       categories[recipe.category] = [];
     }
     categories[recipe.category].push(recipe);
-    recipe.setDiscounted(!playerdata.daytime);
+    recipe.setDiscounted(!game.daytime);
   }
 
   for (let name in categories) {
@@ -314,8 +325,8 @@ function updateGuysList() {
     list.lastElementChild.remove();
   }
 
-  for (let i=0; i<playerdata.guys.length; i++) {
-    if (playerdata.guys[i].served) continue;
+  for (let i=0; i<game.guys.length; i++) {
+    if (game.guys[i].served) continue;
 
     let button = document.createElement("button");
     button.dataset.id = i;
@@ -339,7 +350,7 @@ function updateMinistockWindow() {
       li.addEventListener("mousedown", function(e) {
         if (!this.name) return;
 
-        let tray = playerdata.trays[this.parentNode.dataset.id];
+        let tray = game.trays[this.parentNode.dataset.id];
         let item = playerdata.inventory.removeItemByName(this.name);
         if (!item) return;
         item.drag();
@@ -543,14 +554,17 @@ class Headline {
     let div = divContainingTemplate("template-news-headline");
     ui.storefront.news.appendChild(div);
 
-    let l1 = div.querySelector("#line1");
-    let l2 = div.querySelector("#line2");
+    let l1 = div.querySelector("[name='line1']");
+    let l2 = div.querySelector("[name='line2']");
 
     if (line1) l1.textContent = line1;
     if (line2) l2.textContent = line2;
 
+    const sceneHidden = ui.scenes.storefront.classList.contains("hidden");
+    if (sceneHidden) ui.scenes.storefront.classList.remove("hidden");
     this.squeeze(l1.parentNode);
     this.squeeze(l2.parentNode);
+    if (sceneHidden) ui.scenes.storefront.classList.add("hidden");
   }
 
   squeeze(element) {

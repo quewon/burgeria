@@ -58,11 +58,11 @@
                 </div>
               </div>
             </div>
-            <footer>
+            <div class="buttonbar">
               <button name="clear">clear</button>
               <div class="grow"></div>
               <button name="stock">stock ☰</button>
-            </footer>
+            </div>
           </div>
         </div>
         <div id="guys-container" class="flexbox wrap attached-above marginbelow">
@@ -72,7 +72,7 @@
 
         </div>
       </div>
-      <div id="scene-storefront-body" class="column" style="padding-bottom: 10rem;">
+      <div id="scene-storefront-body" class="column">
         <div id="storefront-guys-list" class="block transparent gone" style="position: absolute; z-index: 10; translate: -1px 0;"></div>
         <div id="storefront-ministock" class="block gone" style="position: absolute; z-index: 10;"></div>
 
@@ -148,17 +148,17 @@
               <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
             </div>
 
-            <div class="block attached-above has-footer" id="library-page-container">
+            <div class="block attached-above has-buttonbar" id="library-page-container">
               <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
                 <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
                 <span id="library-index"></span>/<span id="library-pages-total"></span>
                 <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
               </nav>
               <p id="library-page" class="block"></p>
-              <footer>
+              <div class="buttonbar">
                 <div class="grow"></div>
                 <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
-              </footer>
+              </div>
             </div>
             <!-- <div id="library-page-empty" class="block attached-above">
               <i>Your library is empty.</i>
@@ -184,10 +184,10 @@
 
     <div id="scene-workshop" class="scene">
       <div class="column">
-        <footer>
+        <div class="buttonbar">
           <button onclick="addPieceToWorkshop(); sfx('click');">+ new piece</button>
           <button onclick="removePieceFromWorkshop(); sfx('click');">delete</button>
-        </footer>
+        </div>
 
         <div id="workshop-library">
         </div>
@@ -199,7 +199,7 @@
 
       <div class="column" style="flex-grow: 1;">
         <div class="marginbelow">
-          <footer class="flexbox">
+          <div class="buttonbar flexbox">
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);" style="border-left: 1px solid var(--borders);">file</button>
               <div class="dropdown">
@@ -242,7 +242,7 @@
 
             <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
             <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal()">about <em>Burgeria!</em></button>
-          </footer>
+          </div>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
         </div>
 
@@ -267,7 +267,7 @@
 
     <template id="template-tray">
       <div class="flexbox">
-        <div class="tray block has-footer">
+        <div class="tray block has-buttonbar">
           <span class="label">tray</span>
           <main>
             <div class="container">
@@ -281,12 +281,12 @@
               </div>
             </div>
           </main>
-          <footer class="flexbox">
+          <div class="buttonbar flexbox">
             <button name="send">send off</button>
             <button name="clear">clear</button>
             <div class="grow"></div>
             <button name="stock">stock ☰</button>
-          </footer>
+          </div>
         </div>
         <div>
           <canvas width="300" height="300"></canvas>
@@ -298,11 +298,11 @@
       <div class="news block slide-down">
         <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove();">x</button>
         <div class="centeroriginY">
-          <h1 id="line1">BIG BURGERS...</h1>
+          <h1 name="line1">BIG BURGERS...</h1>
         </div>
         <div class="flexbox centeroriginY" style="margin-top: var(--padding); align-items: flex-start; justify-content: space-between;">
           <div><i>The Journal</i></div>
-          <h1 id="line2" style="text-align: right;">... ARE IN!</h1>
+          <h1 name="line2" style="text-align: right;">... ARE IN!</h1>
         </div>
       </div>
     </template>
@@ -370,7 +370,7 @@
       <div style="text-align: center;">
         <img src="img/burger.png" alt="a deluxe burger" title="a Deluxe Burger" style="width: 70px; margin: auto;">
       </div>
-      <em>Burgeria!</em> is your very own word-processing burger spot.
+      <em>Burgeria!</em> is your very own burger-shaped text editor.
       <br><br>
       Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...
 
@@ -415,6 +415,20 @@
       </div>
     </dialog>
 
+    <!-- <dialog id="dialog-quit">
+      <div class="flexbox">
+        <div class="grow">before you go...!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      <div class="">
+        This is a reminder that if you leave now, you won't be able to bank your points for the day, and you won't be able to recover the ingredients you've used today.
+      </div>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>return to game</button>
+        <button onclick="game.closeStore(); this.parentNode.parentNode.close();">bank my points before i go</button>
+      </div>
+    </dialog> -->
+
     <dialog id="dialog-no-letters" class="error">
       <div class="flexbox">
         <div class="grow">!</div>
@@ -454,7 +468,7 @@
 
       init_3d();
 
-      playerdata.themes.index--;
+      playerdata.themeIndex--;
       toggleTheme();
 
       playerdata.recipes[0].previewRecipe();
@@ -472,9 +486,20 @@
 
       //
 
-      animate();
+      window.addEventListener("resize", function() {
+        if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateGlobalBlockPosition("ministock", ui.storefront.ministockTray.stockbutton)
+        if (ui.storefront.guysListTray) ui.storefront.guysListTray.updateGlobalBlockPosition("guysList", ui.storefront.guysListTray.sendbutton)
+      });
 
       setScene("workshop");
+    }
+
+    function on_data_loaded() {
+      new PieceAlert(WWW[0].text, WWW[0].cost);
+      new PieceAlert(WWW[1].text, WWW[1].cost);
+
+      animate();
+      setInterval(update, 1);
     }
   </script>
 </html>

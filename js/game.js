@@ -17,14 +17,13 @@ function update() {
     }
   }
 }
-setInterval(update, 1);
 
 function animate() {
-  for (let guy of playerdata.guys) {
+  for (let guy of game.guys) {
     if (!guy.served) guy.draw();
   }
 
-  for (let tray of playerdata.trays) {
+  for (let tray of game.trays) {
     if (tray.enabled) tray.draw();
   }
 
@@ -35,29 +34,68 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+window.addEventListener("beforeunload", function(e) {
+  if (game.storetime > -1) {
+    // automatically make everyone served
+    for (let i=game.guys.length-1; i>=0; i--) {
+      let guy = game.guys[i];
+      guy.element.remove();
+      game.guys.splice(i, 1);
+    }
+    game.closeStore();
+  }
+});
+
 const game = {
+  daytime: true, //
+  storetime: -1, //
+  trays: [], //
+  guys: [], //
+  unbankedPoints: 0, //
+
+  themes: {
+    order: ["☼", "☁︎"], //,"☾"
+    "☼": {
+      "burgeria": "red",
+      "burgeria-bg": "pink",
+      "newsgray": "#dcdcdc",
+      "lines": "black",
+      "bg": "white",
+      "graph-neutral": "var(--lines)",
+      "graph-negative": "var(--burgeria)",
+      "graph-positive": "blue",
+    },
+    "☁︎": {
+      "burgeria": "#c43d27",
+      "bg": "#f8eddb",
+      "lines": "#291e2c",
+      "newsgray": "#c0d0cf",
+      "graph-positive": "#5B7553",
+    }
+  },
+
   config: {
     dayLength: 60 * 250, // 1 minute
     guyInterval: 12 * 250,
   },
 
   beginDay: function() {
-    bankPoints(playerdata.unbankedPoints, "BURGERIA");
+    bankPoints(game.unbankedPoints, "BURGERIA");
     playerdata.unbankedPoints = 0;
 
     playerdata.day++;
-    playerdata.daytime = true;
+    game.daytime = true;
 
-    for (let i=playerdata.guys.length-1; i>=0; i--) {
-      let guy = playerdata.guys[i];
+    for (let i=game.guys.length-1; i>=0; i--) {
+      let guy = game.guys[i];
       guy.element.remove();
-      playerdata.guys.splice(i, 1);
+      game.guys.splice(i, 1);
     }
 
-    for (let i=playerdata.trays.length-1; i>=0; i--) {
-      let tray = playerdata.trays[i];
+    for (let i=game.trays.length-1; i>=0; i--) {
+      let tray = game.trays[i];
       tray.element.remove();
-      playerdata.trays.splice(i, 1);
+      game.trays.splice(i, 1);
     }
 
     generateNewPrices();
@@ -73,15 +111,15 @@ const game = {
   },
 
   openStore: function() {
-    playerdata.storetime = 0;
+    game.storetime = 0;
     game.updateStore();
     updateDayUI();
   },
   closeStore: function() {
-    playerdata.storetime = -1;
+    game.storetime = -1;
 
     let everyoneserved = true;
-    for (let guy of playerdata.guys) {
+    for (let guy of game.guys) {
       if (!guy.served) {
         everyoneserved = false;
         break;
@@ -91,34 +129,34 @@ const game = {
       game.beginDay();
     } else {
       sfx("close_store");
-      playerdata.daytime = false;
+      game.daytime = false;
       updateRecipes();
       updateDayUI();
     }
   },
   updateStore: function() {
-    if (playerdata.storetime >= game.config.dayLength) {
+    if (game.storetime >= game.config.dayLength) {
       game.closeStore();
     } else {
-      if (playerdata.storetime % game.config.guyInterval == 0) {
+      if (game.storetime % game.config.guyInterval == 0) {
         new Guy();
       }
     }
 
-    ui.storefront.day.timer.style.height = (playerdata.storetime/game.config.dayLength * 100)+"%";
+    ui.storefront.day.timer.style.height = (game.storetime/game.config.dayLength * 100)+"%";
 
-    if (playerdata.storetime != -1) {
-      playerdata.storetime++;
+    if (game.storetime != -1) {
+      game.storetime++;
       setObjectTimeout(this, "updateStore", 1);
     }
   },
 
   // day toggle action
   burgeria: function() {
-    if (playerdata.storetime != -1) {
+    if (game.storetime != -1) {
       //game.closeStore();
 
-      if (playerdata.storetime < game.config.dayLength) {
+      if (game.storetime < game.config.dayLength) {
         ui.dialogs["early-close"].showModal();
       } else {
         game.closeStore();

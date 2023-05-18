@@ -7,14 +7,14 @@ function init_3d() {
 
 class Tray {
   constructor() {
-    this.id = playerdata.trays.length;
+    this.id = game.trays.length;
     this.enabled = false;
 
     this.collections = {};
     this.init_tray();
     this.init_3d();
 
-    playerdata.trays.push(this);
+    game.trays.push(this);
   }
 
   init_tray() {
@@ -36,7 +36,7 @@ class Tray {
 
         this.classList.add("draghover");
 
-        let tray = playerdata.trays[this.dataset.trayId];
+        let tray = game.trays[this.dataset.trayId];
         tray.openGlobalBlock("ministock", tray.stockbutton);
 
         let col = tray.collections[this.dataset.side];
@@ -78,18 +78,18 @@ class Tray {
     let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
     sendbutton.onclick = function() {
-      playerdata.trays[this.dataset.id].toggleGlobalBlock("guysList", this);
+      game.trays[this.dataset.id].toggleGlobalBlock("guysList", this);
     }
     this.sendbutton = sendbutton;
 
     let clearbutton = this.element.querySelector("[name='clear']");
     clearbutton.dataset.id = this.id;
-    clearbutton.onclick = function() { playerdata.trays[this.dataset.id].clear()}
+    clearbutton.onclick = function() { game.trays[this.dataset.id].clear()}
 
     let stockbutton = this.element.querySelector("[name='stock']");
     stockbutton.dataset.id = this.id;
     stockbutton.onclick = function() {
-      playerdata.trays[this.dataset.id].toggleGlobalBlock("ministock", this);
+      game.trays[this.dataset.id].toggleGlobalBlock("ministock", this);
     }
     this.stockbutton = stockbutton;
     this.element.dataset.id = this.id;
@@ -257,7 +257,7 @@ class Tray {
     el.dataset.id = this.id;
     el.classList.add("sending");
 
-    playerdata.guys[i].receive(this);
+    game.guys[i].receive(this);
 
     el.addEventListener("animationend", function(e) {
       this.remove();
@@ -649,7 +649,7 @@ class Item {
 
     if (this.element.isConnected) {
       let parent = this.element.parentNode;
-      let tray = playerdata.trays[parent.dataset.trayId];
+      let tray = game.trays[parent.dataset.trayId];
       let col = tray.collections[parent.dataset.side];
 
       this.setCollection(col);

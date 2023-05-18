@@ -181,10 +181,10 @@ h2 {
   line-height: 1px;
 }
 
-.has-footer {
+.has-buttonbar {
   padding-bottom: 1.5rem;
 }
-.block footer {
+.block .buttonbar {
   width: 100%;
   justify-content: space-between;
   border-top: 1px solid var(--lines);
@@ -260,23 +260,23 @@ button.selected em, button:active em {
   font-style: inherit;
 }
 
-footer {
+.buttonbar {
   display: flex;
 }
-footer button {
+.buttonbar button {
   border-left: none;
   border-bottom: none;
 }
-footer > button:first-child {
+.buttonbar > button:first-child {
   border-left: 1px solid var(--lines);
 }
 
-.block footer button {
+.block .buttonbar button {
   border-top: none;
   border-right: 1px solid var(--lines);
   border-left: none;
 }
-.block footer button:last-child {
+.block .buttonbar button:last-child {
   border-left: 1px solid var(--lines);
   border-right: none;
 }
@@ -484,9 +484,8 @@ ul.flexbox > li {
   list-style: inside;
 }
 
-#storefront-guys-list button:not(button:first-child):not(button:last-child) {
+#storefront-guys-list button:not(button:first-child) {
   border-left: none;
-  border-right: none;
 }
 
 .prices-title {
@@ -734,7 +733,7 @@ em, .em, .order {
   flex-direction: column;
   width: 50%;
 }
-#recipe-preview footer {
+#recipe-preview .buttonbar {
   display: none;
 }
 .editmode, .editmode button {
@@ -750,7 +749,7 @@ em, .em, .order {
 .editmode canvas {
   opacity: .5;
 }
-#recipe-preview.editmode footer {
+#recipe-preview.editmode .buttonbar {
   display: flex;
   border-color: var(--burgeria);
 }
@@ -937,7 +936,7 @@ dialog .flexbox button:active {
 
 dialog.error > div:first-child > div:first-child {
   font-weight: bold;
-  /* font-style: italic; */
+  font-style: normal;
 }
 dialog.error, dialog.error .flexbox, dialog.error button {
   border-color: var(--burgeria);
