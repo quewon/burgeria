@@ -46,6 +46,7 @@ body {
   animation: burgeria-bg 2s linear infinite;
 
   font-family: serif;
+  text-rendering: optimizeLegibility;
   word-break: keep-all;
 }
 @keyframes burgeria-bg {
@@ -266,7 +267,7 @@ footer button {
   border-left: none;
   border-bottom: none;
 }
-footer button:first-child {
+footer > button:first-child {
   border-left: 1px solid var(--lines);
 }
 
@@ -320,6 +321,7 @@ li button {
   pointer-events: none;
 }
 .send-library .block {
+  /* should be 0s, but it's unreliable when you use tab/enter button activation */
   animation: send-library 0.1ms;
 }
 @keyframes send-library {
@@ -480,6 +482,11 @@ ul.flexbox > li {
 }
 #storefront-ministock li {
   list-style: inside;
+}
+
+#storefront-guys-list button:not(button:first-child):not(button:last-child) {
+  border-left: none;
+  border-right: none;
 }
 
 .prices-title {
@@ -891,13 +898,20 @@ dialog {
   padding: var(--padding);
   box-sizing: border-box;
   overflow: hidden;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  /* box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; */
 }
 dialog > div:first-child {
   user-select: none;
+  background: var(--borders);
+  color: var(--bg);
+}
+dialog > div:first-child > div:first-child {
+  /* font-weight: bold; */
+  font-style: italic;
 }
 dialog::backdrop {
   backdrop-filter: var(--block-bg-filter);
+  background: rgba(255, 255, 255, .5);
 }
 dialog .flexbox {
   width: calc(100% + var(--padding) * 2);
@@ -921,6 +935,10 @@ dialog .flexbox button:active {
   color: var(--bg);
 }
 
+dialog.error > div:first-child > div:first-child {
+  font-weight: bold;
+  /* font-style: italic; */
+}
 dialog.error, dialog.error .flexbox, dialog.error button {
   border-color: var(--burgeria);
 }
@@ -966,28 +984,31 @@ dialog.error .flexbox {
   color: var(--lines);
 }
 
-.dropdown-anchor {
-
+.dropdown-container:not(.dropdown-container:first-child) .dropdown {
+  translate: -1px 0;
+}
+.dropdown-container {
+  display: flex;
+  flex-direction: column;
 }
 .dropdown {
-  display: flex;
   display: none;
   flex-direction: column;
-  height: fit-content;
   position: absolute;
   top: 1.5rem;
+  box-sizing: border-box;
 }
 .dropdown button {
   border: 1px solid var(--borders);
   text-align: left;
 }
-.dropdown-anchor.selected {
+.dropdown-anchor.activated {
   pointer-events: auto;
 }
 .dropdown button:not(button:last-child) {
   border-bottom: none;
 }
-.dropdown-anchor.selected + .dropdown {
+.dropdown-anchor.activated + .dropdown {
   display: flex;
 }
 

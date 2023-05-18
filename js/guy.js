@@ -62,6 +62,7 @@ class Guy {
     this.element = div;
 
     ui.storefront.day.guysContainer.appendChild(this.element);
+    updateGuysList();
 
     //
 
@@ -75,11 +76,12 @@ class Guy {
     this.voice = arch.voice;
     this.soundId = null;
 
-    this.tray = new Tray(this);
-    this.tray.sendToStorefront();
+    const tray = new Tray(this);
+    tray.sendToStorefront();
     _sounds.chime[arch.chime].play();
 
     playerdata.guys.push(this);
+    updateGuysList();
   }
 
   generateDesiredMenu(complexity) {
@@ -244,7 +246,10 @@ class Guy {
     } else {
       this.currentTalkInterval = 0;
     }
-    if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition();
+    if (ui.storefront.ministockTray) {
+      const tray = ui.storefront.ministockTray;
+      tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
+    }
   }
 
   draw() {
@@ -257,10 +262,9 @@ class Guy {
     }
   }
 
-  receive() {
-    let tray = this.tray;
-
+  receive(tray) {
     this.served = true;
+    updateGuysList();
     this.element.dataset.id = this.id;
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
@@ -277,7 +281,7 @@ class Guy {
       }
     });
 
-    const feedback = this.tray.requestFeedback(this.desiredMenu);
+    const feedback = tray.requestFeedback(this.desiredMenu);
     if (feedback.tray_is_perfect) {
       var points = playerdata.storetime == -1 ? Math.ceil(this.desiredMenu.cost/2) : this.desiredMenu.cost;
       playerdata.unbankedPoints += points;
@@ -285,10 +289,10 @@ class Guy {
         setTimeout(burgerpointParticle, Math.random() * 100 * points);
       }
     }
-    this.sendFeedback(feedback);
+    this.sendFeedback(feedback, tray);
   }
 
-  sendFeedback(feedback) {
+  sendFeedback(feedback, tray) {
     console.log(feedback);
 
     let text = "";
@@ -339,7 +343,7 @@ class Guy {
       div.querySelector("[name='text']").textContent = text;
 
       // ui.storefront.news.appendChild(div);
-      ui.storefront.body.insertBefore(div, this.tray.element.nextSibling);
+      ui.storefront.body.insertBefore(div, tray.element.nextSibling);
 
       sfx("scrawl");
     }

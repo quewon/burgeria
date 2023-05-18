@@ -73,6 +73,7 @@
         </div>
       </div>
       <div id="scene-storefront-body" class="column" style="padding-bottom: 10rem;">
+        <div id="storefront-guys-list" class="block transparent gone" style="position: absolute; z-index: 10; translate: -1px 0;"></div>
         <div id="storefront-ministock" class="block gone" style="position: absolute; z-index: 10;"></div>
 
         <div class="flexbox">
@@ -199,43 +200,48 @@
       <div class="column" style="flex-grow: 1;">
         <div class="marginbelow">
           <footer class="flexbox">
-            <button class="dropdown-anchor" onclick="toggleDropdown(this);">file</button>
-            <div class="dropdown">
-              <button onclick="addPieceToWorkshop(); sfx('click');">new piece</button>
-              <button onclick="removePieceFromWorkshop(); sfx('click');">delete piece</button>
-            </div>
-
-            <button class="dropdown-anchor" onclick="toggleDropdown(this);">edit</button>
-            <div class="dropdown">
-              <button onclick="playerdata.workshop[playerdata.workshopIndex].undo();">undo</button>
-              <button onclick="playerdata.workshop[playerdata.workshopIndex].redo();">redo</button>
-              <button onclick="playerdata.workshop[playerdata.workshopIndex].clear();">clear piece</button>
-              <!-- <button>copy selected</button> -->
-              <!-- <button>cut selected</button> -->
-              <!-- <button>paste text in clipboard</button> -->
-            </div>
-
-            <button class="dropdown-anchor" onclick="updateWorkshopLetterCount(); toggleDropdown(this);">count</button>
-            <div class="dropdown">
-              <div class="block">
-                <i>words: <span id="workshop-words">0</span></i><br>
-                <i>letters: <span id="workshop-letters">0</span></i>
+            <div class="dropdown-container">
+              <button class="dropdown-anchor" onclick="toggleDropdown(this);" style="border-left: 1px solid var(--borders);">file</button>
+              <div class="dropdown">
+                <button onclick="addPieceToWorkshop(); sfx('click');">new piece</button>
+                <button onclick="removePieceFromWorkshop(); sfx('click');">delete piece</button>
               </div>
             </div>
 
-            <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
-            <div class="dropdown">
-              <button>publish to Market</button>
-              <button>release into the Wind</button>
+            <div class="dropdown-container">
+              <button class="dropdown-anchor" onclick="toggleDropdown(this);">edit</button>
+              <div class="dropdown">
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].undo();">undo</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].redo();">redo</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].clear();">clear piece</button>
+                <!-- <button>copy selected</button> -->
+                <!-- <button>cut selected</button> -->
+                <!-- <button>paste text in clipboard</button> -->
+              </div>
+            </div>
+
+            <div class="dropdown-container">
+              <button class="dropdown-anchor" onclick="updateWorkshopLetterCount(); toggleDropdown(this);">count</button>
+              <div class="dropdown">
+                <div class="block">
+                  <i>words: <span id="workshop-words">0</span></i><br>
+                  <i>letters: <span id="workshop-letters">0</span></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown-container">
+              <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
+              <div class="dropdown">
+                <button>publish to Market</button>
+                <button>release into the Wind</button>
+              </div>
             </div>
 
             <div class="grow"></div>
 
-            <button style="border: 1px solid var(--borders); border-bottom: none;" class="dropdown-anchor right" onclick="toggleDropdown(this);">help</button>
-            <div class="dropdown">
-              <button style="text-align: right;" onclick="ui.dialogs['help-burgeria'].showModal()">about <em>Burgeria!</em></button>
-              <!-- <button style="text-align: right;" onclick="ui.dialogs['help-burgeria'].showModal()">tip</button> -->
-            </div>
+            <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
+            <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal()">about <em>Burgeria!</em></button>
           </footer>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
         </div>
@@ -247,7 +253,7 @@
               The market is empty.
             </i>
           </div>
-          <button id="market-library-button" class="top right" onclick="ui.kitchen.libraryBlock.classList.remove('gone'); setScene('kitchen');" disabled>→ open library</button>
+          <button id="market-library-button" class="top right" onclick="ui.kitchen.libraryBlock.classList.remove('gone'); setScene('kitchen'); sfx('click');" disabled>→ open library</button>
         </div>
       </div>
       <div class="column">
@@ -261,7 +267,6 @@
 
     <template id="template-tray">
       <div class="flexbox">
-        <div name="number" class="block top right">99</div>
         <div class="tray block has-footer">
           <span class="label">tray</span>
           <main>
@@ -396,9 +401,9 @@
       </div>
     </dialog>
 
-    <dialog id="dialog-early-close" class="error">
+    <dialog id="dialog-early-close">
       <div class="flexbox">
-        <div class="grow" id="dialog-read-text-title"></div>
+        <div class="grow">close store early</div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
       <div class="">

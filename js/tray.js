@@ -6,9 +6,8 @@ function init_3d() {
 }
 
 class Tray {
-  constructor(guy) {
+  constructor() {
     this.id = playerdata.trays.length;
-    this.guy = guy;
     this.enabled = false;
 
     this.collections = {};
@@ -38,7 +37,7 @@ class Tray {
         this.classList.add("draghover");
 
         let tray = playerdata.trays[this.dataset.trayId];
-        tray.openMinistockWindow();
+        tray.openGlobalBlock("ministock", tray.stockbutton);
 
         let col = tray.collections[this.dataset.side];
         if (col.capacity != -1 && col.capacity < 1) return;
@@ -46,7 +45,7 @@ class Tray {
         this.prepend(item.element);
         item.dragGhost.classList.add("gone");
         tray.resize_3d();
-        tray.updateMinistockPosition();
+        tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
       });
       con.addEventListener("mouseup", function(e) {
         this.classList.remove("draghover");
@@ -79,27 +78,21 @@ class Tray {
     let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
     sendbutton.onclick = function() {
-      const tray = playerdata.trays[this.dataset.id];
-      if (tray.enabled) {
-        tray.send();
-        sfx("click");
-      }
+      playerdata.trays[this.dataset.id].toggleGlobalBlock("guysList", this);
     }
+    this.sendbutton = sendbutton;
 
     let clearbutton = this.element.querySelector("[name='clear']");
     clearbutton.dataset.id = this.id;
-    clearbutton.onclick = function() { playerdata.trays[this.dataset.id].clear(); sfx("click"); }
+    clearbutton.onclick = function() { playerdata.trays[this.dataset.id].clear()}
 
     let stockbutton = this.element.querySelector("[name='stock']");
     stockbutton.dataset.id = this.id;
-    stockbutton.onclick = function() { playerdata.trays[this.dataset.id].toggleMinistockWindow(); sfx("click"); }
+    stockbutton.onclick = function() {
+      playerdata.trays[this.dataset.id].toggleGlobalBlock("ministock", this);
+    }
     this.stockbutton = stockbutton;
     this.element.dataset.id = this.id;
-
-    if (this.guy) {
-      let number = this.element.querySelector("[name='number']");
-      number.textContent = this.guy.id+1;
-    }
   }
 
   sendToStorefront() {
@@ -108,31 +101,38 @@ class Tray {
     this.resize_3d();
   }
 
-  updateMinistockPosition() {
-    if (ui.storefront.ministockTray != this) return;
+  updateGlobalBlockPosition(block, button) {
+    const parent = ui.storefront[block+"Tray"];
 
-    let rect = this.stockbutton.getBoundingClientRect();
-    const ministock = ui.storefront.ministock;
-    ministock.style.left = (rect.left + window.scrollX)+"px";
-    ministock.style.top = (rect.bottom + window.scrollY)+"px";
+    if (parent != this) return;
+
+    let rect = button.getBoundingClientRect();
+    ui.storefront[block].style.left = (rect.left + window.scrollX)+"px";
+    ui.storefront[block].style.top = (rect.bottom + window.scrollY)+"px";
   }
 
-  toggleMinistockWindow() {
-    if (ui.storefront.ministockTray != this) {
-      this.openMinistockWindow();
+  toggleGlobalBlock(block, button) {
+    const parent = ui.storefront[block+"Tray"];
+
+    if (parent != this) {
+      this.openGlobalBlock(block, button);
     } else {
-      const ministock = ui.storefront.ministock;
-      ministock.classList.add("gone");
-      ui.storefront.ministockTray = null;
+      ui.storefront[block].classList.add("gone");
+      ui.storefront[block+"Tray"] = null;
     }
   }
 
-  openMinistockWindow() {
-    ui.storefront.ministockTray = this;
-    updateMinistockWindow();
-    this.updateMinistockPosition();
-    const ministock = ui.storefront.ministock;
-    ministock.classList.remove("gone");
+  openGlobalBlock(block, button) {
+    ui.storefront[block+"Tray"] = this;
+
+    if (block == "ministock") {
+      updateMinistockWindow();
+    } else {
+      updateGuysList();
+    }
+
+    this.updateGlobalBlockPosition(block, button);
+    ui.storefront[block].classList.remove("gone");
   }
 
   resize_3d(context) {
@@ -243,18 +243,21 @@ class Tray {
     context.drawImage(renderer.domElement, 0, 0);
   }
 
-  send() {
+  send(i) {
     this.enabled = false;
 
     if (ui.storefront.ministockTray == this) {
-      this.toggleMinistockWindow();
+      this.toggleGlobalBlock("ministock", this.stockbutton);
+    }
+    if (ui.storefront.guysListTray == this) {
+      this.toggleGlobalBlock("guysList", this.sendbutton);
     }
 
     let el = this.element;
     el.dataset.id = this.id;
     el.classList.add("sending");
 
-    this.guy.receive();
+    playerdata.guys[i].receive(this);
 
     el.addEventListener("animationend", function(e) {
       this.remove();
@@ -267,7 +270,7 @@ class Tray {
       col.clear(true);
     }
 
-    this.openMinistockWindow();
+    this.openGlobalBlock("ministock", this.stockbutton);
   }
 
   getConstruction() {
@@ -651,7 +654,10 @@ class Item {
 
       this.setCollection(col);
     } else {
-      if (this.previousCollection && this.previousCollection.tray) this.previousCollection.tray.openMinistockWindow();
+      if (this.previousCollection && this.previousCollection.tray) {
+        const tray = this.previousCollection.tray;
+        tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
+      }
       this.setCollection(playerdata.inventory);
     }
     _dragdrop.itemInHand = null;

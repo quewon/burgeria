@@ -31,6 +31,8 @@ var ui = {
     recipesList: document.getElementById("scene-recipes"),
     ministock: document.getElementById("storefront-ministock"),
     ministockTray: null,
+    guysList: document.getElementById("storefront-guys-list"),
+    guysListTray: null,
     recipePreview: document.getElementById("recipe-preview"),
     recipePreviewContext: document.getElementById("recipe-preview").querySelector("canvas").getContext("2d"),
     menuEditButton: document.getElementById("menu-edit-button"),
@@ -82,7 +84,7 @@ var ui = {
 function setScene(name) {
   let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
   for (let anchor of dropdownAnchors) {
-    anchor.classList.remove("selected");
+    anchor.classList.remove("activated");
   }
 
   for (let scenename in ui.scenes) {
@@ -305,6 +307,29 @@ function updateRecipes() {
   }
 }
 
+function updateGuysList() {
+  const list = ui.storefront.guysList;
+
+  while (list.lastElementChild) {
+    list.lastElementChild.remove();
+  }
+
+  for (let i=0; i<playerdata.guys.length; i++) {
+    if (playerdata.guys[i].served) continue;
+
+    let button = document.createElement("button");
+    button.dataset.id = i;
+    button.textContent = i+1;
+    button.onclick = function() {
+      const tray = ui.storefront.guysListTray;
+      if (tray.enabled) {
+        tray.send(Number(button.dataset.id));
+      }
+    }
+    list.appendChild(button);
+  }
+}
+
 function updateMinistockWindow() {
   const ministock = ui.storefront.ministock;
 
@@ -491,39 +516,24 @@ function updateWorkshopLibrary() {
 }
 
 function toggleDropdown(button) {
-  const right = button.classList.contains("right");
-  const parent = button.parentNode;
+  const container = button.parentNode;
+  const parent = container.parentNode;
   const dropdown = button.nextElementSibling;
 
-  if (!button.dataset.offset) {
-    for (let child of parent.children) {
-      child.classList.add("selected");
-    }
-    const prect = parent.getBoundingClientRect();
-    const brect = button.getBoundingClientRect();
-    button.dataset.offset = right ? brect.right - prect.right : brect.left - prect.left;
-    button.classList.remove("selected");
-    // button.onmouseleave = function(e) {
-    //   if (e.relatedTarget == dropdown || e.relatedTarget == parent) return;
-    //   if (this.classList.contains("selected")) toggleDropdown(this);
-    // }
-    dropdown.onmouseleave = function(e) {
-      if (e.relatedTarget == button) return;
-      toggleDropdown(button);
-    }
-  }
-
-  button.classList.toggle("selected");
   for (let child of parent.children) {
-    if (child == button) continue;
-    child.classList.remove("selected");
+    const anchor = child.firstElementChild;
+    if (anchor && anchor != button && anchor.classList.contains("dropdown-anchor")) {
+      anchor.classList.remove("activated");
+    }
   }
 
-  if (right) {
-    dropdown.style.right = button.dataset.offset+"px";
-  } else {
-    dropdown.style.left = button.dataset.offset+"px";
-  }
+  // if (!button.classList.contains("activated") && !container.onmouseleave) {
+  //   container.onmouseleave = function(e) {
+  //     if (this.firstElementChild.classList.contains("activated")) toggleDropdown(this.firstElementChild);
+  //   }
+  // }
+
+  button.classList.toggle("activated");
 }
 
 // news
