@@ -1,5 +1,4 @@
-var BANK_WWW;
-var BANK_LOCAL;
+var WWW;
 
 function write_data(text, cost) {
   var data = new FormData();
@@ -8,9 +7,13 @@ function write_data(text, cost) {
 
   const url = "https://script.google.com/macros/s/AKfycbzRKbrsf158qdo6BbFn925agIOIp93YwwYND0k3zeugBqcXSAczA7FudEXaePDSy8G4_A/exec";
   fetch(url, {
-    method: 'POST',
-    body: data
-  })
+    redirect: "follow",
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+  }, { mode: 'no-cors' })
   .then(function(response) {
     console.log("successfully published to the www.");
   })
@@ -27,16 +30,9 @@ function load_data() {
   fetch("https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values/www/?key="+API_KEY)
   .then((response) => response.json())
   .then((data) => {
-    BANK_WWW = SheetArrayToObjects(data.values);
+    WWW = SheetArrayToObjects(data.values);
     console.log("loaded www data.");
-
-    fetch("https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values/local/?key="+API_KEY)
-    .then((response) => response.json())
-    .then((data) => {
-      BANK_LOCAL = SheetArrayToObjects(data.values);
-      console.log("loaded local data.");
-      on_data_loaded();
-    });
+    on_data_loaded();
   });
 
   function SheetArrayToObjects(array) {
@@ -47,8 +43,13 @@ function load_data() {
 
     for (let i=1; i<array.length; i++) {
       var entry = {};
+      var remove = false;
       for (let x=0; x<keys.length; x++) {
         var value = array[i][x];
+        if (keys[x] == "remove" && value != "") {
+          remove = true;
+          break;
+        }
 
         if (keys[x] == "cost") {
           value = value ? Number(value) : 0;
@@ -57,7 +58,7 @@ function load_data() {
         entry[keys[x]] = value;
       }
 
-      output.push(entry);
+      if (!remove) output.push(entry);
     }
 
     return output;

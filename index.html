@@ -511,9 +511,9 @@
     }
 
     function on_data_loaded() {
-      if (BANK_WWW.length > 0) {
-        for (let i=0; i<Math.min(2, BANK_WWW.length); i++) {
-          const piece = BANK_WWW[Math.random() * BANK_WWW.length | 0];
+      if (WWW.length > 0) {
+        for (let i=0; i<Math.min(2, WWW.length); i++) {
+          const piece = WWW[Math.random() * WWW.length | 0];
           new PieceAlert(piece.text, piece.cost);
         }
       }
