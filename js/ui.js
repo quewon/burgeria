@@ -6,7 +6,8 @@ var ui = {
     "read-text-content": document.getElementById("dialog-read-text-content"),
     "no-letters": document.getElementById("dialog-no-letters"),
     "early-close": document.getElementById("dialog-early-close"),
-    "help-burgeria": document.getElementById("dialog-help-burgeria")
+    "help-burgeria": document.getElementById("dialog-help-burgeria"),
+    "publishing-error": document.getElementById("dialog-publishing-error")
   },
   templates: {
     "template-tray": document.getElementById("template-tray"),

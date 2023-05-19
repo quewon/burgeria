@@ -1,15 +1,5 @@
 var playerdata;
 
-function bankPoints(value, description) {
-  if (value == 0) return;
-
-  playerdata.points += value;
-  playerdata.bankbook.push([playerdata.day, description || "BURG", value < 0 ? Math.abs(value) : "", value > 0 ? value : "", playerdata.points]);
-
-  updateBankbook();
-  updatePoints();
-}
-
 function init_default_playerdata() {
   playerdata = {
     // daytime: true, //
@@ -34,8 +24,8 @@ function init_default_playerdata() {
     themeIndex: 0,
   }
 
-  // playerdata.points = 100;
-  // playerdata.bankbook.push([0, "BURGERMAN", "", "100", "100"]);
+  playerdata.points = 10;
+  playerdata.bankbook.push([0, "BURGERMAN", "", "10", "10"]);
   // for (let i=0; i<100; i++) {
   //   playerdata.bankbook.push([0, "WWW", "", "100", "100"]);
   // }

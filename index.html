@@ -440,6 +440,18 @@
       </div>
     </dialog>
 
+    <dialog id="dialog-publishing-error" class="error">
+      <div class="flexbox">
+        <div class="grow">!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      You're missed at the Market.<br><br>
+      <i>(There was an error with publishing. Please try again later.)</i>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
   </body>
   <script type="text/javascript" src="js/lib/howler.core.js"></script>
   <script type="text/javascript" src="js/lib/three.min.js"></script>
@@ -449,7 +461,10 @@
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
   <script type="text/javascript" src="js/tray.js"></script>
+
+  <script src="https://apis.google.com/js/forms.js"></script>
   <script type="text/javascript" src="js/writing.js"></script>
+
   <script type="text/javascript" src="js/guy.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/data.js"></script>
@@ -459,6 +474,7 @@
       console.clear();
 
       init_default_playerdata();
+      load_data();
 
       // workshop
       updateWorkshopLibrary();
@@ -495,8 +511,12 @@
     }
 
     function on_data_loaded() {
-      new PieceAlert(WWW[0].text, WWW[0].cost);
-      new PieceAlert(WWW[1].text, WWW[1].cost);
+      if (BANK_WWW.length > 0) {
+        for (let i=0; i<Math.min(2, BANK_WWW.length); i++) {
+          const piece = BANK_WWW[Math.random() * BANK_WWW.length | 0];
+          new PieceAlert(piece.text, piece.cost);
+        }
+      }
 
       animate();
       setInterval(update, 1);

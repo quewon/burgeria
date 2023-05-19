@@ -1,12 +1,3 @@
-var _objectTimeouts = [];
-function setObjectTimeout(object, func, time) {
-  _objectTimeouts.push({
-    object: object,
-    func: func,
-    time: time,
-  });
-}
-
 function update() {
   for (let i=_objectTimeouts.length-1; i>=0; i--) {
     let timeout = _objectTimeouts[i];
@@ -167,4 +158,23 @@ const game = {
       game.openStore();
     }
   }
+}
+
+var _objectTimeouts = [];
+function setObjectTimeout(object, func, time) {
+  _objectTimeouts.push({
+    object: object,
+    func: func,
+    time: time,
+  });
+}
+
+function bankPoints(value, description) {
+  if (value == 0) return;
+
+  playerdata.points += value;
+  playerdata.bankbook.push([playerdata.day, description || "BURG", value < 0 ? Math.abs(value) : "", value > 0 ? value : "", playerdata.points]);
+
+  updateBankbook();
+  updatePoints();
 }
