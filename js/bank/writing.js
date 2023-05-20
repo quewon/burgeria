@@ -10,10 +10,7 @@ form.addEventListener("submit", function(e) {
     method: "POST",
     body: data
   })
-  .then(function() {
-    console.log("successfully published to the www.");
-  })
-  .catch(function(e) {
+  .then(function(e) {
     console.log(e);
   });
 });
