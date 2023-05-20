@@ -196,15 +196,21 @@ class Piece {
     }
 
     ui.dialogs["publishing-success-content"].textContent = this.text;
-    write_data(this.text, 0, function() {
+    write_data(this.text, function() {
       ui.dialogs["publishing-success"].showModal();
     });
+
+    sfx("click");
 
     sellText(this.text);
 
     this.history = [];
     this.update("", 0, 0, "", "");
     removePieceFromWorkshop();
+    let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
+    for (let anchor of dropdownAnchors) {
+      anchor.classList.remove("activated");
+    }
   }
 
   releaseToWind() {
@@ -216,12 +222,17 @@ class Piece {
 
     ui.dialogs["wind-content"].textContent = this.text;
     ui.dialogs["wind"].showModal();
+    sfx("click");
 
     sellText(this.text);
 
     this.history = [];
     this.update("", 0, 0, "", "");
     removePieceFromWorkshop();
+    let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
+    for (let anchor of dropdownAnchors) {
+      anchor.classList.remove("activated");
+    }
   }
 }
 

@@ -7,6 +7,7 @@ var ui = {
     "no-letters": document.getElementById("dialog-no-letters"),
     "early-close": document.getElementById("dialog-early-close"),
     "help-burgeria": document.getElementById("dialog-help-burgeria"),
+    "publishing-loading": document.getElementById("dialog-publishing-loading"),
     "publishing-error": document.getElementById("dialog-publishing-error"),
     "publishing-error-no-letters": document.getElementById("dialog-publishing-error-no-letters"),
     "publishing-success": document.getElementById("dialog-publishing-success"),

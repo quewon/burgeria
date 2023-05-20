@@ -1,28 +1,61 @@
 var WWW;
 
-function write_data(text, cost, onwrite) {
+function write_data(text, onwrite) {
   const data = new FormData();
   data.append("text", text || "");
-  data.append("cost", cost ? cost.toString() : "");
 
   // all this possible, thanks to
   // https://github.com/levinunnink/html-form-to-google-sheet
 
-  fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
-    method: "POST",
-    body: data
-  })
-  .then(function(e) {
+  ui.dialogs["publishing-loading"].showModal();
+
+  const http = new XMLHttpRequest();
+  const url = "https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec";
+  http.open("POST", url);
+
+  http.addEventListener("load", function() {
+    ui.dialogs["publishing-loading"].close();
+    console.log("successfully published to the www.");
+    if (onwrite) onwrite();
+
     load_data(function() {
       console.log("refreshed www data.");
-      console.log("successfully published to the www.");
-      if (onwrite) onwrite();
     });
-  })
-  .catch(function(e) {
+  });
+
+  http.addEventListener("progress", function(e) {
+    if (e.lengthComputable) {
+      const percent = (e.loaded / e.total) * 100;
+      console.log("** progress **\n"+Math.round(percent)+"%");
+    }
+  });
+
+  http.addEventListener("error", function(e) {
     console.log("** publishing error **\n"+e);
+    ui.dialogs["publishing-loading"].close();
     ui.dialogs["publishing-error"].showModal();
   });
+
+  http.send(data);
+
+  // fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
+  //   method: "POST",
+  //   body: data
+  // })
+  // .then(function(e) {
+  //   ui.dialogs["publishing-loading"].close();
+  //   console.log("successfully published to the www.");
+  //   if (onwrite) onwrite();
+  //
+  //   load_data(function() {
+  //     console.log("refreshed www data.");
+  //   });
+  // })
+  // .catch(function(e) {
+  //   console.log("** publishing error **\n"+e);
+  //   ui.dialogs["publishing-loading"].close();
+  //   ui.dialogs["publishing-error"].showModal();
+  // });
 }
 
 function load_data(onload) {
@@ -54,10 +87,6 @@ function load_data(onload) {
           break;
         }
 
-        if (keys[column] == "cost") {
-          value = value ? Number(value) : 0;
-        }
-
         entry[keys[column]] = value;
       }
 
@@ -82,5 +111,5 @@ function newRandomWWWPiece() {
   }
 
   const piece = WWW[pieceIndex];
-  new PieceAlert(piece.text, piece.cost);
+  new PieceAlert(piece.text);
 }

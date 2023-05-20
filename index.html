@@ -150,9 +150,9 @@
 
             <div class="block attached-above has-buttonbar" id="library-page-container">
               <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
-                <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1); sfx('click');">←</button>
+                <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1);">←</button>
                 <span id="library-index"></span>/<span id="library-pages-total"></span>
-                <button class="disabled" title="go to next page" onclick="navigateLibrary(1); sfx('click');">→</button>
+                <button class="disabled" title="go to next page" onclick="navigateLibrary(1);">→</button>
               </nav>
               <p id="library-page" class="block"></p>
               <div class="buttonbar">
@@ -233,8 +233,8 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
               <div class="dropdown">
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].publish(); sfx('click');">publish to Market</button>
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].releaseToWind(); sfx('click');">release into the Wind</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].publish();">publish to Market</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].releaseToWind();">release into the Wind</button>
               </div>
             </div>
 
@@ -463,9 +463,16 @@
       </div>
     </dialog>
 
+    <dialog id="dialog-publishing-loading">
+      <div class="flexbox">
+        <div class="grow">loading...</div>
+      </div>
+      Preparing to publish...
+    </dialog>
+
     <dialog id="dialog-publishing-success" class="piece">
       <div class="flexbox">
-        <div class="grow">you successfully published this piece!</div>
+        <div class="grow">You successfully published this piece!</div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
       <p class="block" id="dialog-publishing-success-content"></p>
@@ -476,7 +483,7 @@
 
     <dialog id="dialog-wind" class="piece">
       <div class="flexbox">
-        <div class="grow">gone with the wind...</div>
+        <div class="grow">Gone with the wind...</div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
       <p class="block" id="dialog-wind-content"></p>
