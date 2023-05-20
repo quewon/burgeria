@@ -3,17 +3,17 @@ var WWW;
 function write_data(text, cost) {
   var data = new FormData();
   data.set("text", text || "");
-  data.set("cost", cost.toString() || "");
+  data.set("cost", cost ? cost.toString() : "");
 
   const url = "https://script.google.com/macros/s/AKfycbzRKbrsf158qdo6BbFn925agIOIp93YwwYND0k3zeugBqcXSAczA7FudEXaePDSy8G4_A/exec";
   fetch(url, {
     redirect: "follow",
     method: "POST",
-    body: JSON.stringify(data),
+    body: data,
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-  }, { mode: 'no-cors' })
+  })
   .then(function(response) {
     console.log("successfully published to the www.");
   })
