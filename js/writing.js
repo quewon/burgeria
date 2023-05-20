@@ -200,7 +200,7 @@ class Piece {
       ui.dialogs["publishing-success"].showModal();
     });
 
-    affectTomorrowsPrices(this.text);
+    sellText(this.text);
 
     this.history = [];
     this.update("", 0, 0, "", "");
@@ -217,7 +217,7 @@ class Piece {
     ui.dialogs["wind-content"].textContent = this.text;
     ui.dialogs["wind"].showModal();
 
-    affectTomorrowsPrices(this.text);
+    sellText(this.text);
 
     this.history = [];
     this.update("", 0, 0, "", "");
@@ -257,6 +257,7 @@ class PieceAlert {
       }
 
       bankPoints(-cost, "WWW");
+      buyText(this.dataset.text);
 
       const piece = new Piece(this.dataset.text);
       game.market.splice(game.market.indexOf(this.dataset.text), 1);
@@ -265,7 +266,6 @@ class PieceAlert {
 
       p.classList.add("send-library");
       p.onanimationend = function() {
-        console.log(this);
         this.remove();
         if (ui.workshop.market.lastElementChild == ui.workshop.marketEmptyMessage) {
           ui.workshop.marketEmptyMessage.classList.remove("gone");

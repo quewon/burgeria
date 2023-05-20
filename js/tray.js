@@ -249,7 +249,7 @@ class Tray {
 
     for (let side in this.collections) {
       for (let item of this.collections[side].items) {
-        affectTomorrowsPrices(item.name);
+        sellText(item.name);
       }
     }
 

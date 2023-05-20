@@ -181,7 +181,7 @@ const game = {
     for (let char of abc) {
       const yesterdaysPrice = playerdata.prices[char][playerdata.prices[char].length - 1];
       const todaysPrice = game.tomorrowsPrices[char];
-      const difference = yesterdaysPrice - todaysPrice;
+      const difference = Math.abs(yesterdaysPrice - todaysPrice);
 
       if (difference == 0) continue;
 
@@ -220,8 +220,9 @@ const game = {
       var todaysPrice = game.tomorrowsPrices[char];
 
       if (yesterdaysPrice == todaysPrice) {
-        // console.log("+*: "+char);
-        todaysPrice = Math.min(1, todaysPrice + stats.mode);
+        if (Math.random() < .5) {
+          todaysPrice = Math.max(.01, todaysPrice - stats.mode);
+        }
       }
 
       playerdata.prices[char].push(todaysPrice);
@@ -248,12 +249,22 @@ function bankPoints(value, description) {
   updatePoints();
 }
 
-function affectTomorrowsPrices(text) {
+function buyText(text) {
+  console.log("+*: "+text);
+
+  for (let char of text) {
+    if (char in playerdata.prices) {
+      game.tomorrowsPrices[char] = Math.min(1, game.tomorrowsPrices[char] + .01);
+    }
+  }
+}
+
+function sellText(text) {
   console.log("-*: "+text);
 
   for (let char of text) {
     if (char in playerdata.prices) {
-      game.tomorrowsPrices[char] = Math.max(0.01, game.tomorrowsPrices[char] - .01);
+      game.tomorrowsPrices[char] = Math.max(.01, game.tomorrowsPrices[char] - .01);
     }
   }
 }
