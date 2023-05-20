@@ -1,22 +1,21 @@
 var WWW;
 
-const form = document.getElementById("form");
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-  const data = new FormData(form);
-  console.log(data);
-  const action = e.target.action;
-  fetch(action, {
+function write_data(text, cost) {
+  const data = new FormData();
+  data.append("text", text || "");
+  data.append("cost", cost ? cost.toString() : "");
+
+  fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
     method: "POST",
     body: data
   })
   .then(function(e) {
-    console.log(e);
+    console.log("successfully published to the www.");
+  })
+  .catch(function(e) {
+    console.log("** publishing error **\n"+e);
+    ui.dialogs["publishing-error"].showModal();
   });
-});
-
-function write_data(text, cost) {
-
 }
 
 function load_data() {
