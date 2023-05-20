@@ -43,6 +43,7 @@ const game = {
   trays: [], //
   guys: [], //
   unbankedPoints: 0, //
+  market: [],
 
   themes: {
     order: ["☼", "☁︎"], //,"☾"
@@ -72,6 +73,8 @@ const game = {
 
   beginDay: function() {
     bankPoints(game.unbankedPoints, "BURGERIA");
+    newRandomWWWPiece();
+
     playerdata.unbankedPoints = 0;
 
     playerdata.day++;

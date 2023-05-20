@@ -180,6 +180,8 @@ class Piece {
 
 class PieceAlert {
   constructor(text, cost) {
+    game.market.push(text);
+
     let div = divContainingTemplate("template-writing-alert");
     cost = cost || 0;
     div.dataset.title = text.split("\n")[0];
@@ -210,6 +212,7 @@ class PieceAlert {
       bankPoints(-cost, "WWW");
 
       const piece = new Piece(this.dataset.text);
+      game.market.splice(game.market.indexOf(this.dataset.text), 1);
       piece.addToLibrary();
       sfx('click');
 

@@ -5,6 +5,9 @@ function write_data(text, cost) {
   data.append("text", text || "");
   data.append("cost", cost ? cost.toString() : "");
 
+  // all this possible, thanks to
+  // https://github.com/levinunnink/html-form-to-google-sheet
+
   fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
     method: "POST",
     body: data
@@ -38,21 +41,23 @@ function load_data(onload) {
     const keys = array[0];
     const output = [];
 
-    for (let i=1; i<array.length; i++) {
+    for (let row=1; row<array.length; row++) {
       var entry = {};
       var remove = false;
-      for (let x=0; x<keys.length; x++) {
-        var value = array[i][x];
-        if (keys[x] == "remove" && value != "") {
+
+      for (let column=0; column<keys.length; column++) {
+        var value = array[row][column];
+
+        if (keys[column] == "remove" && value) {
           remove = true;
           break;
         }
 
-        if (keys[x] == "cost") {
+        if (keys[column] == "cost") {
           value = value ? Number(value) : 0;
         }
 
-        entry[keys[x]] = value;
+        entry[keys[column]] = value;
       }
 
       if (!remove) output.push(entry);
@@ -60,4 +65,21 @@ function load_data(onload) {
 
     return output;
   }
+}
+
+function newRandomWWWPiece() {
+  if (WWW.length == 0) return;
+
+  var pieceIndex = Math.random() * WWW.length | 0;
+
+  var i=1;
+  while (game.market.includes(WWW[pieceIndex].text)) {
+    pieceIndex++;
+    if (pieceIndex >= WWW.length) pieceIndex = 0;
+    i++;
+    if (i > WWW.length) return false;
+  }
+
+  const piece = WWW[pieceIndex];
+  new PieceAlert(piece.text, piece.cost);
 }

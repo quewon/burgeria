@@ -474,7 +474,15 @@
       console.clear();
 
       init_default_playerdata();
-      load_data(on_data_loaded);
+      load_data(function() {
+        console.log("loaded www data.");
+
+        newRandomWWWPiece();
+        newRandomWWWPiece();
+
+        animate();
+        setInterval(update, 1);
+      });
 
       // workshop
       updateWorkshopLibrary();
@@ -508,20 +516,6 @@
       });
 
       setScene("workshop");
-    }
-
-    function on_data_loaded() {
-      console.log("loaded www data.");
-      
-      if (WWW.length > 0) {
-        for (let i=0; i<Math.min(2, WWW.length); i++) {
-          const piece = WWW[Math.random() * WWW.length | 0];
-          new PieceAlert(piece.text, piece.cost);
-        }
-      }
-
-      animate();
-      setInterval(update, 1);
     }
   </script>
 </html>
