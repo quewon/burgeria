@@ -10,7 +10,10 @@ function write_data(text, cost) {
     body: data
   })
   .then(function(e) {
-    console.log("successfully published to the www.");
+    load_data(function() {
+      console.log("refreshed www data.");
+      console.log("successfully published to the www.");
+    });
   })
   .catch(function(e) {
     console.log("** publishing error **\n"+e);
@@ -18,7 +21,7 @@ function write_data(text, cost) {
   });
 }
 
-function load_data() {
+function load_data(onload) {
   const API_KEY = "AIzaSyBzXdECCWJJtWVx8QeZTm7NIWntlmdcX88";
   const SHEET_ID = "13D9a_zTj-VeDTHN0AZBJZ6rRc-fGsmWwRPXUGHBuc7M";
 
@@ -26,8 +29,7 @@ function load_data() {
   .then((response) => response.json())
   .then((data) => {
     WWW = SheetArrayToObjects(data.values);
-    console.log("loaded www data.");
-    on_data_loaded();
+    onload();
   });
 
   function SheetArrayToObjects(array) {
