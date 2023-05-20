@@ -244,7 +244,14 @@ class Tray {
   }
 
   send(i) {
+    if (!this.enabled) return;
     this.enabled = false;
+
+    for (let side in this.collections) {
+      for (let item of this.collections[side].items) {
+        affectTomorrowsPrices(item.name);
+      }
+    }
 
     if (ui.storefront.ministockTray == this) {
       this.toggleGlobalBlock("ministock", this.stockbutton);

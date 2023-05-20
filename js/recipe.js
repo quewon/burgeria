@@ -262,10 +262,3 @@ class Ingredient {
     updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
   }
 }
-
-function generateNewPrices() {
-  let abc = "abcdefghijklmnopqrstuvwxyz";
-  for (let char of abc) {
-    playerdata.prices[char].push(Math.ceil(Math.random() * 100));
-  }
-}

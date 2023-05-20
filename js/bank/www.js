@@ -1,6 +1,6 @@
 var WWW;
 
-function write_data(text, cost) {
+function write_data(text, cost, onwrite) {
   const data = new FormData();
   data.append("text", text || "");
   data.append("cost", cost ? cost.toString() : "");
@@ -16,6 +16,7 @@ function write_data(text, cost) {
     load_data(function() {
       console.log("refreshed www data.");
       console.log("successfully published to the www.");
+      if (onwrite) onwrite();
     });
   })
   .catch(function(e) {
@@ -32,7 +33,7 @@ function load_data(onload) {
   .then((response) => response.json())
   .then((data) => {
     WWW = SheetArrayToObjects(data.values);
-    onload();
+    if (onload) onload();
   });
 
   function SheetArrayToObjects(array) {

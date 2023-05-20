@@ -38,7 +38,10 @@ function init_default_playerdata() {
   let abc = "abcdefghijklmnopqrstuvwxyz";
   for (let char of abc) {
     playerdata.prices[char] = [];
-    playerdata.prices[char].push(Math.ceil(Math.random() * 100));
+
+    const price = Math.random() * .1;
+    playerdata.prices[char].push(price);
+    game.tomorrowsPrices[char] = price;
   }
 
   addPieceToWorkshop();

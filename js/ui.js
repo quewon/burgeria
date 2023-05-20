@@ -7,7 +7,12 @@ var ui = {
     "no-letters": document.getElementById("dialog-no-letters"),
     "early-close": document.getElementById("dialog-early-close"),
     "help-burgeria": document.getElementById("dialog-help-burgeria"),
-    "publishing-error": document.getElementById("dialog-publishing-error")
+    "publishing-error": document.getElementById("dialog-publishing-error"),
+    "publishing-error-no-letters": document.getElementById("dialog-publishing-error-no-letters"),
+    "publishing-success": document.getElementById("dialog-publishing-success"),
+    "publishing-success-content": document.getElementById("dialog-publishing-success-content"),
+    "wind": document.getElementById("dialog-wind"),
+    "wind-content": document.getElementById("dialog-wind-content")
   },
   templates: {
     "template-tray": document.getElementById("template-tray"),
@@ -334,9 +339,7 @@ function updateGuysList() {
     button.textContent = i+1;
     button.onclick = function() {
       const tray = ui.storefront.guysListTray;
-      if (tray.enabled) {
-        tray.send(Number(button.dataset.id));
-      }
+      tray.send(Number(button.dataset.id));
     }
     list.appendChild(button);
   }
@@ -587,13 +590,13 @@ class Prices {
 
     let graph = div.querySelector(".prices-graph");
     let pointsholder = div.querySelector(".points-holder");
-    let points = [0, 25, 50, 75, 100];
+    let points = ["0", ".25", ".5", ".75", "1"];
     let divrect = div.getBoundingClientRect();
     for (let point of points) {
       let label = document.createElement("span");
       label.textContent = point;
       label.className = "graphvaluepoint";
-      label.style.bottom = point+"%";
+      label.style.bottom = (Number(point) * 100)+"%";
       pointsholder.appendChild(label);
 
       let rect = label.getBoundingClientRect();
@@ -621,7 +624,7 @@ class Prices {
       let diff = currentPrice - previousPrice;
 
       let bar = document.createElement("div");
-      bar.style.height = currentPrice+"%";
+      bar.style.height = (currentPrice * 100)+"%";
       bar.style.gridRowStart = 1;
       bar.style.gridColumnStart = i+2;
       if (diff > 0) {
@@ -635,7 +638,7 @@ class Prices {
 
       if (diff != 0) {
         let cbar = document.createElement("div");
-        cbar.style.height = previousPrice+"%";
+        cbar.style.height = (previousPrice * 100)+"%";
         cbar.style.gridRowStart = 1;
         cbar.style.gridColumnStart = i+2;
         if (diff > 0) {
@@ -654,8 +657,9 @@ class Prices {
       hoverarea.style.position = "relative";
 
       let tooltip = document.createElement("div");
-      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+currentPrice;
+      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+currentPrice.toFixed(2);
       if (diff != 0) {
+        diff = diff.toFixed(2);
         tooltip.innerHTML += " <span style='color:"+(diff > 0 ? "var(--graph-positive)'>↑" : "var(--graph-negative)'>↓")+Math.abs(diff)+"</span>";
       }
 

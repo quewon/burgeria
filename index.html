@@ -233,8 +233,8 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
               <div class="dropdown">
-                <button>publish to Market</button>
-                <button>release into the Wind</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].publish(); sfx('click');">publish to Market</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].releaseToWind(); sfx('click');">release into the Wind</button>
               </div>
             </div>
 
@@ -390,12 +390,12 @@
       </div>
     </dialog>
 
-    <dialog id="dialog-read-text">
+    <dialog id="dialog-read-text" class="piece">
       <div class="flexbox">
         <div class="grow" id="dialog-read-text-title"></div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
-      <div id="dialog-read-text-content"></div>
+      <p class="block" id="dialog-read-text-content"></p>
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>
@@ -452,12 +452,45 @@
       </div>
     </dialog>
 
+    <dialog id="dialog-publishing-error-no-letters" class="error">
+      <div class="flexbox">
+        <div class="grow">!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      Sorry, you can't publish a piece with no letters in it!
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-publishing-success" class="piece">
+      <div class="flexbox">
+        <div class="grow">you successfully published this piece!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      <p class="block" id="dialog-publishing-success-content"></p>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-wind" class="piece">
+      <div class="flexbox">
+        <div class="grow">gone with the wind...</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      <p class="block" id="dialog-wind-content"></p>
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
   </body>
   <script type="text/javascript" src="js/lib/howler.core.js"></script>
   <script type="text/javascript" src="js/lib/three.min.js"></script>
   <script type="text/javascript" src="js/bank/geometries.js"></script>
   <script type="text/javascript" src="js/bank/sound.js"></script>
-  <script type="text/javascript" src="js/bank/writing.js"></script>
+  <script type="text/javascript" src="js/bank/www.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
   <script type="text/javascript" src="js/tray.js"></script>
@@ -477,8 +510,8 @@
       load_data(function() {
         console.log("loaded www data.");
 
-        newRandomWWWPiece();
-        newRandomWWWPiece();
+        new PieceAlert(WWW[0].text, "0");
+        new PieceAlert(WWW[1].text, "0");
 
         animate();
         setInterval(update, 1);

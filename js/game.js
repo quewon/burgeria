@@ -44,6 +44,7 @@ const game = {
   guys: [], //
   unbankedPoints: 0, //
   market: [],
+  tomorrowsPrices: {},
 
   themes: {
     order: ["☼", "☁︎"], //,"☾"
@@ -73,12 +74,12 @@ const game = {
 
   beginDay: function() {
     bankPoints(game.unbankedPoints, "BURGERIA");
-    newRandomWWWPiece();
-
     playerdata.unbankedPoints = 0;
 
     playerdata.day++;
     game.daytime = true;
+
+    newRandomWWWPiece();
 
     for (let i=game.guys.length-1; i>=0; i--) {
       let guy = game.guys[i];
@@ -92,7 +93,7 @@ const game = {
       game.trays.splice(i, 1);
     }
 
-    generateNewPrices();
+    game.updatePrices();
 
     new Headline("SMALL BURGERS...", "... ARE IN!");
     new Prices();
@@ -160,6 +161,71 @@ const game = {
       console.clear();
       game.openStore();
     }
+  },
+
+  updatePrices() {
+    var stats = {
+      mean: 0, //average
+      median: 0, //middle
+      mode: 0, //most
+      range: 0
+    };
+
+    const abc = "abcdefghijklmnopqrstuvwxyz";
+    var priceDifferences = [];
+    var priceHash = {};
+    var smallestPriceDifference = Infinity;
+    var largestPriceDifference = 0;
+    var differenceTotal = 0;
+
+    for (let char of abc) {
+      const yesterdaysPrice = playerdata.prices[char][playerdata.prices[char].length - 1];
+      const todaysPrice = game.tomorrowsPrices[char];
+      const difference = yesterdaysPrice - todaysPrice;
+
+      if (difference == 0) continue;
+
+      if (difference > largestPriceDifference) largestPriceDifference = difference;
+      if (difference < smallestPriceDifference) smallestPriceDifference = difference;
+
+      if (!(difference in priceHash)) {
+        priceHash[difference] = 0;
+      }
+      priceHash[difference]++;
+
+      differenceTotal += difference;
+
+      priceDifferences.push(difference);
+    }
+
+    stats.range = largestPriceDifference - smallestPriceDifference;
+
+    var modeValue = -1;
+    var modeCount = 0;
+    for (let diff in priceHash) {
+      if (priceHash[diff] > modeCount) {
+        modeValue = diff;
+        modeCount = priceHash[diff];
+      }
+    }
+
+    stats.mode = Number(modeValue);
+
+    stats.mean = differenceTotal / priceDifferences.length;
+
+    stats.median = priceDifferences[Math.floor((priceDifferences.length - 1) / 2)];
+
+    for (let char of abc) {
+      const yesterdaysPrice = playerdata.prices[char][playerdata.prices[char].length - 1];
+      var todaysPrice = game.tomorrowsPrices[char];
+
+      if (yesterdaysPrice == todaysPrice) {
+        // console.log("+*: "+char);
+        todaysPrice = Math.min(1, todaysPrice + stats.mode);
+      }
+
+      playerdata.prices[char].push(todaysPrice);
+    }
   }
 }
 
@@ -180,4 +246,14 @@ function bankPoints(value, description) {
 
   updateBankbook();
   updatePoints();
+}
+
+function affectTomorrowsPrices(text) {
+  console.log("-*: "+text);
+
+  for (let char of text) {
+    if (char in playerdata.prices) {
+      game.tomorrowsPrices[char] = Math.max(0.01, game.tomorrowsPrices[char] - .01);
+    }
+  }
 }

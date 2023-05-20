@@ -582,21 +582,21 @@ input::placeholder, textarea::placeholder {
   font-style: italic;
 }
 
-p.block, #dialog-read-text-content {
+p.block {
   padding-left: 3rem;
   padding-right: 3rem;
   background: var(--newsgray);
   white-space: pre-wrap;
   text-align: justify;
-}
-p.block {
   margin: 0;
   margin-left: calc(-1 * var(--padding));
   margin-right: calc(-1 * var(--padding));
   border-left: none;
   border-right: none;
-  /* border: none; */
-  /* font-size: inherit; */
+}
+dialog p.block {
+  border-bottom: none;
+  border-top: none;
 }
 
 .lettericon {
@@ -946,7 +946,7 @@ dialog.error .flexbox {
   color: var(--bg);
 }
 
-#dialog-read-text {
+dialog.piece {
   background: var(--newsgray);
 }
 

@@ -1,3 +1,14 @@
+function calculatePieceCost(text) {
+  var cost = 0;
+  for (let char of text) {
+    if (char in playerdata.prices) {
+      const prices = playerdata.prices[char];
+      cost += prices[prices.length - 1];
+    }
+  }
+  return Math.ceil(cost);
+}
+
 class Piece {
   constructor(text) {
     text = text || "";
@@ -176,6 +187,42 @@ class Piece {
     }
     updateLibrary();
   }
+
+  publish() {
+    if (this.lettersCount() == 0) {
+      console.log("tried to publish a piece without letters.");
+      ui.dialogs["publishing-error-no-letters"].showModal();
+      return;
+    }
+
+    ui.dialogs["publishing-success-content"].textContent = this.text;
+    write_data(this.text, 0, function() {
+      ui.dialogs["publishing-success"].showModal();
+    });
+
+    affectTomorrowsPrices(this.text);
+
+    this.history = [];
+    this.update("", 0, 0, "", "");
+    removePieceFromWorkshop();
+  }
+
+  releaseToWind() {
+    if (this.lettersCount() == 0) {
+      console.log("tried to publish a piece without letters.");
+      ui.dialogs["publishing-error-no-letters"].showModal();
+      return;
+    }
+
+    ui.dialogs["wind-content"].textContent = this.text;
+    ui.dialogs["wind"].showModal();
+
+    affectTomorrowsPrices(this.text);
+
+    this.history = [];
+    this.update("", 0, 0, "", "");
+    removePieceFromWorkshop();
+  }
 }
 
 class PieceAlert {
@@ -183,7 +230,7 @@ class PieceAlert {
     game.market.push(text);
 
     let div = divContainingTemplate("template-writing-alert");
-    cost = cost || 0;
+    cost = cost || calculatePieceCost(text);
     div.dataset.title = text.split("\n")[0];
     div.className = "block transparent";
 
