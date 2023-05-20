@@ -464,10 +464,9 @@
 
     <dialog id="dialog-publishing-loading">
       <div class="flexbox">
-        <div class="grow">loading...</div>
+        <div class="grow">preparing to publish...</div>
       </div>
       <div id="publishing-loading-canvas"></div>
-      Preparing to publish...
     </dialog>
 
     <dialog id="dialog-publishing-success" class="piece">
@@ -588,16 +587,20 @@
         [new Geometry("condiment"), 0xffffe0],
         [new Geometry("bun", 1), 0xFFE4B5],
       ], "wireframe"));
+      loadingScene.time = 0;
       loadingScene.update = function() {
         const mesh = this.scene.children[2];
+
+        this.time += .001;
 
         mesh.rotation.y += .01;
         if (mesh.rotation.y > Math.PI * 2) mesh.rotation.y -= Math.PI * 2;
 
-        mesh.rotation.x -= .01;
-        if (mesh.rotation.x < Math.PI * 2) mesh.rotation.x += Math.PI * 2;
+        mesh.rotation.z = Math.sin(this.time * 30) * Math.PI/8;
+
+        mesh.position.y = Math.sin(this.time * 35) * 1;
+        mesh.position.x = Math.cos(this.time * 35) * 1;
       };
-      loadingScene.camera.position.y = 1;
       loadingScene.camera.zoom = 50;
       ui.dialogs["publishing-loading"].showModal();
       ui.dialogs["publishing-loading-canvas"].setScene3D(loadingScene);

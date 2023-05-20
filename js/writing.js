@@ -154,8 +154,6 @@ class Piece {
       this.disintegrating = true;
       this.sfxId = sfx("disintegrate");
     }
-
-    sfx('click');
   }
 
   disintegrateFrame() {
