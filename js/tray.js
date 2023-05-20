@@ -1,10 +1,3 @@
-var renderer;
-function init_3d() {
-  renderer = new THREE.WebGLRenderer({ alpha: true });
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize(150, 150);
-}
-
 class Tray {
   constructor() {
     this.id = game.trays.length;
@@ -44,7 +37,6 @@ class Tray {
 
         this.prepend(item.element);
         item.dragGhost.classList.add("gone");
-        tray.resize_3d();
         tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
       });
       con.addEventListener("mouseup", function(e) {
@@ -98,7 +90,9 @@ class Tray {
   sendToStorefront() {
     this.enabled = true;
     ui.storefront.body.appendChild(this.element);
-    this.resize_3d();
+
+    const canvasContainer = this.element.querySelector("[name='canvascontainer']");
+    this.canvas = new Canvas3D(canvasContainer, this.scene);
   }
 
   updateGlobalBlockPosition(block, button) {
@@ -135,51 +129,22 @@ class Tray {
     ui.storefront[block].classList.remove("gone");
   }
 
-  resize_3d(context) {
-    context = context || this.context;
-
-    let width = context.canvas.width;
-    let height = context.canvas.height;
-    let aspect = context.canvas.offsetHeight/context.canvas.offsetWidth;
-    height = width * aspect;
-
-    this.camera.left = -width/2;
-    this.camera.right = width/2;
-    this.camera.top = height/2;
-    this.camera.bottom = -height/2;
-    this.camera.updateProjectionMatrix();
-  }
-
   init_3d() {
-    let canvas = this.element.querySelector("canvas");
-    let width = canvas.width;
-    let height = canvas.height;
-    let context = canvas.getContext("2d");
-
-    var camera = new THREE.OrthographicCamera(0, 0, 0, 0, .1, 1000);
-    camera.zoom = 35;
-
-    var scene = new THREE.Scene();
-    scene.add(new THREE.AmbientLight(0xffffff, .5));
-    var light = new THREE.DirectionalLight(0xffe6e6, .5);
-    light.position.set(10, 10, -10);
-    scene.add(light);
-
-    this.scene = scene;
-    this.context = context;
-    this.camera = camera;
+    this.scene = new Scene3D();
 
     var traymesh = new THREE.Mesh(
       new THREE.BoxGeometry(6, .3, 4.5),
       new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
     traymesh.position.set(0, -2, 0);
-
-    camera.position.set(0, 1, -10);
-    camera.lookAt(0, 0, 0);
-
-    scene.add(traymesh);
     this.mesh = traymesh;
+
+    this.scene.scene.add(this.mesh);
+
+    this.scene.tray = this;
+    this.scene.update = function() {
+      this.tray.draw();
+    };
   }
 
   resetMeshes() {
@@ -224,23 +189,9 @@ class Tray {
     }
   }
 
-  draw(context) {
-    context = context || this.context;
-
-    let width = context.canvas.width;
-    let height = context.canvas.height;
-
-    context.clearRect(0, 0, width, height);
-
-    for (let side in this.collections) {
-      if (!this.collections[side]) continue;
-      this.collections[side].draw();
-    }
-
+  draw() {
     this.mesh.rotation.y += .01;
-
-    renderer.render(this.scene, this.camera);
-    context.drawImage(renderer.domElement, 0, 0);
+    for (let side in this.collections) { this.collections[side].draw() };
   }
 
   send(i) {
@@ -267,6 +218,7 @@ class Tray {
     game.guys[i].receive(this);
 
     el.addEventListener("animationend", function(e) {
+      game.trays[this.dataset.id].canvas.delete();
       this.remove();
     });
   }

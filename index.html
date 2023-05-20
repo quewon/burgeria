@@ -45,7 +45,8 @@
           </div>
           <div id="recipe-preview" class="block">
             <button id="menu-edit-button" class="top right" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
-            <canvas width="300" height="300"></canvas>
+            <div id="recipe-preview-canvas">
+            </div>
             <div class="flexbox">
               <div class="container">
                 <div class="collection empty" placeholder="burger" data-capacity="-1">
@@ -288,8 +289,7 @@
             <button name="stock">stock ☰</button>
           </div>
         </div>
-        <div>
-          <canvas width="300" height="300"></canvas>
+        <div name="canvascontainer">
         </div>
       </div>
     </template>
@@ -367,9 +367,8 @@
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
 
-      <div style="text-align: center;">
-        <img src="img/burger.png" alt="a deluxe burger" title="a Deluxe Burger" style="width: 70px; margin: auto;">
-      </div>
+      <div style="text-align: center;" id="help-burgeria-canvas"></div><br>
+
       <em>Burgeria!</em> is your very own burger-shaped text editor.
       <br><br>
       Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...
@@ -467,6 +466,7 @@
       <div class="flexbox">
         <div class="grow">loading...</div>
       </div>
+      <div id="publishing-loading-canvas"></div>
       Preparing to publish...
     </dialog>
 
@@ -498,6 +498,7 @@
   <script type="text/javascript" src="js/bank/geometries.js"></script>
   <script type="text/javascript" src="js/bank/sound.js"></script>
   <script type="text/javascript" src="js/bank/www.js"></script>
+  <script type="text/javascript" src="js/canvas.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
   <script type="text/javascript" src="js/tray.js"></script>
@@ -527,9 +528,9 @@
       // workshop
       updateWorkshopLibrary();
       updateList(ui.workshop.lettersList, playerdata.letters);
+      setScene("workshop");
 
       // storefront
-
       init_3d();
 
       playerdata.themeIndex--;
@@ -555,7 +556,53 @@
         if (ui.storefront.guysListTray) ui.storefront.guysListTray.updateGlobalBlockPosition("guysList", ui.storefront.guysListTray.sendbutton)
       });
 
-      setScene("workshop");
+      const aboutScene = new Scene3D();
+      aboutScene.scene.add(prebuiltBurger([
+        [new Geometry("bun"), 0xFFE4B5],
+        [new Geometry("condiment"), 0xff0000],
+        [new Geometry("pickle"), 0x3CB371],
+        [new Geometry("onion"), 0xffffe0],
+        [new Geometry("cheese"), 0xffd700],
+        [new Geometry("patty"), 0x8b4513],
+        [new Geometry("tomato"), 0xff0000],
+        [new Geometry("lettuce"), 0x90ee90],
+        [new Geometry("condiment"), 0xffffe0],
+        [new Geometry("bun", 1), 0xFFE4B5],
+      ]));
+      aboutScene.camera.position.y = 1.25;
+      aboutScene.camera.zoom = 70;
+      ui.dialogs["help-burgeria"].showModal();
+      ui.dialogs["help-burgeria-canvas"].setScene3D(aboutScene);
+      ui.dialogs["help-burgeria"].close();
+
+      const loadingScene = new Scene3D();
+      loadingScene.scene.add(prebuiltBurger([
+        [new Geometry("bun"), 0xFFE4B5],
+        [new Geometry("condiment"), 0xff0000],
+        [new Geometry("pickle"), 0x3CB371],
+        [new Geometry("onion"), 0xffffe0],
+        [new Geometry("cheese"), 0xffd700],
+        [new Geometry("patty"), 0x8b4513],
+        [new Geometry("tomato"), 0xff0000],
+        [new Geometry("lettuce"), 0x90ee90],
+        [new Geometry("condiment"), 0xffffe0],
+        [new Geometry("bun", 1), 0xFFE4B5],
+      ], "wireframe"));
+      loadingScene.update = function() {
+        const mesh = this.scene.children[2];
+
+        mesh.rotation.y += .01;
+        if (mesh.rotation.y > Math.PI * 2) mesh.rotation.y -= Math.PI * 2;
+
+        mesh.rotation.x -= .01;
+        if (mesh.rotation.x < Math.PI * 2) mesh.rotation.x += Math.PI * 2;
+      };
+      loadingScene.camera.position.y = 1;
+      loadingScene.camera.zoom = 50;
+      ui.dialogs["publishing-loading"].showModal();
+      ui.dialogs["publishing-loading-canvas"].setScene3D(loadingScene);
+      ui.dialogs["publishing-loading"].close();
+      ui.dialogs["publishing-loading-canvas"].deactivate();
     }
   </script>
 </html>

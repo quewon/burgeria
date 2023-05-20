@@ -57,3 +57,41 @@ class Geometry {
     this.rx = rx;
   }
 }
+
+function prebuiltBurger(meshInfoArray, type) {
+  const group = new THREE.Group();
+
+  var combinedHeight = 0;
+  for (let meshInfo of meshInfoArray) {
+    combinedHeight += meshInfo[0].height;
+  }
+
+  var ground = combinedHeight/2;
+  for (let meshInfo of meshInfoArray) {
+    var mesh;
+    if (type == "wireframe") {
+      mesh = new THREE.LineSegments(
+        new THREE.EdgesGeometry(meshInfo[0].geometry),
+        new THREE.LineBasicMaterial({ color: meshInfo[1] })
+      );
+    } else {
+      mesh = new THREE.Mesh(
+        meshInfo[0].geometry,
+        new THREE.MeshStandardMaterial({ color: meshInfo[1] })
+      );
+    }
+
+    if (meshInfo[0].rx != 0) {
+      mesh.rotation.x += Math.PI * meshInfo[0].rx;
+    }
+
+    const height = meshInfo[0].height;
+
+    mesh.position.y = ground - height/2;
+    ground -= height;
+
+    group.add(mesh);
+  }
+
+  return group;
+}

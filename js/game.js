@@ -10,16 +10,12 @@ function update() {
 }
 
 function animate() {
+  for (let canvas of _canvases) {
+    canvas.draw();
+  }
+
   for (let guy of game.guys) {
     if (!guy.served) guy.draw();
-  }
-
-  for (let tray of game.trays) {
-    if (tray.enabled) tray.draw();
-  }
-
-  for (let recipe of playerdata.recipes) {
-    if (recipe.visible) recipe.draw();
   }
 
   requestAnimationFrame(animate);

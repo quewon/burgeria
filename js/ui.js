@@ -6,8 +6,13 @@ var ui = {
     "read-text-content": document.getElementById("dialog-read-text-content"),
     "no-letters": document.getElementById("dialog-no-letters"),
     "early-close": document.getElementById("dialog-early-close"),
+
     "help-burgeria": document.getElementById("dialog-help-burgeria"),
+    "help-burgeria-canvas": new Canvas3D(document.getElementById("help-burgeria-canvas")),
+
     "publishing-loading": document.getElementById("dialog-publishing-loading"),
+    "publishing-loading-canvas": new Canvas3D(document.getElementById("publishing-loading-canvas")),
+    
     "publishing-error": document.getElementById("dialog-publishing-error"),
     "publishing-error-no-letters": document.getElementById("dialog-publishing-error-no-letters"),
     "publishing-success": document.getElementById("dialog-publishing-success"),
@@ -36,6 +41,7 @@ var ui = {
     body: document.getElementById("scene-storefront-body"),
     news: document.getElementById("scene-storefront-news"),
     recipesList: document.getElementById("scene-recipes"),
+    recipePreviewCanvas: new Canvas3D(document.getElementById("recipe-preview-canvas")),
     ministock: document.getElementById("storefront-ministock"),
     ministockTray: null,
     guysList: document.getElementById("storefront-guys-list"),

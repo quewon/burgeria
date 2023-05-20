@@ -8,41 +8,13 @@ function write_data(text, onwrite) {
   // https://github.com/levinunnink/html-form-to-google-sheet
 
   ui.dialogs["publishing-loading"].showModal();
+  ui.dialogs["publishing-loading-canvas"].activate();
 
-  const http = new XMLHttpRequest();
-  const url = "https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec";
-  http.open("POST", url);
-
-  http.addEventListener("load", function() {
-    ui.dialogs["publishing-loading"].close();
-    console.log("successfully published to the www.");
-    if (onwrite) onwrite();
-
-    load_data(function() {
-      console.log("refreshed www data.");
-    });
-  });
-
-  http.addEventListener("progress", function(e) {
-    if (e.lengthComputable) {
-      const percent = (e.loaded / e.total) * 100;
-      console.log("** progress **\n"+Math.round(percent)+"%");
-    }
-  });
-
-  http.addEventListener("error", function(e) {
-    console.log("** publishing error **\n"+e);
-    ui.dialogs["publishing-loading"].close();
-    ui.dialogs["publishing-error"].showModal();
-  });
-
-  http.send(data);
-
-  // fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
-  //   method: "POST",
-  //   body: data
-  // })
-  // .then(function(e) {
+  // const http = new XMLHttpRequest();
+  // const url = "https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec";
+  // http.open("POST", url);
+  //
+  // http.addEventListener("load", function() {
   //   ui.dialogs["publishing-loading"].close();
   //   console.log("successfully published to the www.");
   //   if (onwrite) onwrite();
@@ -50,12 +22,43 @@ function write_data(text, onwrite) {
   //   load_data(function() {
   //     console.log("refreshed www data.");
   //   });
-  // })
-  // .catch(function(e) {
+  // });
+  //
+  // http.addEventListener("progress", function(e) {
+  //   if (e.lengthComputable) {
+  //     const percent = (e.loaded / e.total) * 100;
+  //     console.log("** progress **\n"+Math.round(percent)+"%");
+  //   }
+  // });
+  //
+  // http.addEventListener("error", function(e) {
   //   console.log("** publishing error **\n"+e);
   //   ui.dialogs["publishing-loading"].close();
   //   ui.dialogs["publishing-error"].showModal();
   // });
+  //
+  // http.send(data);
+
+  fetch("https://script.google.com/macros/s/AKfycby6dOmupDq_FYd_gp1Y0HXSNJx67dy9ds4Zf_Xb4FFw1Hp9mMvjBs_AgnyJIp0jMLPQ/exec", {
+    method: "POST",
+    body: data
+  })
+  .then(function(e) {
+    ui.dialogs["publishing-loading"].close();
+    ui.dialogs["publishing-loading-canvas"].deactivate();
+    console.log("successfully published to the www.");
+    if (onwrite) onwrite();
+
+    load_data(function() {
+      console.log("refreshed www data.");
+    });
+  })
+  .catch(function(e) {
+    console.log("** publishing error **\n"+e);
+    ui.dialogs["publishing-loading"].close();
+    ui.dialogs["publishing-loading-canvas"].deactivate();
+    ui.dialogs["publishing-error"].showModal();
+  });
 }
 
 function load_data(onload) {

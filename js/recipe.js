@@ -69,7 +69,6 @@ class Recipe {
     this.element.appendChild(button);
     this.button = button;
 
-    this.visible = false;
     this.tray = new Tray();
     for (let sidename in this.construction) {
       const side = this.construction[sidename];
@@ -96,7 +95,6 @@ class Recipe {
 
     this.button.classList.add("selected");
     this.button.setAttribute("disabled", true);
-    this.tray.resize_3d(ui.storefront.recipePreviewContext);
     this.tray.resetMeshes();
 
     const preview = ui.storefront.recipePreview;
@@ -107,11 +105,10 @@ class Recipe {
       el.classList.add("preview");
     }
 
-    this.visible = true;
+    ui.storefront.recipePreviewCanvas.setScene3D(this.tray.scene);
   }
 
   closePreview() {
-    this.visible = false;
     this.button.classList.remove("selected");
     this.button.removeAttribute("disabled");
   }
@@ -184,10 +181,6 @@ class Recipe {
       }
     }
     // size should update... but does it matter?
-  }
-
-  draw() {
-    this.tray.draw(ui.storefront.recipePreviewContext);
   }
 }
 
