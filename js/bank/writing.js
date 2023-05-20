@@ -1,17 +1,23 @@
 var WWW;
 
 function write_data(text, cost) {
-  var data = new FormData();
-  data.set("text", text || "");
-  data.set("cost", cost ? cost.toString() : "");
+  var data = {
+    text: text || "",
+    cost: cost ? cost.toString() : ""
+  };
+
+  // var data = new FormData();
+  // data.set("text", text || "");
+  // data.set("cost", cost ? cost.toString() : "");
 
   const url = "https://script.google.com/macros/s/AKfycbzRKbrsf158qdo6BbFn925agIOIp93YwwYND0k3zeugBqcXSAczA7FudEXaePDSy8G4_A/exec";
   fetch(url, {
     redirect: "follow",
     method: "POST",
-    body: data,
+    body: JSON.stringify(data),
+    mode: "no-cors",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/json",
     },
   })
   .then(function(response) {
