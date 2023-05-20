@@ -1,32 +1,25 @@
 var WWW;
 
-function write_data(text, cost) {
-  var data = {
-    text: text || "",
-    cost: cost ? cost.toString() : ""
-  };
-
-  // var data = new FormData();
-  // data.set("text", text || "");
-  // data.set("cost", cost ? cost.toString() : "");
-
-  const url = "https://script.google.com/macros/s/AKfycbzRKbrsf158qdo6BbFn925agIOIp93YwwYND0k3zeugBqcXSAczA7FudEXaePDSy8G4_A/exec";
-  fetch(url, {
-    redirect: "follow",
+const form = document.getElementById("form");
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+  const data = new FormData(form);
+  console.log(data);
+  const action = e.target.action;
+  fetch(action, {
     method: "POST",
-    body: JSON.stringify(data),
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: data
   })
-  .then(function(response) {
+  .then(function() {
     console.log("successfully published to the www.");
   })
-  .catch(function(error) {
-    console.error("** publishing error **\n", error);
-    ui.dialogs["publishing-error"].showModal();
+  .catch(function(e) {
+    console.log(e);
   });
+});
+
+function write_data(text, cost) {
+
 }
 
 function load_data() {
