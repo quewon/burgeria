@@ -58,6 +58,7 @@ function write_data(text, onwrite) {
     ui.dialogs["publishing-loading"].close();
     ui.dialogs["publishing-loading-canvas"].deactivate();
     ui.dialogs["publishing-error"].showModal();
+    sfx("error");
   });
 }
 

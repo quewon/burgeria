@@ -7,6 +7,10 @@ function update() {
       _objectTimeouts.splice(i, 1);
     }
   }
+
+  for (let canvas of _canvases) {
+    canvas.update();
+  }
 }
 
 function animate() {

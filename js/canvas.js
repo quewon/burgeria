@@ -3,8 +3,7 @@ var _canvases = [];
 var renderer;
 function init_3d() {
   renderer = new THREE.WebGLRenderer({ alpha: true });
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize(150, 150);
+  renderer.setSize(300, 300);
 }
 
 class Canvas3D {
@@ -16,9 +15,8 @@ class Canvas3D {
     parentNode.appendChild(this.canvas);
 
     this.context = this.canvas.getContext("2d");
-    this.active = true;
-    this.scene3D = null;
-    if (scene) this.setScene3D(scene);
+    this.setScene3D(scene);
+    this.activate();
 
     this.id = _canvases.length;
     _canvases.push(this);
@@ -26,11 +24,11 @@ class Canvas3D {
 
   setScene3D(scene) {
     this.scene3D = scene;
-    scene.sizeToCanvas(this.canvas);
   }
 
   activate() {
     this.active = true;
+    if (this.scene3D) this.scene3D.onactivate();
   }
 
   deactivate() {
@@ -42,15 +40,18 @@ class Canvas3D {
 
     const context = this.context;
     const scene = this.scene3D;
-    const width = context.canvas.width;
-    const height = context.canvas.height;
+    const width = this.canvas.width;
+    const height = this.canvas.height;
 
     context.clearRect(0, 0, width, height);
 
-    scene.update();
-
     renderer.render(scene.scene, scene.camera);
     context.drawImage(renderer.domElement, 0, 0);
+  }
+
+  update() {
+    const scene = this.scene3D;
+    scene.update();
   }
 
   delete() {
@@ -71,8 +72,9 @@ class Scene3D {
     light.position.set(10, 10, -10);
     scene.add(light);
 
-    var camera = new THREE.OrthographicCamera(0, 0, 0, 0, .1, 1000);
+    var camera = new THREE.OrthographicCamera(-150, 150, 150, -150, .1, 1000);
     camera.zoom = 35;
+    camera.updateProjectionMatrix();
     camera.position.set(0, 1, -10);
     camera.lookAt(0, 0, 0);
 
@@ -80,18 +82,7 @@ class Scene3D {
     this.camera = camera;
   }
 
-  sizeToCanvas(canvas) {
-    var width = canvas.width;
-    var height = canvas.height;
-    const aspect = canvas.offsetHeight / canvas.offsetWidth;
-    height = width * aspect;
-
-    this.camera.left = -width/2;
-    this.camera.right = width/2;
-    this.camera.top = height/2;
-    this.camera.bottom = -height/2;
-    this.camera.updateProjectionMatrix();
-  }
+  onactivate() { }
 
   update() { }
 }

@@ -194,7 +194,7 @@
         </div>
 
         <div class="block transparent" style="line-height: 0;">
-          <img src="img/window.png" alt="window overlooking the field" title="window overlooking the field">
+          <img data-latesrc="img/window.png" alt="window overlooking the field" title="window overlooking the field">
         </div>
       </div>
 
@@ -242,7 +242,7 @@
             <div class="grow"></div>
 
             <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
-            <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal()">about <em>Burgeria!</em></button>
+            <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal(); ui.dialogs['help-burgeria-canvas'].activate();">about <em>Burgeria!</em></button>
           </div>
           <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
         </div>
@@ -364,7 +364,7 @@
     <dialog id="dialog-help-burgeria">
       <div class="flexbox">
         <div class="grow">Welcome to Burgeria!</div>
-        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+        <button title="close" onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();">x</button>
       </div>
 
       <div style="text-align: center;" id="help-burgeria-canvas"></div><br>
@@ -374,7 +374,7 @@
       Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...
 
       <div class="margintop" style="text-align: center;">
-        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+        <button onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();" autofocus>close</button>
       </div>
     </dialog>
 
@@ -517,11 +517,7 @@
       load_data(function() {
         console.log("loaded www data.");
 
-        new PieceAlert(WWW[0].text, "0");
-        new PieceAlert(WWW[1].text, "0");
-
-        animate();
-        setInterval(update, 1);
+        post_load_default_playerdata();
       });
 
       // workshop
@@ -555,6 +551,9 @@
         if (ui.storefront.guysListTray) ui.storefront.guysListTray.updateGlobalBlockPosition("guysList", ui.storefront.guysListTray.sendbutton)
       });
 
+      animate();
+      setInterval(update, 1);
+
       const aboutScene = new Scene3D();
       aboutScene.scene.add(prebuiltBurger([
         [new Geometry("bun"), 0xFFE4B5],
@@ -568,8 +567,19 @@
         [new Geometry("condiment"), 0xffffe0],
         [new Geometry("bun", 1), 0xFFE4B5],
       ]));
-      aboutScene.camera.position.y = 1.25;
+      // aboutScene.camera.position.y = 1.25;
       aboutScene.camera.zoom = 70;
+      aboutScene.camera.updateProjectionMatrix();
+      aboutScene.onactivate = function() {
+        this.time = 0;
+      };
+      aboutScene.update = function() {
+        const mesh = this.scene.children[2];
+        this.time += .004;
+        mesh.rotation.y += .004;
+        if (mesh.rotation.y > Math.PI * 2) mesh.rotation.y -= Math.PI * 2;
+        mesh.rotation.z = Math.sin(this.time) * Math.PI/8;
+      };
       ui.dialogs["help-burgeria"].showModal();
       ui.dialogs["help-burgeria-canvas"].setScene3D(aboutScene);
       ui.dialogs["help-burgeria"].close();
@@ -587,13 +597,15 @@
         [new Geometry("condiment"), 0xffffe0],
         [new Geometry("bun", 1), 0xFFE4B5],
       ], "wireframe"));
-      loadingScene.time = 0;
+      loadingScene.onactivate = function() {
+        this.time = 0;
+      };
       loadingScene.update = function() {
         const mesh = this.scene.children[2];
 
-        this.time += .001;
+        this.time += .0003;
 
-        mesh.rotation.y += .01;
+        mesh.rotation.y += .003;
         if (mesh.rotation.y > Math.PI * 2) mesh.rotation.y -= Math.PI * 2;
 
         mesh.rotation.z = Math.sin(this.time * 30) * Math.PI/8;
@@ -602,10 +614,18 @@
         mesh.position.x = Math.cos(this.time * 35) * 1;
       };
       loadingScene.camera.zoom = 50;
+      loadingScene.camera.updateProjectionMatrix();
       ui.dialogs["publishing-loading"].showModal();
       ui.dialogs["publishing-loading-canvas"].setScene3D(loadingScene);
       ui.dialogs["publishing-loading"].close();
       ui.dialogs["publishing-loading-canvas"].deactivate();
+
+      const imgs = document.querySelectorAll("img");
+      for (let i=0; i<imgs.length; i++) {
+        if (imgs[i].dataset.latesrc) {
+          imgs[i].src = imgs[i].dataset.latesrc;
+        }
+      }
     }
   </script>
 </html>

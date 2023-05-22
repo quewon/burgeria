@@ -143,7 +143,7 @@ class Tray {
 
     this.scene.tray = this;
     this.scene.update = function() {
-      this.tray.draw();
+      this.tray.update();
     };
   }
 
@@ -189,9 +189,9 @@ class Tray {
     }
   }
 
-  draw() {
-    this.mesh.rotation.y += .01;
-    for (let side in this.collections) { this.collections[side].draw() };
+  update() {
+    this.mesh.rotation.y += .003;
+    for (let side in this.collections) { this.collections[side].update() };
   }
 
   send(i) {
@@ -518,8 +518,8 @@ class Collection {
     }
   }
 
-  draw() {
-    for (let item of this.items) { item.draw() };
+  update() {
+    for (let item of this.items) { item.update() };
   }
 }
 
@@ -582,8 +582,8 @@ class Item {
     this.ground = 0;
   }
 
-  draw() {
-    this.velocity += .0125;
+  update() {
+    this.velocity += .0009;
     this.mesh.position.y -= this.velocity;
 
     if (this.mesh.position.y - this.height/2 < this.ground) {
