@@ -159,8 +159,3 @@ function init_default_playerdata() {
     addToMenu: true
   });
 }
-
-function post_load_default_playerdata() {
-  new PieceAlert(WWW[0].text, "0");
-  new PieceAlert(WWW[1].text, "0");
-}

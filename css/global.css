@@ -38,6 +38,9 @@
 .flexbox .grow {
   flex-grow: 1;
 }
+.flexbox.top * {
+  border-top: none;
+}
 
 .top {
   position: absolute;

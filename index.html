@@ -44,7 +44,12 @@
             </div>
           </div>
           <div id="recipe-preview" class="block">
-            <button id="menu-edit-button" class="top right" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
+            <div class="buttonbar top">
+              <button title="add menu item">+ add menu item</button>
+              <button title="add menu item">delete</button>
+              <div class="grow"></div>
+              <button id="menu-edit-button" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
+            </div>
             <div id="recipe-preview-canvas">
             </div>
             <div class="flexbox">
@@ -59,10 +64,12 @@
                 </div>
               </div>
             </div>
-            <div class="buttonbar">
-              <button name="clear">clear</button>
-              <div class="grow"></div>
-              <button name="stock">stock ☰</button>
+            <div id="show-on-editmode">
+              <div class="buttonbar bottom border-above">
+                <button name="clear">clear</button>
+                <div class="grow"></div>
+                <button name="stock">stock ☰</button>
+              </div>
             </div>
           </div>
         </div>
@@ -156,7 +163,7 @@
                 <button class="disabled" title="go to next page" onclick="navigateLibrary(1);">→</button>
               </nav>
               <p id="library-page" class="block"></p>
-              <div class="buttonbar">
+              <div class="buttonbar bottom border-above">
                 <div class="grow"></div>
                 <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
               </div>
@@ -282,7 +289,7 @@
               </div>
             </div>
           </main>
-          <div class="buttonbar flexbox">
+          <div class="buttonbar bottom border-above">
             <button name="send">send off</button>
             <button name="clear">clear</button>
             <div class="grow"></div>
@@ -367,7 +374,7 @@
         <button title="close" onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();">x</button>
       </div>
 
-      <div style="text-align: center;" id="help-burgeria-canvas"></div><br>
+      <div style="text-align: center;" id="help-burgeria-canvas"></div>
 
       <em>Burgeria!</em> is your very own burger-shaped text editor.
       <br><br>
@@ -517,7 +524,8 @@
       load_data(function() {
         console.log("loaded www data.");
 
-        post_load_default_playerdata();
+        new PieceAlert(WWW[0].text, "0");
+        new PieceAlert(WWW[1].text, "0");
       });
 
       // workshop

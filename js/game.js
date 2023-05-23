@@ -82,14 +82,11 @@ const game = {
     newRandomWWWPiece();
 
     for (let i=game.guys.length-1; i>=0; i--) {
-      let guy = game.guys[i];
-      guy.element.remove();
       game.guys.splice(i, 1);
     }
 
     for (let i=game.trays.length-1; i>=0; i--) {
-      let tray = game.trays[i];
-      tray.element.remove();
+      game.trays[i].delete();
       game.trays.splice(i, 1);
     }
 

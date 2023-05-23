@@ -218,9 +218,14 @@ class Tray {
     game.guys[i].receive(this);
 
     el.addEventListener("animationend", function(e) {
-      game.trays[this.dataset.id].canvas.delete();
-      this.remove();
+      const tray = game.trays[this.dataset.id];
+      if (tray) tray.delete();
     });
+  }
+
+  delete() {
+    if (this.element) this.element.remove();
+    if (this.canvas) this.canvas.delete();
   }
 
   clear() {

@@ -58,6 +58,10 @@ body {
   }
 }
 
+canvas {
+  pointer-events: none;
+}
+
 .scene {
   display: flex;
   flex-wrap: wrap;
@@ -181,18 +185,55 @@ h2 {
   line-height: 1px;
 }
 
+.buttonbar {
+  display: flex;
+}
+.buttonbar button {
+  border-left: none;
+  border-bottom: none;
+}
+.buttonbar > button:first-child {
+  border-left: 1px solid var(--lines);
+}
+
+.block .buttonbar button {
+  border-right: 1px solid var(--lines);
+  border-left: none;
+  border-bottom: 1px solid var(--lines);
+}
+.block .buttonbar button:last-child {
+  border-left: 1px solid var(--lines);
+  border-right: none;
+}
+.buttonbar.border-above {
+  border-top: 1px solid var(--borders);
+}
+.buttonbar.border-above button {
+  border-top: none;
+}
+
 .has-buttonbar {
   padding-bottom: 1.5rem;
 }
 .block .buttonbar {
   width: 100%;
-  justify-content: space-between;
-  border-top: 1px solid var(--lines);
   position: absolute;
-  bottom: 0;
   left: 0;
   height: 1.5rem;
 }
+.buttonbar.bottom {
+  bottom: 0;
+}
+.buttonbar.bottom button {
+  border-bottom: none;
+}
+.buttonbar.top {
+  top: 0;
+}
+.buttonbar.top button {
+  border-top: none;
+}
+
 .tray main {
   display: flex;
   box-sizing: border-box;
@@ -260,26 +301,6 @@ button.selected em, button:active em {
   font-style: inherit;
 }
 
-.buttonbar {
-  display: flex;
-}
-.buttonbar button {
-  border-left: none;
-  border-bottom: none;
-}
-.buttonbar > button:first-child {
-  border-left: 1px solid var(--lines);
-}
-
-.block .buttonbar button {
-  border-top: none;
-  border-right: 1px solid var(--lines);
-  border-left: none;
-}
-.block .buttonbar button:last-child {
-  border-left: 1px solid var(--lines);
-  border-right: none;
-}
 s {
   opacity: .5;
 }
@@ -733,13 +754,12 @@ em, .em, .order {
   flex-direction: column;
   width: 50%;
 }
-#recipe-preview .buttonbar {
-  display: none;
-}
 .editmode, .editmode button {
-  border-color: var(--burgeria) !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+.editmode, .editmode * {
+  border-color: var(--burgeria) !important;
 }
 .editmode {
   border-style: dashed;
@@ -749,9 +769,8 @@ em, .em, .order {
 .editmode canvas {
   opacity: .5;
 }
-#recipe-preview.editmode .buttonbar {
-  display: flex;
-  border-color: var(--burgeria);
+#recipe-preview:not(.editmode) #show-on-editmode {
+  display: none;
 }
 
 #burgeria-overtime-message {
