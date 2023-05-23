@@ -182,8 +182,8 @@
     <div id="scene-workshop" class="scene">
       <div class="column">
         <div class="buttonbar">
-          <button onclick="addPieceToWorkshop(); sfx('click');">+ new piece</button>
-          <button onclick="removePieceFromWorkshop(); sfx('click');">delete</button>
+          <button onclick="const piece = new Piece(); piece.addToWorkshop(); sfx('click');">+ new piece</button>
+          <button onclick="playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop(); sfx('click');">delete</button>
         </div>
 
         <div id="workshop-library">
@@ -531,7 +531,6 @@
       });
 
       // workshop
-      updateWorkshopLibrary();
       updateList(ui.workshop.lettersList, playerdata.letters);
       setScene("workshop");
 

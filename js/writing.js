@@ -217,6 +217,8 @@ class Piece {
   }
 
   publishSucceeded() {
+    this.locked = false;
+
     ui.dialogs["publishing-success-content"].textContent = this.text;
     if (ui.dialogs["publishing-success"].getAttribute("open") == null) {
       ui.dialogs["publishing-success"].showModal();
@@ -226,7 +228,7 @@ class Piece {
 
     this.history = [];
     this.update("", 0, 0, "", "");
-    removePieceFromWorkshop();
+    this.removeFromWorkshop();
     let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
     for (let anchor of dropdownAnchors) {
       anchor.classList.remove("activated");
@@ -250,11 +252,87 @@ class Piece {
 
     this.history = [];
     this.update("", 0, 0, "", "");
-    removePieceFromWorkshop();
+    this.removeFromWorkshop();
     let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
     for (let anchor of dropdownAnchors) {
       anchor.classList.remove("activated");
     }
+  }
+
+  addToWorkshop() {
+    this.workshopIndex = playerdata.workshop.length;
+    playerdata.workshop.push(this);
+
+    const lib = ui.workshop.library;
+    const pieces = playerdata.workshop;
+
+    let button = document.createElement("button");
+    button.textContent = this.title;
+    button.dataset.index = this.workshopIndex;
+    button.onclick = function() {
+      playerdata.workshop[this.dataset.index].buttonSelect();
+    }
+    lib.appendChild(button);
+    this.element = button;
+
+    this.buttonSelect();
+  }
+
+  removeFromWorkshop() {
+    for (let char of this.text) {
+      unuse_letter(char);
+    }
+
+    for (let i=this.workshopIndex; i<playerdata.workshop.length; i++) {
+      if (this.workshopIndex == i) continue;
+      const piece = playerdata.workshop[i];
+      piece.workshopIndex--;
+      piece.element.dataset.index = piece.workshopIndex;
+    }
+    playerdata.workshop.splice(this.workshopIndex, 1);
+
+    if (playerdata.workshopIndex >= playerdata.workshop.length) playerdata.workshopIndex--;
+    if (playerdata.workshop.length <= 0) {
+      const piece = new Piece();
+      piece.addToWorkshop();
+    } else {
+      const lib = ui.workshop.library;
+      lib.children[playerdata.workshopIndex].classList.add("selected");
+      lib.children[playerdata.workshopIndex].classList.add("focused");
+    }
+
+    const piece = playerdata.workshop[playerdata.workshopIndex];
+    ui.workshop.textarea.value = piece.text;
+
+    piece.buttonSelect();
+
+    this.element.remove();
+  }
+
+  buttonSelect() {
+    let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
+    for (let anchor of dropdownAnchors) {
+      anchor.classList.remove("activated");
+    }
+    
+    playerdata.workshop[playerdata.workshopIndex].buttonDeselect();
+
+    playerdata.workshopIndex = this.workshopIndex;
+    this.element.classList.add("selected");
+    this.element.classList.add("focused");
+    this.element.setAttribute("disabled", true);
+    ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
+
+    const words = ui.workshop.wordsCount;
+    const letters = ui.workshop.lettersCount;
+    words.textContent = this.wordsCount();
+    letters.textContent = this.lettersCount();
+  }
+
+  buttonDeselect() {
+    this.element.classList.remove("selected");
+    this.element.classList.remove("focused");
+    this.element.removeAttribute("disabled");
   }
 }
 
@@ -471,41 +549,4 @@ function init_workshop() {
   });
 
   workshop.addEventListener("input", update_workshop);
-}
-
-function addPieceToWorkshop(text) {
-  deselectWorkshopLibraryButton();
-  playerdata.workshopIndex = playerdata.workshop.length;
-  playerdata.workshop.push(new Piece(text));
-  createWorkshopLibraryButton(playerdata.workshopIndex);
-
-  const piece = playerdata.workshop[playerdata.workshopIndex];
-  piece.displayInWorkshopTextarea();
-}
-
-function removePieceFromWorkshop() {
-  for (let char of playerdata.workshop[playerdata.workshopIndex].text) {
-    unuse_letter(char);
-  }
-
-  playerdata.workshop.splice(playerdata.workshopIndex, 1);
-  const lib = ui.workshop.library;
-  for (let i=lib.children.length - 1; i>=0; i--) {
-    if (i > playerdata.workshopIndex) {
-      lib.children[i].dataset.index = i-1;
-    } else if (i == playerdata.workshopIndex) {
-      lib.children[i].remove();
-      break;
-    }
-  }
-  if (playerdata.workshopIndex >= playerdata.workshop.length) playerdata.workshopIndex--;
-  if (playerdata.workshop.length <= 0) {
-    addPieceToWorkshop();
-  } else {
-    lib.children[playerdata.workshopIndex].classList.add("selected");
-    lib.children[playerdata.workshopIndex].classList.add("focused");
-  }
-
-  const piece = playerdata.workshop[playerdata.workshopIndex];
-  ui.workshop.textarea.value = piece.text;
 }

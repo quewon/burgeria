@@ -40,8 +40,18 @@ function init_default_playerdata() {
     game.tomorrowsPrices[char] = price;
   }
 
-  addPieceToWorkshop("i've found myself a long way from home\nthe air smells different here\nthings taste different here\n\nthe people here have lived here for a very long time\nand they know this Burgeria\nthis House they provided me\nfor all i have left with me are my words.");
-  addPieceToWorkshop();
+  for (let char of abc) {
+    playerdata.letters[char] = 0;
+  }
+
+  for (let char of "abcde") {
+    playerdata.letters[char]++;
+  }
+
+  const piece1 = new Piece("i've found myself a long way from home\nthe air smells different here\nthings taste different here\n\nthe people here have lived here for a very long time\nand they know this Burgeria\nthis House they provided me\nfor all i have left are my words.");
+  const piece2 = new Piece();
+  piece1.addToWorkshop();
+  piece2.addToWorkshop();
 
   new Ingredient({
     name: "top bun",

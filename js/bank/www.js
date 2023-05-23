@@ -1,5 +1,4 @@
 var WWW;
-var piecesPublishing = [];
 
 function write_data(piece) {
   const data = new FormData();

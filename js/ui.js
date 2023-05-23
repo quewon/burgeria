@@ -496,60 +496,6 @@ function updateBankbook() {
   }
 }
 
-function updateWorkshopLetterCount() {
-  const words = ui.workshop.wordsCount;
-  const letters = ui.workshop.lettersCount;
-  const piece = playerdata.workshop[playerdata.workshopIndex];
-  words.textContent = piece.wordsCount();
-  letters.textContent = piece.lettersCount();
-}
-
-function deselectWorkshopLibraryButton() {
-  const og = ui.workshop.library.children[playerdata.workshopIndex];
-  if (!og) return;
-  og.classList.remove("selected");
-  og.classList.remove("focused");
-  og.removeAttribute("disabled");
-}
-
-function createWorkshopLibraryButton(i) {
-  const lib = ui.workshop.library;
-  const pieces = playerdata.workshop;
-
-  let button = document.createElement("button");
-  button.textContent = pieces[i].title;
-  button.dataset.index = i;
-  button.onclick = function() {
-    deselectWorkshopLibraryButton();
-    playerdata.workshopIndex = this.dataset.index;
-    this.classList.add("selected");
-    this.classList.add("focused");
-    this.setAttribute("disabled", true);
-    ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
-    updateWorkshopLetterCount();
-  }
-  lib.appendChild(button);
-
-  if (i==playerdata.workshopIndex) {
-    button.classList.add("selected");
-    button.classList.add("focused");
-    button.setAttribute("disabled", true);
-  }
-}
-
-function updateWorkshopLibrary() {
-  const lib = ui.workshop.library;
-  const pieces = playerdata.workshop;
-
-  while (lib.lastElementChild) {
-    lib.lastElementChild.remove();
-  }
-
-  for (let i=0; i<pieces.length; i++) {
-    createWorkshopLibraryButton(i);
-  }
-}
-
 function toggleDropdown(button) {
   const container = button.parentNode;
   const parent = container.parentNode;
