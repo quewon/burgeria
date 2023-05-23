@@ -231,6 +231,15 @@ function toggleMenuEditMode() {
     const tray = playerdata.recipes[game.recipeIndex].tray;
     tray.toggleGlobalBlock("ministock", tray.stockbutton);
   }
+
+  if (!preview.classList.contains("editmode")) {
+    for (let i=playerdata.recipes.length-1; i>=0; i--) {
+      const recipe = playerdata.recipes[i];
+      if (recipe.calculateSize() == 0) {
+        recipe.delete();
+      }
+    }
+  }
 }
 
 function toggleTheme(button) {
@@ -282,7 +291,6 @@ function updateDayUI() {
       dtb.removeAttribute("disabled");
       di.textContent = "☼";
       overtime.classList.add("gone");
-      ui.storefront.ministock.classList.add("gone");
     }
 
     counter.textContent = playerdata.day;
@@ -298,7 +306,6 @@ function updateDayUI() {
     timer.onanimationend = function() {
       ui.storefront.day.timer.classList.remove("transition");
     };
-    ui.storefront.ministock.classList.add("gone");
   }
 }
 
@@ -321,13 +328,16 @@ function updateRecipes() {
     recipe.setDiscounted(!game.daytime);
   }
 
+  let i=0;
   for (let name in categories) {
     const category = categories[name];
     let label = document.createElement("b");
     label.textContent = category[0].category.toUpperCase();
     let ul = document.createElement("ul");
     for (let recipe of category) {
+      recipe.domIndex = i;
       ul.appendChild(recipe.element);
+      i++;
     }
     ui.storefront.recipesList.appendChild(label);
     ui.storefront.recipesList.appendChild(ul);

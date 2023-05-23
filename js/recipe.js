@@ -34,9 +34,7 @@ class Recipe {
 
     this.tray = new RecipeTray(p.construction);
 
-    if (p.addToMenu) {
-      this.addToMenu();
-    }
+    if (p.addToMenu) this.addToMenu();
   }
 
   updateConstruction() {
@@ -88,12 +86,15 @@ class Recipe {
     }
     this.size = size;
     this.uniqueIngredients = ingredientsCounted.length;
+
+    return size;
   }
 
   addToMenu() {
     this.id = playerdata.recipes.length;
 
     this.element = document.createElement("li");
+    this.element.id = this.id;
     let button = document.createElement("button");
     button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
     button.dataset.id = this.id;
@@ -116,8 +117,8 @@ class Recipe {
     }
   }
 
-  previewRecipe() {
-    playerdata.recipes[game.recipeIndex].closePreview();
+  previewRecipe(dontClose) {
+    if (!dontClose && game.recipeIndex < playerdata.recipes.length) playerdata.recipes[game.recipeIndex].closePreview();
     game.recipeIndex = this.index;
 
     this.button.classList.add("selected");
@@ -143,10 +144,6 @@ class Recipe {
   closePreview() {
     this.button.classList.remove("selected");
     this.button.removeAttribute("disabled");
-
-    if (Object.keys(this.construction).length == 0) {
-      this.delete();
-    }
   }
 
   deviate() {
@@ -231,7 +228,25 @@ class Recipe {
 
     this.element.remove();
 
-    updateRecipes();
+    if (playerdata.recipes.length == 0) {
+      const newRecipe = new Recipe({ addToMenu: true });
+      updateRecipes();
+      newRecipe.previewRecipe(true);
+    } else {
+      updateRecipes();
+
+      var domIndex = this.domIndex;
+      if (domIndex >= playerdata.recipes.length) {
+        domIndex--;
+      }
+
+      for (let recipe of playerdata.recipes) {
+        if (recipe.domIndex == domIndex) {
+          recipe.previewRecipe();
+          break;
+        }
+      }
+    }
   }
 }
 

@@ -77,6 +77,8 @@ const game = {
     bankPoints(game.unbankedPoints, "BURGERIA");
     playerdata.unbankedPoints = 0;
 
+    ui.storefront.menuEditButton.removeAttribute("disabled");
+
     playerdata.day++;
     game.daytime = true;
 
@@ -106,6 +108,7 @@ const game = {
   openStore: function() {
     game.storetime = 0;
     game.updateStore();
+    ui.storefront.menuEditButton.setAttribute("disabled", true);
     updateDayUI();
   },
   closeStore: function() {
@@ -157,6 +160,10 @@ const game = {
 
     } else {
       console.clear();
+      if (ui.storefront.recipePreview.classList.contains("editmode")) {
+        toggleMenuEditMode();
+      }
+
       game.openStore();
     }
   },

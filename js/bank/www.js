@@ -1,8 +1,9 @@
 var WWW;
+var piecesPublishing = [];
 
-function write_data(text, onwrite) {
+function write_data(piece) {
   const data = new FormData();
-  data.append("text", text || "");
+  data.append("text", piece.text || "");
 
   // all this possible, thanks to
   // https://github.com/levinunnink/html-form-to-google-sheet
@@ -47,7 +48,7 @@ function write_data(text, onwrite) {
     ui.dialogs["publishing-loading"].close();
     ui.dialogs["publishing-loading-canvas"].deactivate();
     console.log("successfully published to the www.");
-    if (onwrite) onwrite();
+    piece.publishSucceeded();
 
     load_data(function() {
       console.log("refreshed www data.");

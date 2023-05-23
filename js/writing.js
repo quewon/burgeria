@@ -16,9 +16,13 @@ class Piece {
     this.historyIndex = -1;
     this.disintegrated = false;
     this.update(text, text.length - 1, text.length - 1, "", "");
+
+    this.locked = false;
   }
 
   update(text, selectionStart, selectionEnd, added, deleted) {
+    if (this.locked) return;
+
     if (this.historyIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.historyIndex + 1);
     }
@@ -65,6 +69,8 @@ class Piece {
   }
 
   clear() {
+    if (this.locked) return;
+
     let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let deleting = "";
     for (let char of this.text) {
@@ -79,6 +85,7 @@ class Piece {
   }
 
   undo() {
+    if (this.locked) return;
     if (this.historyIndex <= 0) return;
 
     const state = this.history[this.historyIndex];
@@ -98,6 +105,7 @@ class Piece {
   }
 
   redo() {
+    if (this.locked) return;
     if (this.historyIndex == this.history.length - 1) return;
 
     this.historyIndex++;
@@ -117,6 +125,8 @@ class Piece {
   }
 
   updateState() {
+    if (this.locked) return;
+
     const workshop = ui.workshop.textarea;
     const state = this.history[this.historyIndex];
     this.text = state.text;
@@ -186,19 +196,31 @@ class Piece {
     updateLibrary();
   }
 
-  publish() {
+  attemptPublish() {
+    if (this.locked) return;
+
     if (this.lettersCount() == 0) {
       console.log("tried to publish a piece without letters.");
       ui.dialogs["publishing-error-no-letters"].showModal();
       return;
     }
 
-    ui.dialogs["publishing-success-content"].textContent = this.text;
-    write_data(this.text, function() {
-      ui.dialogs["publishing-success"].showModal();
-    });
+    write_data(this);
 
     sfx("click");
+
+    this.locked = true;
+  }
+
+  publishFailed() {
+    this.locked = false;
+  }
+
+  publishSucceeded() {
+    ui.dialogs["publishing-success-content"].textContent = this.text;
+    if (ui.dialogs["publishing-success"].getAttribute("open") == null) {
+      ui.dialogs["publishing-success"].showModal();
+    }
 
     sellText(this.text);
 
@@ -212,6 +234,8 @@ class Piece {
   }
 
   releaseToWind() {
+    if (this.locked) return;
+
     if (this.lettersCount() == 0) {
       console.log("tried to publish a piece without letters.");
       ui.dialogs["publishing-error-no-letters"].showModal();
@@ -317,11 +341,16 @@ function unuse_letter(letter) {
 }
 
 function update_workshop() {
-  const workshop = ui.workshop.textarea;
-  let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
   const piece = playerdata.workshop[playerdata.workshopIndex];
   const prevState = piece.history[piece.historyIndex];
+  const workshop = ui.workshop.textarea;
+
+  if (piece.locked) {
+    workshop.value = prevState.text;
+    return;
+  }
+
+  const abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   let prevtext = prevState.text;
   let text = workshop.value;

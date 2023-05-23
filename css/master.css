@@ -16,12 +16,6 @@
   --block-bg-filter: none;
   --borders: var(--lines);
   --block-border-radius: 0;
-
-  /* for when im bored of the ui */
-  /* --block-bg: rgba(255, 255, 255, .3); */
-  /* --block-bg-filter: blur(5px); */
-  /* --borders: white; */
-  /* --block-border-radius: 5px; */
 }
 
 body.grabbing, body.grabbing * {
@@ -33,9 +27,8 @@ body.grabbing, body.grabbing * {
 
 body {
   margin: auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  max-width: 1000px;
+  padding: var(--padding);
+  max-width: 1100px;
 
   background-color: var(--bg);
   background-image: radial-gradient(var(--burgeria-bg) 1px, transparent 0);
@@ -912,7 +905,7 @@ span[name="title"] {
 }
 
 dialog {
-  max-width: max(50%, 500px);
+  max-width: 30rem;
   background: var(--bg);
   border: 1px solid var(--borders);
   padding: var(--padding);

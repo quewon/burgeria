@@ -44,12 +44,6 @@
             </div>
           </div>
           <div id="recipe-preview" class="block">
-            <div class="buttonbar top">
-              <button>+ add recipe</button>
-              <button>delete</button>
-              <div class="grow"></div>
-              <button id="menu-edit-button" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
-            </div>
             <div id="recipe-preview-canvas">
             </div>
             <div class="flexbox">
@@ -65,12 +59,20 @@
               </div>
             </div>
             <div id="show-on-editmode">
+              <div class="buttonbar top">
+                <button onclick="new Recipe({ addToMenu: true }); updateRecipes();">+ new recipe</button>
+                <button onclick="playerdata.recipes[game.recipeIndex].delete(); sfx('click')">delete</button>
+                <div class="grow"></div>
+              </div>
+
               <div class="buttonbar bottom border-above">
                 <button name="clear" onclick="playerdata.recipes[game.recipeIndex].tray.clear(ui.storefront.menuStockbutton); playerdata.recipes[game.recipeIndex].updateConstruction();">clear</button>
                 <div class="grow"></div>
                 <button id="menu-stockbutton" name="stock" onclick="const tray = playerdata.recipes[game.recipeIndex].tray; tray.toggleGlobalBlock('ministock', this);">stock ☰</button>
               </div>
             </div>
+
+            <button class="top right" id="menu-edit-button" onclick="toggleMenuEditMode(); sfx('click');" title="toggle edit mode">✎</button>
           </div>
         </div>
         <div id="guys-container" class="flexbox wrap attached-above marginbelow">
@@ -240,7 +242,7 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);">publish</button>
               <div class="dropdown">
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].publish();">publish to Market</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].attemptPublish();">publish to Market</button>
                 <button onclick="playerdata.workshop[playerdata.workshopIndex].releaseToWind();">release into the Wind</button>
               </div>
             </div>
