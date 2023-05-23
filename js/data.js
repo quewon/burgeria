@@ -48,7 +48,7 @@ function init_default_playerdata() {
     playerdata.letters[char]++;
   }
 
-  const piece1 = new Piece("i've found myself a long way from home\nthe air smells different here\nthings taste different here\n\nthe people here have lived here for a very long time\nand they know this Burgeria\nthis House they provided me\nfor all i have left are my words.");
+  const piece1 = new Piece("i've found myself a long way from home\nthe air smells different here\nthings taste different here\npeople have lived here for a very long time\n\nthey know this Burgeria\nthis House they provided me\nfor all i have left are my words\n\nthere was so much i wanted to tell you");
   const piece2 = new Piece();
   piece1.addToWorkshop();
   piece2.addToWorkshop();
@@ -122,7 +122,7 @@ function init_default_playerdata() {
 
   new Recipe({
     name: "Burgeria Special",
-    // cost: 10,
+    cost: 10,
     construction: {
       burger: ["bottom bun", "patty", "top bun"]
     },
@@ -130,7 +130,7 @@ function init_default_playerdata() {
   });
   new Recipe({
     name: "Onions",
-    // cost: 5,
+    cost: 5,
     construction: {
       burger: ["onion", "onion", "onion"],
       side: ["onion"],
@@ -148,7 +148,7 @@ function init_default_playerdata() {
   // });
   new Recipe({
     name: "Burgeria Set",
-    // cost: 15,
+    cost: 15,
     construction: {
       burger: ["bottom bun", "patty", "top bun"],
       drink: ["coke"],

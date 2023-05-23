@@ -80,10 +80,21 @@ class Tray {
       });
     };
 
+    let closebutton = this.element.querySelector("[name='close']");
+    closebutton.dataset.id = this.id;
+    closebutton.onclick = function() {
+      const tray = game.trays[this.dataset.id];
+      tray.clear(true);
+      tray.prepareDeletion();
+      return;
+    }
+    this.closebutton = closebutton;
+
     let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
     sendbutton.onclick = function() {
       const tray = game.trays[this.dataset.id];
+
       tray.toggleGlobalBlock("guysList", this);
     }
     this.sendbutton = sendbutton;
@@ -91,6 +102,7 @@ class Tray {
     let clearbutton = this.element.querySelector("[name='clear']");
     clearbutton.dataset.id = this.id;
     clearbutton.onclick = function() { game.trays[this.dataset.id].clear()}
+    this.clearbutton = clearbutton;
 
     let stockbutton = this.element.querySelector("[name='stock']");
     stockbutton.dataset.id = this.id;
@@ -227,30 +239,45 @@ class Tray {
       this.toggleGlobalBlock("guysList", this.sendbutton);
     }
 
-    let el = this.element;
-    el.dataset.id = this.id;
-    el.classList.add("sending");
-
     game.guys[i].receive(this);
+    this.prepareDeletion();
+  }
 
-    el.addEventListener("animationend", function(e) {
+  prepareDeletion() {
+    this.element.classList.add("sending");
+    this.element.addEventListener("animationend", function(e) {
       const tray = game.trays[this.dataset.id];
-      if (tray) tray.delete();
+      tray.delete();
     });
   }
 
   delete() {
+    for (let i=this.id; i<game.trays.length; i++) {
+      if (i==this.id) continue;
+      const tray = game.trays[i];
+      tray.id--;
+      tray.element.dataset.id = tray.id;
+      tray.stockbutton.dataset.id = tray.id;
+      tray.sendbutton.dataset.id = tray.id;
+      tray.clearbutton.dataset.id = tray.id;
+      tray.closebutton.dataset.id = tray.id;
+      for (let sidename in tray.collections) {
+        tray.collections[sidename].element.dataset.id = tray.id;
+      }
+    }
+    game.trays.splice(this.id, 1);
+
     if (this.element) this.element.remove();
     if (this.canvas) this.canvas.delete();
   }
 
-  clear(stockbutton) {
+  clear(dontOpenStock) {
     for (let side in this.collections) {
       let col = this.collections[side];
       col.clear(true);
     }
 
-    this.openGlobalBlock("ministock", stockbutton || this.stockbutton);
+    if (!dontOpenStock) this.openGlobalBlock("ministock", stockbutton || this.stockbutton);
   }
 
   getConstruction() {
@@ -623,7 +650,7 @@ class Item {
 
   drag() {
     sfx("grab");
-    document.body.classList.add("grabbing");
+    document.documentElement.classList.add("grabbing");
 
     _dragdrop.itemInHand = this;
     this.dragGhost.classList.remove("gone");
@@ -633,7 +660,7 @@ class Item {
 
   drop() {
     sfx("drop");
-    document.body.classList.remove("grabbing");
+    document.documentElement.classList.remove("grabbing");
 
     if (this.element.isConnected) {
       let parent = this.element.parentNode;
@@ -657,6 +684,9 @@ class Item {
     } else {
       if (this.previousCollection && this.previousCollection.tray) {
         const tray = this.previousCollection.tray;
+        if (ui.storefront.ministock.classList.contains("gone")) {
+          tray.toggleGlobalBlock("ministock", tray.stockbutton);
+        }
         tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
       }
       this.setCollection(playerdata.inventory);

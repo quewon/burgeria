@@ -60,7 +60,7 @@
             </div>
             <div id="show-on-editmode">
               <div class="buttonbar top">
-                <button onclick="new Recipe({ addToMenu: true, open: true }); updateRecipes();">+ new recipe</button>
+                <button onclick="new Recipe({ name: 'Untitled Burger', addToMenu: true, open: true }); updateRecipes();">+ new recipe</button>
                 <button onclick="playerdata.recipes[game.recipeIndex].delete(); sfx('click')">delete</button>
                 <button onclick="sfx('click'); playerdata.recipes[game.recipeIndex].startRename();">rename</button>
                 <div class="grow"></div>
@@ -83,7 +83,7 @@
 
         </div>
       </div>
-      <div id="scene-storefront-body" class="column">
+      <div class="column">
         <div id="storefront-guys-list" class="block transparent gone" style="position: absolute; z-index: 10; translate: -1px 0;"></div>
         <div id="storefront-ministock" class="block gone" style="position: absolute; z-index: 10;"></div>
 
@@ -102,6 +102,14 @@
         <div id="burgeria-overtime-message" class="block attached-above gone" onanimationend="if(ui.storefront.ministockTray) ui.storefront.ministockTray.updateMinistockPosition()">
           <i>Overtime discount—All menu items are 50% off.</i>
         </div>
+
+        <div id="scene-storefront-body">
+
+        </div>
+
+        <button id="tray-generator" class="block" onclick="const tray = new Tray(); tray.sendToStorefront();">
+          take out tray
+        </button>
       </div>
     </div>
 
@@ -157,18 +165,18 @@
                 <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
               </div>
             </div>
-            <!-- <div id="library-page-empty" class="block attached-above">
+            <div id="library-page-empty" class="block attached-above">
               <i>Your library is empty.</i>
-            </div> -->
+            </div>
             <div id="kitchen-letterstock" class="block attached-above">
-              <b>LETTERSTOCK</b>
+              <b>INK</b>
               <ul id="kitchen-letters-list" class="flexbox">
               </ul>
             </div>
           </div>
 
           <!-- this is for LATER game stuff -->
-          <div class="block">
+          <div class="block" id="research-block">
             <h1 class="marginbelow">R&D</h1>
             <div class="flexbox gap">
               <b>develop new ingredient</b>
@@ -231,7 +239,7 @@
             </div>
 
             <div class="dropdown-container">
-              <button class="dropdown-anchor" onclick="updateWorkshopLetterCount(); toggleDropdown(this);">count</button>
+              <button class="dropdown-anchor" onclick="playerdata.workshop[playerdata.workshopIndex].updateCountUI(); toggleDropdown(this);">count</button>
               <div class="dropdown">
                 <div class="block">
                   <i>words: <span id="workshop-words">0</span></i><br>
@@ -268,7 +276,7 @@
       </div>
       <div class="column">
         <div class="block transparent">
-          <b>LETTERSTOCK</b>
+          <b>INK</b>
           <ul id="workshop-letters-list" class="flexbox">
           </ul>
         </div>
@@ -277,6 +285,7 @@
 
     <template id="template-tray">
       <div class="flexbox">
+        <button style="border: 1px solid var(--borders)" name="close" class="top right" title="clear and remove tray">x</button>
         <div class="tray block has-buttonbar">
           <span class="label">tray</span>
           <main>

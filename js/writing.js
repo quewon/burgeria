@@ -187,7 +187,7 @@ class Piece {
     } else {
       if (!this.disintegrated) {
         playerdata.library.splice(playerdata.library.indexOf(this), 1);
-        updateBookshelf();
+        updateBookshelf(true);
         navigateLibrary(0);
         sfx_stop("disintegrate", null, this.sfxId);
       }
@@ -309,12 +309,19 @@ class Piece {
     this.element.remove();
   }
 
+  updateCountUI() {
+    const words = ui.workshop.wordsCount;
+    const letters = ui.workshop.lettersCount;
+    words.textContent = this.wordsCount();
+    letters.textContent = this.lettersCount();
+  }
+
   buttonSelect() {
     let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
     for (let anchor of dropdownAnchors) {
       anchor.classList.remove("activated");
     }
-    
+
     playerdata.workshop[playerdata.workshopIndex].buttonDeselect();
 
     playerdata.workshopIndex = this.workshopIndex;
@@ -322,11 +329,6 @@ class Piece {
     this.element.classList.add("focused");
     this.element.setAttribute("disabled", true);
     ui.workshop.textarea.value = playerdata.workshop[playerdata.workshopIndex].text;
-
-    const words = ui.workshop.wordsCount;
-    const letters = ui.workshop.lettersCount;
-    words.textContent = this.wordsCount();
-    letters.textContent = this.lettersCount();
   }
 
   buttonDeselect() {

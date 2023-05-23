@@ -88,11 +88,6 @@ const game = {
       game.guys.splice(i, 1);
     }
 
-    for (let i=game.trays.length-1; i>=0; i--) {
-      game.trays[i].delete();
-      game.trays.splice(i, 1);
-    }
-
     game.updatePrices();
 
     new Headline("SMALL BURGERS...", "... ARE IN!");

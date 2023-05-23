@@ -87,8 +87,6 @@ class Guy {
     this.voice = arch.voice;
     this.soundId = null;
 
-    const tray = new Tray();
-    tray.sendToStorefront();
     _sounds.chime[arch.chime].play();
 
     game.guys.push(this);
@@ -280,16 +278,7 @@ class Guy {
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
       let guy = game.guys[this.dataset.id];
-      guy.element.remove();
-
-      // check: am i done serving everybody?
-      // if so, allow player to start the day up again!
-      if (game.storetime == -1) {
-        for (let guy of game.guys) {
-          if (!guy.served) return;
-        }
-        game.beginDay();
-      }
+      guy.delete();
     });
 
     const feedback = tray.requestFeedback(this.desiredMenu);
@@ -301,6 +290,19 @@ class Guy {
       }
     }
     this.sendFeedback(feedback, tray);
+  }
+
+  delete() {
+    this.element.remove();
+
+    // check: am i done serving everybody?
+    // if so, allow player to start the day up again!
+    if (game.storetime == -1) {
+      for (let guy of game.guys) {
+        if (!guy.served) return;
+      }
+      game.beginDay();
+    }
   }
 
   sendFeedback(feedback, tray) {

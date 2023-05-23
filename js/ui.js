@@ -69,7 +69,7 @@ var ui = {
       index: document.getElementById("library-index"),
       nav: document.getElementById("library-nav"),
       pageContainer: document.getElementById("library-page-container"),
-      // pageEmptyMessage: document.getElementById("library-page-empty")
+      pageEmptyMessage: document.getElementById("library-page-empty")
     },
     libraryBlock: document.getElementById("library-block"),
     inventoryList: document.getElementById("inventory-list"),
@@ -80,6 +80,7 @@ var ui = {
     bankbook: document.getElementById("bankbook"),
     bankbookLabel: document.getElementById("bankbook-label"),
     bankbookBlock: document.getElementById("bankbook-block"),
+    researchBlock: document.getElementById("research-block"),
     bookshelf: document.getElementById("bookshelf"),
   },
   "workshop": {
@@ -168,6 +169,7 @@ function createSystemBook(uiElement, title, icon) {
   book.classList.add("system");
   book.classList.add("book");
   if (icon) book.setAttribute("name", icon);
+
   if (!uiElement.classList.contains("gone")) {
     book.classList.add("selected");
   }
@@ -179,6 +181,8 @@ function createSystemBook(uiElement, title, icon) {
   };
 
   bookshelf.appendChild(book);
+
+  return book;
 }
 
 function createBookLabel(parent, text) {
@@ -204,16 +208,22 @@ function createBook(title, index) {
   createBookLabel(book, title);
 
   bookshelf.appendChild(book);
+
+  return book;
 }
 
-function updateBookshelf() {
+function updateBookshelf(dontHideLibrary) {
   const bookshelf = ui.kitchen.bookshelf;
 
   bookshelf.innerHTML = "";
 
   createSystemBook(ui.kitchen.bankbookBlock, "bankbook", "✸");
   createSystemBook(ui.kitchen.inventoryBlock, "stock", "☰");
-  // createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
+  createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
+  if (playerdata.library.length == 0) {
+    const book = createSystemBook(ui.kitchen.libraryBlock, "library", "");
+    if (!dontHideLibrary) book.onclick();
+  }
 
   for (let index in playerdata.library) {
     const book = playerdata.library[index];
@@ -351,6 +361,12 @@ function updateGuysList() {
     list.lastElementChild.remove();
   }
 
+  if (game.guys.length > 0) {
+    list.innerHTML = "";
+  } else {
+    list.innerHTML = "<div class='block'><i>Nobody to serve.</i></div>";
+  }
+
   for (let i=0; i<game.guys.length; i++) {
     if (game.guys[i].served) continue;
 
@@ -386,10 +402,10 @@ function updateMinistockWindow() {
 function updateLibrary() {
   if (playerdata.library.length == 0) {
     ui.workshop.kitchenLibraryButton.setAttribute("disabled", true);
-    ui.kitchen.libraryBlock.classList.add("gone");
+    // ui.kitchen.libraryBlock.classList.add("gone");
   } else {
     ui.workshop.kitchenLibraryButton.removeAttribute("disabled");
-    ui.kitchen.libraryBlock.classList.remove("gone");
+    // ui.kitchen.libraryBlock.classList.remove("gone");
   }
 
   let page = playerdata.library[playerdata.libraryIndex];
@@ -398,12 +414,12 @@ function updateLibrary() {
     ui.kitchen.library.page.textContent = page.text;
 
     ui.kitchen.library.pageContainer.classList.remove("gone");
-    // ui.kitchen.library.pageEmptyMessage.classList.add("gone");
+    ui.kitchen.library.pageEmptyMessage.classList.add("gone");
   } else {
     ui.kitchen.library.page.innerHTML = "<i>There are no words here.</i>";
 
     ui.kitchen.library.pageContainer.classList.add("gone");
-    // ui.kitchen.library.pageEmptyMessage.classList.remove("gone");
+    ui.kitchen.library.pageEmptyMessage.classList.remove("gone");
   }
 
   ui.kitchen.library.pagesTotal.textContent = playerdata.library.length;

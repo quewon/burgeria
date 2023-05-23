@@ -17,7 +17,7 @@ class RecipeTray extends Tray {
 
 class Recipe {
   constructor(p) {
-    this.name = p.name || "Untitled Burger";
+    this.name = p.name || "";
     this.construction = p.construction || {};
     this.deviations = p.deviations || [];
 
@@ -303,7 +303,7 @@ class Recipe {
   rename(value) {
     value = value || this.input.value;
     this.name = value;
-    this.button.textContent = value;
+    this.button.innerHTML = value+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
 
     this.input.classList.add("gone");
     this.button.classList.remove("gone");
