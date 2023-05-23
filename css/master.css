@@ -27,8 +27,9 @@ body.grabbing, body.grabbing * {
 
 body {
   margin: auto;
-  padding: var(--padding);
-  max-width: 1100px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  max-width: min(1100px, 90%);
 
   background-color: var(--bg);
   background-image: radial-gradient(var(--burgeria-bg) 1px, transparent 0);

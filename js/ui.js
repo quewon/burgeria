@@ -232,14 +232,14 @@ function toggleMenuEditMode() {
     tray.toggleGlobalBlock("ministock", tray.stockbutton);
   }
 
-  if (!preview.classList.contains("editmode")) {
-    for (let i=playerdata.recipes.length-1; i>=0; i--) {
-      const recipe = playerdata.recipes[i];
-      if (recipe.calculateSize() == 0) {
-        recipe.delete();
-      }
-    }
-  }
+  // if (!preview.classList.contains("editmode")) {
+  //   for (let i=playerdata.recipes.length-1; i>=0; i--) {
+  //     const recipe = playerdata.recipes[i];
+  //     if (recipe.calculateSize() == 0) {
+  //       recipe.delete();
+  //     }
+  //   }
+  // }
 }
 
 function toggleTheme(button) {

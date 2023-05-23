@@ -60,14 +60,14 @@
             </div>
             <div id="show-on-editmode">
               <div class="buttonbar top">
-                <button onclick="new Recipe({ addToMenu: true }); updateRecipes();">+ new recipe</button>
+                <button onclick="new Recipe({ addToMenu: true, open: true }); updateRecipes();">+ new recipe</button>
                 <button onclick="playerdata.recipes[game.recipeIndex].delete(); sfx('click')">delete</button>
                 <button onclick="sfx('click'); playerdata.recipes[game.recipeIndex].startRename();">rename</button>
                 <div class="grow"></div>
               </div>
 
               <div class="buttonbar bottom border-above">
-                <button name="clear" onclick="playerdata.recipes[game.recipeIndex].tray.clear(ui.storefront.menuStockbutton); playerdata.recipes[game.recipeIndex].updateConstruction();">clear</button>
+                <button name="clear" onclick="playerdata.recipes[game.recipeIndex].tray.clear(ui.storefront.menuStockbutton); playerdata.recipes[game.recipeIndex].update();">clear</button>
                 <div class="grow"></div>
                 <button id="menu-stockbutton" name="stock" onclick="const tray = playerdata.recipes[game.recipeIndex].tray; tray.toggleGlobalBlock('ministock', this);">stock ☰</button>
               </div>

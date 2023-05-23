@@ -58,10 +58,7 @@ class Tray {
 
         if (this.classList.contains("preview")) {
           const recipe = playerdata.recipes[this.dataset.trayId];
-          recipe.updateConstruction();
-          recipe.updateCategory();
-          recipe.calculateSize();
-          updateRecipes();
+          recipe.update();
         }
 
         item.drag();
@@ -655,10 +652,7 @@ class Item {
       this.setCollection(col);
 
       if (recipe) {
-        recipe.updateConstruction();
-        recipe.updateCategory();
-        recipe.calculateSize();
-        updateRecipes();
+        recipe.update();
       }
     } else {
       if (this.previousCollection && this.previousCollection.tray) {

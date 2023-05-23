@@ -23,11 +23,14 @@ class Recipe {
 
     this.updateCategory();
     this.calculateSize();
-    this.cost = p.cost || 10;
+    this.cost = p.cost || this.calculateIdealCost();
 
     this.tray = new RecipeTray(p.construction);
 
     if (p.addToMenu) this.addToMenu();
+    if (p.open) {
+      this.previewRecipe();
+    }
   }
 
   updateConstruction() {
@@ -89,6 +92,24 @@ class Recipe {
     this.uniqueIngredients = ingredientsCounted.length;
 
     return size;
+  }
+
+  calculateIdealCost() {
+    var ingredientCost = 0;
+
+    for (let sidename in this.construction) {
+      const side = this.construction[sidename];
+      for (let item of side) {
+        for (let char of item) {
+          if (char in playerdata.prices) {
+            const prices = playerdata.prices[char];
+            ingredientCost += prices[prices.length - 1];
+          }
+        }
+      }
+    }
+
+    return Math.ceil(ingredientCost);
   }
 
   addToMenu() {
@@ -286,6 +307,13 @@ class Recipe {
 
     this.input.classList.add("gone");
     this.button.classList.remove("gone");
+  }
+
+  update() {
+    this.updateConstruction();
+    this.updateCategory();
+    this.calculateSize();
+    updateRecipes();
   }
 }
 

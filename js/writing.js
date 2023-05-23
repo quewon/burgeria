@@ -473,10 +473,10 @@ function init_workshop() {
   workshop.addEventListener("input", update_workshop);
 }
 
-function addPieceToWorkshop() {
+function addPieceToWorkshop(text) {
   deselectWorkshopLibraryButton();
   playerdata.workshopIndex = playerdata.workshop.length;
-  playerdata.workshop.push(new Piece());
+  playerdata.workshop.push(new Piece(text));
   createWorkshopLibraryButton(playerdata.workshopIndex);
 
   const piece = playerdata.workshop[playerdata.workshopIndex];

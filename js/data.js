@@ -31,10 +31,6 @@ function init_default_playerdata() {
   // }
   // playerdata.bankbook.push([0, "END", "", "100", "100"]);
 
-  for (let char of "abcde") {
-    playerdata.letters[char] = 1;
-  }
-
   let abc = "abcdefghijklmnopqrstuvwxyz";
   for (let char of abc) {
     playerdata.prices[char] = [];
@@ -44,6 +40,7 @@ function init_default_playerdata() {
     game.tomorrowsPrices[char] = price;
   }
 
+  addPieceToWorkshop("i've found myself a long way from home\nthe air smells different here\nthings taste different here\n\nthe people here have lived here for a very long time\nand they know this Burgeria\nthis House they provided me\nfor all i have left with me are my words.");
   addPieceToWorkshop();
 
   new Ingredient({
@@ -115,7 +112,7 @@ function init_default_playerdata() {
 
   new Recipe({
     name: "Burgeria Special",
-    cost: 10,
+    // cost: 10,
     construction: {
       burger: ["bottom bun", "patty", "top bun"]
     },
@@ -123,7 +120,7 @@ function init_default_playerdata() {
   });
   new Recipe({
     name: "Onions",
-    cost: 5,
+    // cost: 5,
     construction: {
       burger: ["onion", "onion", "onion"],
       side: ["onion"],
@@ -141,7 +138,7 @@ function init_default_playerdata() {
   // });
   new Recipe({
     name: "Burgeria Set",
-    cost: 15,
+    // cost: 15,
     construction: {
       burger: ["bottom bun", "patty", "top bun"],
       drink: ["coke"],
