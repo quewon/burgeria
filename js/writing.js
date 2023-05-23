@@ -280,7 +280,10 @@ class Piece {
 
   removeFromWorkshop() {
     for (let char of this.text) {
-      unuse_letter(char);
+      const letter = char.toLowerCase();
+      if (letter in playerdata.prices) {
+        unuse_letter(letter);
+      }
     }
 
     for (let i=this.workshopIndex; i<playerdata.workshop.length; i++) {

@@ -4,6 +4,7 @@ var ui = {
     "read-text": document.getElementById("dialog-read-text"),
     "read-text-title": document.getElementById("dialog-read-text-title"),
     "read-text-content": document.getElementById("dialog-read-text-content"),
+    "no-pages": document.getElementById("dialog-no-pages"),
     "no-letters": document.getElementById("dialog-no-letters"),
     "early-close": document.getElementById("dialog-early-close"),
 

@@ -221,8 +221,8 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);" style="border-left: 1px solid var(--borders);">file</button>
               <div class="dropdown">
-                <button onclick="addPieceToWorkshop(); sfx('click');">new piece</button>
-                <button onclick="removePieceFromWorkshop(); sfx('click');">delete piece</button>
+                <button onclick="const piece = new Piece(); piece.addToWorkshop(); sfx('click');">new piece</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop(); sfx('click');">delete piece</button>
               </div>
             </div>
 
@@ -452,6 +452,17 @@
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
       There are not enough letters on the open page.
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-no-pages" class="error">
+      <div class="flexbox">
+        <div class="grow">!</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+      There are no pages in your library.
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>
