@@ -12,8 +12,6 @@ class RecipeTray extends Tray {
         }
       }
     }
-
-    this.element = ui.storefront.recipePreview;
   }
 }
 
@@ -23,12 +21,7 @@ class Recipe {
     this.construction = p.construction || {};
     this.deviations = p.deviations || [];
 
-    if (Object.keys(this.construction).length > 1) {
-      this.category = "sets";
-    } else {
-      this.category = "singles";
-    }
-
+    this.updateCategory();
     this.calculateSize();
     this.cost = p.cost || 10;
 
@@ -74,6 +67,14 @@ class Recipe {
     return construction;
   }
 
+  updateCategory() {
+    if (Object.keys(this.construction).length > 1) {
+      this.category = "sets";
+    } else {
+      this.category = "singles";
+    }
+  }
+
   calculateSize() {
     let size = 0;
     var ingredientsCounted = [];
@@ -105,8 +106,30 @@ class Recipe {
     this.element.appendChild(button);
     this.button = button;
 
-    this.index = playerdata.recipes.length;
+    this.input = document.createElement("input");
+    this.input.className = "gone";
+    this.input.type = "text";
+    this.input.value = this.name;
+    this.input.dataset.id = this.id;
+    this.input.addEventListener("blur", function(e) {
+      const recipe = playerdata.recipes[this.dataset.id];
+      recipe.rename();
+    });
+    this.input.addEventListener("keydown", function(e) {
+      if (e.key == "Enter") {
+        const recipe = playerdata.recipes[this.dataset.id];
+        recipe.rename();
+      }
+    });
+    this.element.appendChild(this.input);
+
     playerdata.recipes.push(this);
+
+    this.tray.id = this.id;
+    for (let side in this.tray.collections) {
+      const el = this.tray.collections[side].element;
+      el.dataset.trayId = this.tray.id;
+    }
   }
 
   setDiscounted(discounted) {
@@ -119,7 +142,7 @@ class Recipe {
 
   previewRecipe(dontClose) {
     if (!dontClose && game.recipeIndex < playerdata.recipes.length) playerdata.recipes[game.recipeIndex].closePreview();
-    game.recipeIndex = this.index;
+    game.recipeIndex = this.id;
 
     this.button.classList.add("selected");
     this.button.setAttribute("disabled", true);
@@ -217,14 +240,15 @@ class Recipe {
   }
 
   delete() {
-    for (let i=this.index; i<playerdata.recipes.length; i++) {
-      if (this.index == i) continue;
+    for (let i=this.id; i<playerdata.recipes.length; i++) {
+      if (this.id == i) continue;
       const recipe = playerdata.recipes[i];
 
-      recipe.index--;
-      recipe.button.dataset.id = recipe.index;
+      recipe.id--;
+      recipe.button.dataset.id = recipe.id;
+      recipe.input.dataset.id = recipe.id;
     }
-    playerdata.recipes.splice(this.index, 1);
+    playerdata.recipes.splice(this.id, 1);
 
     this.element.remove();
 
@@ -247,6 +271,21 @@ class Recipe {
         }
       }
     }
+  }
+
+  startRename() {
+    this.input.classList.remove("gone");
+    this.button.classList.add("gone");
+    this.input.focus();
+  }
+
+  rename(value) {
+    value = value || this.input.value;
+    this.name = value;
+    this.button.textContent = value;
+
+    this.input.classList.add("gone");
+    this.button.classList.remove("gone");
   }
 }
 

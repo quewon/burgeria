@@ -31,7 +31,13 @@ class Tray {
 
         this.classList.add("draghover");
 
-        let tray = game.trays[this.dataset.trayId];
+        let tray;
+        if (!this.classList.contains("preview")) {
+          tray = game.trays[this.dataset.trayId];
+        } else {
+          tray = playerdata.recipes[this.dataset.trayId].tray;
+        }
+
         tray.openGlobalBlock("ministock", tray.stockbutton);
 
         let col = tray.collections[this.dataset.side];
@@ -49,6 +55,14 @@ class Tray {
 
         let item = col.removeItemByIndex(col.items.length-1);
         if (!item) return;
+
+        if (this.classList.contains("preview")) {
+          const recipe = playerdata.recipes[this.dataset.trayId];
+          recipe.updateConstruction();
+          recipe.updateCategory();
+          recipe.calculateSize();
+          updateRecipes();
+        }
 
         item.drag();
         this.classList.add("draghover");
@@ -151,11 +165,13 @@ class Tray {
   }
 
   resetMeshes() {
+    const editmode = ui.storefront.recipePreview.classList.contains("editmode");
+
     this.mesh.rotation.y = 0;
     for (let side in this.collections) {
       const col = this.collections[side];
       for (let item of col.items) {
-        item.mesh.position.y = 7 + item.ground;
+        item.mesh.position.y = editmode ? item.ground : 7 + item.ground;
         item.velocity = 0;
       }
     }
@@ -579,7 +595,15 @@ class Item {
     material.shading = THREE.SmoothShading;
     geo.computeVertexNormals(true);
 
-    this.mesh = new THREE.Mesh(geo, material);
+    this.mesh = new THREE.Group();
+
+    this.solidMesh = new THREE.Mesh(geo, material);
+    // this.wireframeMesh = new THREE.LineSegments(
+    //   new THREE.EdgesGeometry(geo),
+    //   new THREE.LineBasicMaterial({ color: 0xff0000 })
+    // );
+
+    this.mesh.add(this.solidMesh);
 
     if (ing.mesh.rx != 0) {
       this.mesh.rotation.x += Math.PI * ing.mesh.rx;
@@ -616,10 +640,26 @@ class Item {
 
     if (this.element.isConnected) {
       let parent = this.element.parentNode;
-      let tray = game.trays[parent.dataset.trayId];
+
+      let tray;
+      let recipe;
+      if (!parent.classList.contains("preview")) {
+        tray = game.trays[parent.dataset.trayId];
+      } else {
+        recipe = playerdata.recipes[parent.dataset.trayId];
+        tray = recipe.tray;
+      }
+
       let col = tray.collections[parent.dataset.side];
 
       this.setCollection(col);
+
+      if (recipe) {
+        recipe.updateConstruction();
+        recipe.updateCategory();
+        recipe.calculateSize();
+        updateRecipes();
+      }
     } else {
       if (this.previousCollection && this.previousCollection.tray) {
         const tray = this.previousCollection.tray;

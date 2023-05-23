@@ -431,11 +431,11 @@ li button {
   font-style: normal;
 }
 
-.collection.preview {
+#recipe-preview:not(.editmode) .collection.preview {
   pointer-events: none;
   border-style: solid;
 }
-.collection.preview.empty {
+#recipe-preview:not(.editmode) .collection.preview.empty {
   border-style: dashed;
 }
 

@@ -62,6 +62,7 @@
               <div class="buttonbar top">
                 <button onclick="new Recipe({ addToMenu: true }); updateRecipes();">+ new recipe</button>
                 <button onclick="playerdata.recipes[game.recipeIndex].delete(); sfx('click')">delete</button>
+                <button onclick="sfx('click'); playerdata.recipes[game.recipeIndex].startRename();">rename</button>
                 <div class="grow"></div>
               </div>
 
