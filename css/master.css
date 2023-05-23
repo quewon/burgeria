@@ -47,6 +47,7 @@ body {
 
   font-family: serif;
   text-rendering: optimizeLegibility;
+
   word-break: keep-all;
 }
 @keyframes burgeria-bg {
@@ -753,6 +754,7 @@ em, .em, .order {
   display: flex;
   flex-direction: column;
   width: 50%;
+  padding-top: 1.5rem;
 }
 .editmode, .editmode button {
   backdrop-filter: none;

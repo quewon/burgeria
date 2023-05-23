@@ -87,7 +87,7 @@ class Guy {
     this.voice = arch.voice;
     this.soundId = null;
 
-    const tray = new Tray(this);
+    const tray = new Tray();
     tray.sendToStorefront();
     _sounds.chime[arch.chime].play();
 

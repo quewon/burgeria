@@ -39,7 +39,7 @@ function init_default_playerdata() {
   for (let char of abc) {
     playerdata.prices[char] = [];
 
-    const price = Math.random() * .1;
+    const price = Math.max(.01, Math.random() * .1);
     playerdata.prices[char].push(price);
     game.tomorrowsPrices[char] = price;
   }
@@ -131,14 +131,14 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new Recipe({
-    name: "Deluxe Burger",
-    cost: 30,
-    construction: {
-      burger: ["bottom bun", "mayo", "lettuce", "tomato", "patty", "cheese", "onion", "pickle", "ketchup", "top bun"]
-    },
-    addToMenu: true
-  });
+  // new Recipe({
+  //   name: "Deluxe Burger",
+  //   cost: 30,
+  //   construction: {
+  //     burger: ["bottom bun", "mayo", "lettuce", "tomato", "patty", "cheese", "onion", "pickle", "ketchup", "top bun"]
+  //   },
+  //   addToMenu: true
+  // });
   new Recipe({
     name: "Burgeria Set",
     cost: 15,
@@ -149,13 +149,13 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
-  new Recipe({
-    name: "Weird Set",
-    cost: 10,
-    construction: {
-      drink: ["coke"],
-      side: ["fries"]
-    },
-    addToMenu: true
-  });
+  // new Recipe({
+  //   name: "Weird Set",
+  //   cost: 10,
+  //   construction: {
+  //     drink: ["coke"],
+  //     side: ["fries"]
+  //   },
+  //   addToMenu: true
+  // });
 }

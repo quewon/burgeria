@@ -12,7 +12,7 @@ var ui = {
 
     "publishing-loading": document.getElementById("dialog-publishing-loading"),
     "publishing-loading-canvas": new Canvas3D(document.getElementById("publishing-loading-canvas")),
-    
+
     "publishing-error": document.getElementById("dialog-publishing-error"),
     "publishing-error-no-letters": document.getElementById("dialog-publishing-error-no-letters"),
     "publishing-success": document.getElementById("dialog-publishing-success"),
@@ -49,6 +49,7 @@ var ui = {
     recipePreview: document.getElementById("recipe-preview"),
     recipePreviewContext: document.getElementById("recipe-preview").querySelector("canvas").getContext("2d"),
     menuEditButton: document.getElementById("menu-edit-button"),
+    menuStockbutton: document.getElementById("menu-stockbutton"),
     day: {
       toggleButton: document.getElementById("day-toggle-button"),
       state: document.getElementById("day-state"),
@@ -225,8 +226,10 @@ function toggleMenuEditMode() {
   const button = ui.storefront.menuEditButton;
 
   preview.classList.toggle("editmode");
-  if (preview.classList.contains("editmode")) {
 
+  if (!ui.storefront.ministock.classList.contains("gone")) {
+    const tray = playerdata.recipes[game.recipeIndex].tray;
+    tray.toggleGlobalBlock("ministock", tray.stockbutton);
   }
 }
 

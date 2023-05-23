@@ -1,10 +1,29 @@
+class RecipeTray extends Tray {
+  constructor(construction) {
+    super(true);
+
+    this.stockbutton = ui.storefront.menuStockbutton;
+
+    if (construction) {
+      for (let sidename in construction) {
+        const side = construction[sidename];
+        for (let itemname of side) {
+          new Item(itemname, this.collections[sidename]);
+        }
+      }
+    }
+
+    this.element = ui.storefront.recipePreview;
+  }
+}
+
 class Recipe {
   constructor(p) {
-    this.name = p.name || "Nameless Burger";
+    this.name = p.name || "Untitled Burger";
     this.construction = p.construction || {};
     this.deviations = p.deviations || [];
 
-    if (this.construction.burger && Object.keys(this.construction).length > 1) {
+    if (Object.keys(this.construction).length > 1) {
       this.category = "sets";
     } else {
       this.category = "singles";
@@ -13,8 +32,24 @@ class Recipe {
     this.calculateSize();
     this.cost = p.cost || 10;
 
+    this.tray = new RecipeTray(p.construction);
+
     if (p.addToMenu) {
       this.addToMenu();
+    }
+  }
+
+  updateConstruction() {
+    this.construction = {};
+
+    for (let sidename in this.tray.collections) {
+      const col = this.tray.collections[sidename];
+      if (col.items.length > 0) {
+        this.construction[sidename] = [];
+        for (let item of col.items) {
+          this.construction[sidename].push(item.name);
+        }
+      }
     }
   }
 
@@ -69,14 +104,7 @@ class Recipe {
     this.element.appendChild(button);
     this.button = button;
 
-    this.tray = new Tray();
-    for (let sidename in this.construction) {
-      const side = this.construction[sidename];
-      for (let itemname of side) {
-        new Item(itemname, this.tray.collections[sidename]);
-      }
-    }
-
+    this.index = playerdata.recipes.length;
     playerdata.recipes.push(this);
   }
 
@@ -89,9 +117,8 @@ class Recipe {
   }
 
   previewRecipe() {
-    for (let recipe of playerdata.recipes) {
-      recipe.closePreview();
-    }
+    playerdata.recipes[game.recipeIndex].closePreview();
+    game.recipeIndex = this.index;
 
     this.button.classList.add("selected");
     this.button.setAttribute("disabled", true);
@@ -106,11 +133,20 @@ class Recipe {
     }
 
     ui.storefront.recipePreviewCanvas.setScene3D(this.tray.scene);
+
+    if (!ui.storefront.ministock.classList.contains("gone") && ui.storefront.recipePreview.classList.contains("editmode")) {
+      ui.storefront.ministockTray = this.tray;
+      this.tray.updateGlobalBlockPosition("ministock", this.tray.stockbutton);
+    }
   }
 
   closePreview() {
     this.button.classList.remove("selected");
     this.button.removeAttribute("disabled");
+
+    if (Object.keys(this.construction).length == 0) {
+      this.delete();
+    }
   }
 
   deviate() {
@@ -159,7 +195,7 @@ class Recipe {
     }
   }
 
-  remove(item) {
+  removeItem(item) {
     for (let sidename in this.construction) {
       const side = this.construction[sidename];
       let index = side.indexOf(item);
@@ -171,7 +207,7 @@ class Recipe {
     // size should update... but does it matter?
   }
 
-  replace(item, replace_with) {
+  replaceItem(item, replace_with) {
     for (let sidename in this.construction) {
       const side = this.construction[sidename];
       let index = side.indexOf(item);
@@ -181,6 +217,21 @@ class Recipe {
       }
     }
     // size should update... but does it matter?
+  }
+
+  delete() {
+    for (let i=this.index; i<playerdata.recipes.length; i++) {
+      if (this.index == i) continue;
+      const recipe = playerdata.recipes[i];
+
+      recipe.index--;
+      recipe.button.dataset.id = recipe.index;
+    }
+    playerdata.recipes.splice(this.index, 1);
+
+    this.element.remove();
+
+    updateRecipes();
   }
 }
 

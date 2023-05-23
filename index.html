@@ -45,8 +45,8 @@
           </div>
           <div id="recipe-preview" class="block">
             <div class="buttonbar top">
-              <button title="add menu item">+ add menu item</button>
-              <button title="add menu item">delete</button>
+              <button>+ add recipe</button>
+              <button>delete</button>
               <div class="grow"></div>
               <button id="menu-edit-button" onclick="toggleMenuEditMode()" title="toggle edit mode">✎</button>
             </div>
@@ -66,9 +66,9 @@
             </div>
             <div id="show-on-editmode">
               <div class="buttonbar bottom border-above">
-                <button name="clear">clear</button>
+                <button name="clear" onclick="playerdata.recipes[game.recipeIndex].tray.clear(ui.storefront.menuStockbutton); playerdata.recipes[game.recipeIndex].updateConstruction();">clear</button>
                 <div class="grow"></div>
-                <button name="stock">stock ☰</button>
+                <button id="menu-stockbutton" name="stock" onclick="const tray = playerdata.recipes[game.recipeIndex].tray; tray.toggleGlobalBlock('ministock', this);">stock ☰</button>
               </div>
             </div>
           </div>
@@ -107,21 +107,7 @@
       <div class="flexbox gap wrap" style="width:100%;">
         <div class="column">
           <div class="block" id="bankbook-block">
-            <div class="flexbox">
-              <h1 class="marginbelow grow">BANKBOOK</h1>
-              <div style="text-align: right; float: right; font-family: monospace;">
-                <table>
-                  <tr>
-                    <th>day</th>
-                    <td><span id="day-counter"></span></td>
-                  </tr>
-                  <tr>
-                    <th>burgerpoints</th>
-                    <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
+            <h1 class="marginbelow grow">BANKBOOK</h1>
 
             <table class="bankbook" id="bankbook-label" style="position: absolute;">
               <tr>
@@ -202,6 +188,19 @@
 
         <div class="block transparent" style="line-height: 0;">
           <img data-latesrc="img/window.png" alt="window overlooking the field" title="window overlooking the field">
+        </div>
+
+        <div style="width: 100%; text-align: left; float: left; font-family: monospace;">
+          <table>
+            <tr>
+              <th>day</th>
+              <td><span id="day-counter"></span></td>
+            </tr>
+            <tr>
+              <th>burgerpoints</th>
+              <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
+            </tr>
+          </table>
         </div>
       </div>
 
@@ -506,8 +505,8 @@
   <script type="text/javascript" src="js/bank/www.js"></script>
   <script type="text/javascript" src="js/canvas.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
-  <script type="text/javascript" src="js/recipe.js"></script>
   <script type="text/javascript" src="js/tray.js"></script>
+  <script type="text/javascript" src="js/recipe.js"></script>
 
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="js/writing.js"></script>

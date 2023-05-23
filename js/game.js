@@ -45,6 +45,7 @@ const game = {
   unbankedPoints: 0, //
   market: [],
   tomorrowsPrices: {},
+  recipeIndex: 0,
 
   themes: {
     order: ["☼", "☁︎"], //,"☾"
@@ -195,9 +196,12 @@ const game = {
       priceDifferences.push(difference);
     }
 
+    console.log(playerdata.prices);
+    console.log(stats);
+
     stats.range = largestPriceDifference - smallestPriceDifference;
 
-    var modeValue = -1;
+    var modeValue = 0;
     var modeCount = 0;
     for (let diff in priceHash) {
       if (priceHash[diff] > modeCount) {
@@ -206,7 +210,7 @@ const game = {
       }
     }
 
-    stats.mode = Number(modeValue);
+    stats.mode = modeValue;
 
     stats.mean = differenceTotal / priceDifferences.length;
 

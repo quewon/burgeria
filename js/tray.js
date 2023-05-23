@@ -1,13 +1,15 @@
 class Tray {
-  constructor() {
+  constructor(isRecipeTray) {
     this.id = game.trays.length;
     this.enabled = false;
 
     this.collections = {};
-    this.init_tray();
     this.init_3d();
+    this.init_tray();
 
-    game.trays.push(this);
+    if (!isRecipeTray) {
+      game.trays.push(this);
+    }
   }
 
   init_tray() {
@@ -70,7 +72,8 @@ class Tray {
     let sendbutton = this.element.querySelector("[name='send']");
     sendbutton.dataset.id = this.id;
     sendbutton.onclick = function() {
-      game.trays[this.dataset.id].toggleGlobalBlock("guysList", this);
+      const tray = game.trays[this.dataset.id];
+      tray.toggleGlobalBlock("guysList", this);
     }
     this.sendbutton = sendbutton;
 
@@ -228,13 +231,13 @@ class Tray {
     if (this.canvas) this.canvas.delete();
   }
 
-  clear() {
+  clear(stockbutton) {
     for (let side in this.collections) {
       let col = this.collections[side];
       col.clear(true);
     }
 
-    this.openGlobalBlock("ministock", this.stockbutton);
+    this.openGlobalBlock("ministock", stockbutton || this.stockbutton);
   }
 
   getConstruction() {
@@ -299,8 +302,8 @@ class Tray {
       }
       const aj = a.join("|");
       const bj = b.join("|");
-      const asj = a.toSorted().join("|");
-      const bsj = b.toSorted().join("|");
+      const asj = a.sort().join("|");
+      const bsj = b.sort().join("|");
 
       if (aj != bj && a.length == b.length && asj == bsj) {
         feedback.tray_is_perfect = false;
