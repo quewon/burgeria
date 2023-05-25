@@ -1,6 +1,6 @@
 class Tray {
   constructor(isRecipeTray) {
-    this.id = game.trays.length;
+    this.index = game.trays.length;
     this.enabled = false;
 
     this.collections = {};
@@ -13,7 +13,7 @@ class Tray {
   }
 
   init_tray() {
-    this.element = divContainingTemplate("template-tray");
+    this.element = divContainingTemplate("tray");
     this.element.classList.add("slide-down");
 
     let cons = this.element.querySelectorAll(".collection");
@@ -23,7 +23,7 @@ class Tray {
       let col = new Collection(this, con, sidename);
       col.capacity = Number(con.dataset.capacity);
       con.dataset.containerValue = 2;
-      con.dataset.trayId = this.id;
+      con.dataset.trayId = this.index;
       con.dataset.side = col.side;
       con.addEventListener("mouseenter", function(e) {
         let item = _dragdrop.itemInHand;
@@ -81,9 +81,9 @@ class Tray {
     };
 
     let closebutton = this.element.querySelector("[name='close']");
-    closebutton.dataset.id = this.id;
+    closebutton.dataset.index = this.index;
     closebutton.onclick = function() {
-      const tray = game.trays[this.dataset.id];
+      const tray = game.trays[this.dataset.index];
       tray.clear(true);
       tray.prepareDeletion();
       return;
@@ -91,26 +91,26 @@ class Tray {
     this.closebutton = closebutton;
 
     let sendbutton = this.element.querySelector("[name='send']");
-    sendbutton.dataset.id = this.id;
+    sendbutton.dataset.index = this.index;
     sendbutton.onclick = function() {
-      const tray = game.trays[this.dataset.id];
+      const tray = game.trays[this.dataset.index];
 
       tray.toggleGlobalBlock("guysList", this);
     }
     this.sendbutton = sendbutton;
 
     let clearbutton = this.element.querySelector("[name='clear']");
-    clearbutton.dataset.id = this.id;
-    clearbutton.onclick = function() { game.trays[this.dataset.id].clear()}
+    clearbutton.dataset.index = this.index;
+    clearbutton.onclick = function() { game.trays[this.dataset.index].clear()}
     this.clearbutton = clearbutton;
 
     let stockbutton = this.element.querySelector("[name='stock']");
-    stockbutton.dataset.id = this.id;
+    stockbutton.dataset.index = this.index;
     stockbutton.onclick = function() {
-      game.trays[this.dataset.id].toggleGlobalBlock("ministock", this);
+      game.trays[this.dataset.index].toggleGlobalBlock("ministock", this);
     }
     this.stockbutton = stockbutton;
-    this.element.dataset.id = this.id;
+    this.element.dataset.index = this.index;
   }
 
   sendToStorefront() {
@@ -246,26 +246,22 @@ class Tray {
   prepareDeletion() {
     this.element.classList.add("sending");
     this.element.addEventListener("animationend", function(e) {
-      const tray = game.trays[this.dataset.id];
+      const tray = game.trays[this.dataset.index];
       tray.delete();
     });
   }
 
   delete() {
-    for (let i=this.id; i<game.trays.length; i++) {
-      if (i==this.id) continue;
-      const tray = game.trays[i];
-      tray.id--;
-      tray.element.dataset.id = tray.id;
-      tray.stockbutton.dataset.id = tray.id;
-      tray.sendbutton.dataset.id = tray.id;
-      tray.clearbutton.dataset.id = tray.id;
-      tray.closebutton.dataset.id = tray.id;
+    spliceIndexedObject(game.trays, this.index, function(tray) {
+      tray.element.dataset.index = tray.index;
+      tray.stockbutton.dataset.index = tray.index;
+      tray.sendbutton.dataset.index = tray.index;
+      tray.clearbutton.dataset.index = tray.index;
+      tray.closebutton.dataset.index = tray.index;
       for (let sidename in tray.collections) {
-        tray.collections[sidename].element.dataset.id = tray.id;
+        tray.collections[sidename].element.dataset.index = tray.index;
       }
-    }
-    game.trays.splice(this.id, 1);
+    });
 
     if (this.element) this.element.remove();
     if (this.canvas) this.canvas.delete();

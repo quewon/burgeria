@@ -90,6 +90,7 @@ const game = {
 
     game.updatePrices();
 
+    new MarketAlert();
     new Headline("SMALL BURGERS...", "... ARE IN!");
     new Prices();
 
@@ -123,6 +124,10 @@ const game = {
       game.daytime = false;
       updateRecipes();
       updateDayUI();
+
+      for (let guy of game.guys) {
+        guy.rejectbutton.classList.remove("gone");
+      }
     }
   },
   updateStore: function() {
@@ -198,9 +203,6 @@ const game = {
       priceDifferences.push(difference);
     }
 
-    console.log(playerdata.prices);
-    console.log(stats);
-
     stats.range = largestPriceDifference - smallestPriceDifference;
 
     var modeValue = 0;
@@ -270,4 +272,14 @@ function sellText(text) {
       game.tomorrowsPrices[char] = Math.max(.01, game.tomorrowsPrices[char] - .01);
     }
   }
+}
+
+function spliceIndexedObject(array, objectIndex, objectFunction) {
+  for (let i=objectIndex; i<array.length; i++) {
+    if (i==objectIndex) continue;
+    array[i].index--;
+    if (objectFunction) objectFunction(array[i]);
+  }
+
+  array.splice(objectIndex, 1);
 }

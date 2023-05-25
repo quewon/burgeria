@@ -48,7 +48,7 @@ class Guy {
 
     //
 
-    let div = divContainingTemplate("template-guy");
+    let div = divContainingTemplate("guy");
     let img = div.querySelector("img");
     img.src = arch.source;
     img.alt = img.title = arch.name;
@@ -56,6 +56,13 @@ class Guy {
     let text = div.querySelector("[name='text']");
     let number = div.querySelector("[name='number']");
     number.textContent = this.id+1;
+
+    let rejectbutton = div.querySelector("[name='reject']");
+    rejectbutton.dataset.index = this.id;
+    rejectbutton.onclick = function() {
+      game.guys[this.dataset.index].reject();
+    }
+    this.rejectbutton = rejectbutton;
 
     this.imageElement = img;
     this.textElement = text;
@@ -246,14 +253,32 @@ class Guy {
     }
   }
 
+  addPause(length) {
+    let el = document.createElement("span");
+    el.className = "pause gone";
+    el.dataset.length = length;
+    el.textContent = "";
+    this.words.push(el);
+    this.textElement.appendChild(el);
+  }
+
   updateTalk() {
-    this.soundId = sfx_talk(this.voice, this.soundId);
     let el = this.words.shift();
     el.classList.remove("gone");
+
+    if (!el.classList.contains("pause")) {
+      this.soundId = sfx_talk(this.voice, this.soundId);
+    }
+
     if (this.words.length > 0) {
-      this.currentTalkInterval = this.words[0].textContent.length * this.talkInterval;
+      let length = this.words[0].textContent.length;
+      if (this.words[0].classList.contains("pause")) {
+        length = Number(this.words[0].dataset.length);
+      }
+
+      this.currentTalkInterval = length * this.talkInterval;
     } else {
-      this.currentTalkInterval = 0;
+      this.currentTalkInterval = -1;
     }
     if (ui.storefront.ministockTray) {
       const tray = ui.storefront.ministockTray;
@@ -262,7 +287,12 @@ class Guy {
   }
 
   draw() {
-    if (this.words.length == 0) return;
+    if (this.words.length == 0) {
+      if (this.rejected) {
+        this.delete();
+      }
+      return;
+    }
 
     this.talkTime++;
     if (this.talkTime >= this.currentTalkInterval) {
@@ -292,6 +322,25 @@ class Guy {
     this.sendFeedback(feedback, tray);
   }
 
+  reject() {
+    if (this.words.length > 0) {
+      const dialogue = "wait i wasn't done talking";
+      this.words = [];
+      this.addString(dialogue);
+      this.addPause(10);
+    } else {
+      while (this.textElement.lastElementChild) {
+        this.textElement.lastElementChild.remove();
+      }
+      this.addString("bye bye");
+      this.addPause(15);
+    }
+
+    this.rejected = true;
+
+    this.rejectbutton.setAttribute("disabled", true);
+  }
+
   delete() {
     this.element.remove();
 
@@ -299,7 +348,7 @@ class Guy {
     // if so, allow player to start the day up again!
     if (game.storetime == -1) {
       for (let guy of game.guys) {
-        if (!guy.served) return;
+        if (!guy.served && !guy.rejected) return;
       }
       game.beginDay();
     }
@@ -352,7 +401,7 @@ class Guy {
     if (text != "") {
       text = this.styleText(text, true);
 
-      let div = divContainingTemplate("template-feedback-napkin");
+      let div = divContainingTemplate("feedback-napkin");
       div.querySelector("[name='text']").textContent = text;
 
       // ui.storefront.news.appendChild(div);

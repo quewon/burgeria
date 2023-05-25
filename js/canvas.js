@@ -19,7 +19,7 @@ class Canvas3D {
     this.activate();
 
     this.deleted = false;
-    this.id = _canvases.length;
+    this.index = _canvases.length;
     _canvases.push(this);
   }
 
@@ -58,11 +58,7 @@ class Canvas3D {
   delete() {
     if (this.deleted) return;
 
-    for (let i=this.id; i<_canvases.length; i++) {
-      if (i == this.id) continue;
-      _canvases[i].id--;
-    }
-    _canvases.splice(this.id, 1);
+    spliceIndexedObject(_canvases, this.index);
 
     this.deleted = true;
   }

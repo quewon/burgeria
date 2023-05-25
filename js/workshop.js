@@ -9,12 +9,12 @@ function calculatePieceCost(text) {
   return Math.ceil(cost);
 }
 
-class Piece {
+class WorkshopPiece {
   constructor(text) {
     text = text || "";
+
     this.history = [];
     this.historyIndex = -1;
-    this.disintegrated = false;
     this.update(text, text.length - 1, text.length - 1, "", "");
 
     this.locked = false;
@@ -35,7 +35,28 @@ class Piece {
     });
     this.historyIndex = this.history.length - 1;
 
-    this.updateState();
+    this.updateUI();
+  }
+
+  updateUI() {
+    if (this.locked) return;
+
+    const workshop = ui.workshop.textarea;
+    const state = this.history[this.historyIndex];
+    workshop.selectionStart = state.selectionStart;
+    workshop.selectionEnd = state.selectionEnd;
+    workshop.value = state.text;
+
+    this.text = state.text;
+    const title = this.text.split("\n")[0];
+    this.title = title == "" ? "Empty note" : title;
+
+    const lib = ui.workshop.library;
+    if (
+      playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length &&
+      playerdata.workshop[playerdata.workshopIndex] == this
+    )
+      lib.children[playerdata.workshopIndex].textContent = this.title;
   }
 
   wordsCount() {
@@ -74,14 +95,14 @@ class Piece {
     let abcs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let deleting = "";
     for (let char of this.text) {
-      if (abcs.includes(char)) {
-        unuse_letter(char.toLowerCase());
-        deleting += char.toLowerCase();
+      const letter = char.toLowerCase();
+      if (letter in playerdata.values) {
+        unuse_letter(letter);
+        deleting += letter;
       }
     }
 
     this.update("", 0, 0, "", deleting);
-    this.displayInWorkshopTextarea();
   }
 
   undo() {
@@ -100,8 +121,7 @@ class Piece {
     updateList(ui.workshop.lettersList, playerdata.letters);
 
     this.historyIndex--;
-    this.updateState();
-    this.displayInWorkshopTextarea();
+    this.updateUI();
   }
 
   redo() {
@@ -109,7 +129,7 @@ class Piece {
     if (this.historyIndex == this.history.length - 1) return;
 
     this.historyIndex++;
-    this.updateState();
+    this.updateUI();
 
     const state = this.history[this.historyIndex];
     const deleted = state.deleted;
@@ -121,79 +141,6 @@ class Piece {
       playerdata.letters[char]--;
     }
     updateList(ui.workshop.lettersList, playerdata.letters);
-    this.displayInWorkshopTextarea();
-  }
-
-  updateState() {
-    if (this.locked) return;
-
-    const workshop = ui.workshop.textarea;
-    const state = this.history[this.historyIndex];
-    this.text = state.text;
-    workshop.selectionStart = state.selectionStart;
-    workshop.selectionEnd = state.selectionEnd;
-
-    const title = this.text.split("\n")[0];
-    this.title = title == "" ? "Empty note" : title;
-
-    const lib = ui.workshop.library;
-    if (
-      playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length &&
-      playerdata.workshop[playerdata.workshopIndex] == this
-    )
-      lib.children[playerdata.workshopIndex].textContent = this.title;
-  }
-
-  displayInWorkshopTextarea() {
-    const state = this.history[this.historyIndex];
-    const workshop = ui.workshop.textarea;
-
-    workshop.value = state.text;
-  }
-
-  addToLibrary() {
-    playerdata.libraryIndex = playerdata.library.length;
-    playerdata.library.push(this);
-    updateBookshelf();
-    selectBook(ui.kitchen.bookshelf.lastElementChild, playerdata.libraryIndex);
-  }
-
-  disintegrate() {
-    this.disintegrateFrame();
-    if (!this.disintegrating) {
-      this.disintegrating = true;
-      this.sfxId = sfx("disintegrate");
-    }
-  }
-
-  disintegrateFrame() {
-    if (/[a-zA-Z]/.test(this.text)) {
-      let randomindex = Math.random() * this.text.length | 0;
-      while (this.text[randomindex] == " ") {
-        randomindex--;
-        if (randomindex < 0) randomindex = this.text.length - 1;
-      }
-      let char = this.text[randomindex];
-      this.text = this.text.slice(0, randomindex) + " " + this.text.slice(randomindex + 1);
-      if ("abcdefghijklmnopqrstuvwxyz".includes(char)) {
-        if (!(char in playerdata.letters)) {
-          playerdata.letters[char] = 0;
-        }
-        playerdata.letters[char]++;
-        updateList(ui.kitchen.lettersList, playerdata.letters);
-        updateList(ui.workshop.lettersList, playerdata.letters);
-      }
-      setObjectTimeout(this, "disintegrateFrame", 2);
-    } else {
-      if (!this.disintegrated) {
-        playerdata.library.splice(playerdata.library.indexOf(this), 1);
-        updateBookshelf(true);
-        navigateLibrary(0);
-        sfx_stop("disintegrate", null, this.sfxId);
-      }
-      this.disintegrated = true;
-    }
-    updateLibrary();
   }
 
   attemptPublish() {
@@ -260,7 +207,7 @@ class Piece {
   }
 
   addToWorkshop() {
-    this.workshopIndex = playerdata.workshop.length;
+    this.index = playerdata.workshop.length;
     playerdata.workshop.push(this);
 
     const lib = ui.workshop.library;
@@ -268,7 +215,7 @@ class Piece {
 
     let button = document.createElement("button");
     button.textContent = this.title;
-    button.dataset.index = this.workshopIndex;
+    button.dataset.index = this.index;
     button.onclick = function() {
       playerdata.workshop[this.dataset.index].buttonSelect();
     }
@@ -286,17 +233,13 @@ class Piece {
       }
     }
 
-    for (let i=this.workshopIndex; i<playerdata.workshop.length; i++) {
-      if (this.workshopIndex == i) continue;
-      const piece = playerdata.workshop[i];
-      piece.workshopIndex--;
-      piece.element.dataset.index = piece.workshopIndex;
-    }
-    playerdata.workshop.splice(this.workshopIndex, 1);
+    spliceIndexedObject(playerdata.workshop, this.index, function(obj) {
+      obj.element.dataset.index = obj.index;
+    });
 
     if (playerdata.workshopIndex >= playerdata.workshop.length) playerdata.workshopIndex--;
     if (playerdata.workshop.length <= 0) {
-      const piece = new Piece();
+      const piece = new WorkshopPiece();
       piece.addToWorkshop();
     } else {
       const lib = ui.workshop.library;
@@ -325,9 +268,10 @@ class Piece {
       anchor.classList.remove("activated");
     }
 
-    playerdata.workshop[playerdata.workshopIndex].buttonDeselect();
+    const prevPiece = playerdata.workshop[playerdata.workshopIndex];
+    if (prevPiece) prevPiece.buttonDeselect();
 
-    playerdata.workshopIndex = this.workshopIndex;
+    playerdata.workshopIndex = this.index;
     this.element.classList.add("selected");
     this.element.classList.add("focused");
     this.element.setAttribute("disabled", true);
@@ -338,68 +282,6 @@ class Piece {
     this.element.classList.remove("selected");
     this.element.classList.remove("focused");
     this.element.removeAttribute("disabled");
-  }
-}
-
-class PieceAlert {
-  constructor(text, cost) {
-    game.market.push(text);
-
-    let div = divContainingTemplate("template-writing-alert");
-    cost = cost || calculatePieceCost(text);
-    div.dataset.title = text.split("\n")[0];
-    div.className = "block transparent";
-
-    let readbutton = div.querySelectorAll("button")[0];
-    readbutton.dataset.text = text;
-    readbutton.dataset.title = div.dataset.title;
-    readbutton.onclick = function() {
-      ui.dialogs["read-text-title"].textContent = this.dataset.title;
-      ui.dialogs["read-text-content"].textContent = this.dataset.text;
-      ui.dialogs["read-text"].showModal();
-    }
-
-    let savebutton = div.querySelectorAll("button")[1];
-    savebutton.dataset.text = text;
-    savebutton.dataset.cost = cost;
-    savebutton.onclick = function() {
-      const p = this.parentNode.parentNode.parentNode;
-      const cost = Number(this.dataset.cost);
-
-      if (playerdata.points < cost) {
-        sfx("error");
-        ui.dialogs["no-points"].showModal();
-        return;
-      }
-
-      bankPoints(-cost, "WWW");
-      buyText(this.dataset.text);
-
-      const piece = new Piece(this.dataset.text);
-      game.market.splice(game.market.indexOf(this.dataset.text), 1);
-      piece.addToLibrary();
-      sfx('click');
-
-      p.classList.add("send-library");
-      p.onanimationend = function() {
-        this.remove();
-        if (ui.workshop.market.lastElementChild == ui.workshop.marketEmptyMessage) {
-          ui.workshop.marketEmptyMessage.classList.remove("gone");
-        }
-      }
-
-      this.onclick = null;
-    }
-
-    div.querySelector("[name='title']").textContent = div.dataset.title;
-    if (cost == 0) {
-      div.querySelector("[name='nonzerocost']").remove();
-    } else {
-      div.querySelector("[name='cost']").textContent = cost;
-    }
-
-    ui.workshop.market.appendChild(div);
-    ui.workshop.marketEmptyMessage.classList.add("gone");
   }
 }
 
@@ -524,7 +406,6 @@ function update_workshop() {
 
   if (output != prevtext) {
     piece.update(output, workshop.selectionStart, workshop.selectionEnd, charsAdded, charsDeleted);
-    piece.displayInWorkshopTextarea();
 
     sfx("type");
   } else if (letterRejected) {
@@ -554,4 +435,15 @@ function init_workshop() {
   });
 
   workshop.addEventListener("input", update_workshop);
+}
+
+function createWorkshopPiece() {
+  const piece = new WorkshopPiece();
+  piece.addToWorkshop();
+  sfx('click');
+}
+
+function deleteWorkshopPiece() {
+  playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop();
+  sfx('click');
 }

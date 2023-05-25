@@ -261,16 +261,11 @@ class Recipe {
   }
 
   delete() {
-    for (let i=this.id; i<playerdata.recipes.length; i++) {
-      if (this.id == i) continue;
-      const recipe = playerdata.recipes[i];
-
-      recipe.id--;
+    spliceIndexedObject(playerdata.recipes, this.id, function(recipe) {
       recipe.button.dataset.id = recipe.id;
       recipe.input.dataset.id = recipe.id;
-    }
-    playerdata.recipes.splice(this.id, 1);
-
+    });
+    
     this.element.remove();
 
     if (playerdata.recipes.length == 0) {

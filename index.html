@@ -160,10 +160,7 @@
                 <button class="disabled" title="go to next page" onclick="navigateLibrary(1);">→</button>
               </nav>
               <p id="library-page" class="block"></p>
-              <div class="buttonbar bottom border-above">
-                <div class="grow"></div>
-                <button onclick="playerdata.library[playerdata.libraryIndex].disintegrate();">disintegrate</button>
-              </div>
+              <button class="bottom right" onclick="playerdata.library[playerdata.libraryIndex].disintegrate();" style="border-top: none;">disintegrate</button>
             </div>
             <div id="library-page-empty" class="block attached-above">
               <i>Your library is empty.</i>
@@ -190,8 +187,8 @@
     <div id="scene-workshop" class="scene">
       <div class="column">
         <div class="buttonbar">
-          <button onclick="const piece = new Piece(); piece.addToWorkshop(); sfx('click');">+ new piece</button>
-          <button onclick="playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop(); sfx('click');">delete</button>
+          <button onclick="createWorkshopPiece();">+ new piece</button>
+          <button onclick="deleteWorkshopPiece();">delete</button>
         </div>
 
         <div id="workshop-library">
@@ -221,8 +218,8 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);" style="border-left: 1px solid var(--borders);">file</button>
               <div class="dropdown">
-                <button onclick="const piece = new Piece(); piece.addToWorkshop(); sfx('click');">new piece</button>
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop(); sfx('click');">delete piece</button>
+                <button onclick="createWorkshopPiece();">new piece</button>
+                <button onclick="deleteWorkshopPiece();">delete piece</button>
               </div>
             </div>
 
@@ -325,6 +322,16 @@
       </div>
     </template>
 
+    <template id="template-market-alert">
+      <div class="block dashed">
+        <div class="buttonbar top right front">
+          <button onclick="setScene('workshop'); this.parentNode.parentNode.remove();">→ check the market</button>
+          <button title="close" onclick="this.parentNode.parentNode.remove();">x</button>
+        </div>
+        <i>You've got mail!</i>
+      </div>
+    </template>
+
     <template id="template-news-prices">
       <div class="news block slide-down">
         <button class="top right front" title="close" onclick="this.parentNode.parentNode.remove();">x</button>
@@ -342,6 +349,7 @@
         <div name="number" class="block top left">99</div>
         <img src="" alt="" title="">
         <div name="text" class="block attached-top"></div>
+        <button name="reject" class="gone" style="margin-top: var(--gap)">turn away</button>
       </div>
     </template>
 
@@ -531,10 +539,10 @@
   <script type="text/javascript" src="js/tray.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
 
-  <script src="https://apis.google.com/js/api.js"></script>
-  <script type="text/javascript" src="js/writing.js"></script>
+  <script type="text/javascript" src="js/workshop.js"></script>
 
   <script type="text/javascript" src="js/guy.js"></script>
+  <script type="text/javascript" src="js/news.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/data.js"></script>
   <script type="text/javascript" src="js/game.js"></script>

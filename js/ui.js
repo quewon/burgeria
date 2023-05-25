@@ -22,12 +22,13 @@ var ui = {
     "wind-content": document.getElementById("dialog-wind-content")
   },
   templates: {
-    "template-tray": document.getElementById("template-tray"),
-    "template-news-headline": document.getElementById("template-news-headline"),
-    "template-news-prices": document.getElementById("template-news-prices"),
-    "template-guy": document.getElementById("template-guy"),
-    "template-feedback-napkin": document.getElementById("template-feedback-napkin"),
-    "template-writing-alert": document.getElementById("template-writing-alert"),
+    "tray": document.getElementById("template-tray"),
+    "news-headline": document.getElementById("template-news-headline"),
+    "news-prices": document.getElementById("template-news-prices"),
+    "guy": document.getElementById("template-guy"),
+    "feedback-napkin": document.getElementById("template-feedback-napkin"),
+    "writing-alert": document.getElementById("template-writing-alert"),
+    "market-alert": document.getElementById("template-market-alert"),
   },
   scenes: {
     "storefront": document.getElementById("scene-storefront"),
@@ -129,9 +130,9 @@ function setScene(name) {
 
 // utility functions
 
-function divContainingTemplate(templateId) {
+function divContainingTemplate(templateName) {
   let div = document.createElement("div");
-  let template = ui.templates[templateId];
+  let template = ui.templates[templateName];
   let clone = template.content.cloneNode(true);
   div.appendChild(clone);
   return div;
@@ -159,6 +160,7 @@ function selectBook(el, index) {
     el.classList.add("selected");
     playerdata.libraryIndex = index;
     updateLibrary();
+    ui.kitchen.libraryBlock.classList.remove("gone");
   } else {
     ui.kitchen.libraryBlock.classList.add("gone");
   }
@@ -195,24 +197,6 @@ function createBookLabel(parent, text) {
   parent.style.width=Math.ceil(text.length / 10)+"rem";
 }
 
-function createBook(title, index) {
-  const bookshelf = ui.kitchen.bookshelf;
-
-  var book = document.createElement("button");
-  book.classList.add("book");
-  book.setAttribute("type", "book");
-  book.dataset.index = index;
-  book.onclick = function() {
-    selectBook(this, Number(this.dataset.index));
-  };
-
-  createBookLabel(book, title);
-
-  bookshelf.appendChild(book);
-
-  return book;
-}
-
 function updateBookshelf(dontHideLibrary) {
   const bookshelf = ui.kitchen.bookshelf;
 
@@ -226,9 +210,8 @@ function updateBookshelf(dontHideLibrary) {
     if (!dontHideLibrary) book.onclick();
   }
 
-  for (let index in playerdata.library) {
-    const book = playerdata.library[index];
-    createBook(book.title, index);
+  for (let book of playerdata.library) {
+    ui.kitchen.bookshelf.appendChild(book.element);
   }
 }
 
@@ -409,10 +392,10 @@ function updateLibrary() {
     // ui.kitchen.libraryBlock.classList.remove("gone");
   }
 
-  let page = playerdata.library[playerdata.libraryIndex];
+  const piece = playerdata.library[playerdata.libraryIndex];
 
-  if (page) {
-    ui.kitchen.library.page.textContent = page.text;
+  if (piece) {
+    ui.kitchen.library.page.textContent = piece.text;
 
     ui.kitchen.library.pageContainer.classList.remove("gone");
     ui.kitchen.library.pageEmptyMessage.classList.add("gone");
@@ -430,9 +413,7 @@ function updateLibrary() {
   buttons[0].setAttribute("disabled", true);
   buttons[1].setAttribute("disabled", true);
   if (playerdata.library.length > 1) {
-    if (playerdata.libraryIndex > 0) {
-      buttons[0].removeAttribute("disabled");
-    }
+    if (playerdata.libraryIndex > 0) buttons[0].removeAttribute("disabled");
     if (playerdata.libraryIndex < playerdata.library.length - 1) {
       buttons[1].removeAttribute("disabled");
     }
@@ -532,131 +513,4 @@ function toggleDropdown(button) {
   // }
 
   button.classList.toggle("activated");
-}
-
-// news
-
-class Headline {
-  constructor(line1, line2) {
-    let div = divContainingTemplate("template-news-headline");
-    ui.storefront.news.appendChild(div);
-
-    let l1 = div.querySelector("[name='line1']");
-    let l2 = div.querySelector("[name='line2']");
-
-    if (line1) l1.textContent = line1;
-    if (line2) l2.textContent = line2;
-
-    const sceneHidden = ui.scenes.storefront.classList.contains("hidden");
-    if (sceneHidden) ui.scenes.storefront.classList.remove("hidden");
-    this.squeeze(l1.parentNode);
-    this.squeeze(l2.parentNode);
-    if (sceneHidden) ui.scenes.storefront.classList.add("hidden");
-  }
-
-  squeeze(element) {
-    let xscale = element.clientWidth / element.scrollWidth;
-    if (xscale < 1) {
-      element.style.transform = "scaleX("+xscale+")";
-    }
-  }
-}
-
-class Prices {
-  constructor() {
-    let div = divContainingTemplate("template-news-prices");
-    div.style.position = "relative";
-
-    ui.storefront.news.appendChild(div);
-
-    //
-
-    let graph = div.querySelector(".prices-graph");
-    let pointsholder = div.querySelector(".points-holder");
-    let points = ["0", ".25", ".5", ".75", "1"];
-    let divrect = div.getBoundingClientRect();
-    for (let point of points) {
-      let label = document.createElement("span");
-      label.textContent = point;
-      label.className = "graphvaluepoint";
-      label.style.bottom = (Number(point) * 100)+"%";
-      pointsholder.appendChild(label);
-
-      let rect = label.getBoundingClientRect();
-      let line = document.createElement("div");
-      line.className = "graphline";
-      line.style.top = (rect.top - divrect.top)+"px";
-
-      div.appendChild(line);
-    }
-
-    let abcprices = playerdata.prices;
-    let abc = "abcdefghijklmnopqrstuvwxyz";
-    for (let i=0; i<abc.length; i++) {
-      let char = abc[i];
-      let label = document.createElement("span");
-      label.textContent = char;
-      label.classList.add("graphlabel");
-      label.style.gridColumnStart = i+2;
-      label.style.gridRowStart = 2;
-      graph.appendChild(label);
-
-      let p = abcprices[char];
-      let currentPrice = p[p.length - 1];
-      let previousPrice = p[p.length - 2];
-      let diff = currentPrice - previousPrice;
-
-      let bar = document.createElement("div");
-      bar.style.height = (currentPrice * 100)+"%";
-      bar.style.gridRowStart = 1;
-      bar.style.gridColumnStart = i+2;
-      if (diff > 0) {
-        bar.className = "graphbar positive";
-      } else if (diff == 0) {
-        bar.className = "graphbar";
-      } else {
-        bar.className = "graphbar negative";
-      }
-      graph.appendChild(bar);
-
-      if (diff != 0) {
-        let cbar = document.createElement("div");
-        cbar.style.height = (previousPrice * 100)+"%";
-        cbar.style.gridRowStart = 1;
-        cbar.style.gridColumnStart = i+2;
-        if (diff > 0) {
-          cbar.className = "graphbar past positive";
-        } else {
-          cbar.className = "graphbar past negative";
-        }
-        graph.appendChild(cbar);
-      }
-
-      let hoverarea = document.createElement("div");
-      hoverarea.style.gridRowStart = 1;
-      hoverarea.style.gridRowEnd = 3;
-      hoverarea.style.gridColumnStart = i+2;
-      hoverarea.style.zIndex = 10;
-      hoverarea.style.position = "relative";
-
-      let tooltip = document.createElement("div");
-      tooltip.innerHTML = char+"<br><span class='burgerpoints'></span>"+currentPrice.toFixed(2);
-      if (diff != 0) {
-        diff = diff.toFixed(2);
-        tooltip.innerHTML += " <span style='color:"+(diff > 0 ? "var(--graph-positive)'>↑" : "var(--graph-negative)'>↓")+Math.abs(diff)+"</span>";
-      }
-
-      tooltip.className = "tooltip gone";
-      hoverarea.appendChild(tooltip);
-
-      hoverarea.addEventListener("mouseover", function() {
-        this.firstElementChild.classList.remove("gone");
-      });
-      hoverarea.addEventListener("mouseout", function() {
-        this.firstElementChild.classList.add("gone");
-      });
-
-      graph.appendChild(hoverarea);
-    }
-  }
 }

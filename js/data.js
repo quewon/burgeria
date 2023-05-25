@@ -48,8 +48,8 @@ function init_default_playerdata() {
     playerdata.letters[char]++;
   }
 
-  const piece1 = new Piece("ahhhhhhhh\n\ni'm a long way from home\n\nthere was so much i wanted to tell you");
-  const piece2 = new Piece();
+  const piece1 = new WorkshopPiece("ahhhhhhhh\n\ni'm a long way from home\n\nthere was so much i wanted to tell you");
+  const piece2 = new WorkshopPiece();
   piece1.addToWorkshop();
   piece2.addToWorkshop();
 

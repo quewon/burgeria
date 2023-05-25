@@ -229,7 +229,6 @@ h2 {
 .block .buttonbar {
   width: 100%;
   position: absolute;
-  left: 0;
   height: 1.5rem;
 }
 .buttonbar.bottom {
@@ -243,6 +242,16 @@ h2 {
 }
 .buttonbar.top button {
   border-top: none;
+}
+.buttonbar.right {
+  right: 0;
+  justify-content: end;
+}
+.buttonbar.right button {
+  border-left: 1px solid var(--lines);
+}
+.buttonbar.right button:not(:first-child) {
+  border-left: none;
 }
 
 .tray main {
@@ -282,6 +291,10 @@ button {
   padding: 0;
   padding-left: .7ch;
   padding-right: .7ch;
+
+  user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 button:disabled {
   opacity: .2;
