@@ -170,7 +170,7 @@ h2 {
 #tray-generator {
   width: 100%;
   height: 10rem;
-  opacity: 0;
+  opacity: .2;
   border-style: dashed;
   font-style: italic;
   background: transparent;

@@ -23,7 +23,7 @@ class Tray {
       let col = new Collection(this, con, sidename);
       col.capacity = Number(con.dataset.capacity);
       con.dataset.containerValue = 2;
-      con.dataset.trayId = this.index;
+      con.dataset.index = this.index;
       con.dataset.side = col.side;
       con.addEventListener("mouseenter", function(e) {
         let item = _dragdrop.itemInHand;
@@ -33,9 +33,9 @@ class Tray {
 
         let tray;
         if (!this.classList.contains("preview")) {
-          tray = game.trays[this.dataset.trayId];
+          tray = game.trays[this.dataset.index];
         } else {
-          tray = playerdata.recipes[this.dataset.trayId].tray;
+          tray = playerdata.recipes[this.dataset.index].tray;
         }
 
         tray.openGlobalBlock("ministock", tray.stockbutton);
@@ -57,7 +57,7 @@ class Tray {
         if (!item) return;
 
         if (this.classList.contains("preview")) {
-          const recipe = playerdata.recipes[this.dataset.trayId];
+          const recipe = playerdata.recipes[this.dataset.index];
           recipe.update();
         }
 
@@ -664,9 +664,9 @@ class Item {
       let tray;
       let recipe;
       if (!parent.classList.contains("preview")) {
-        tray = game.trays[parent.dataset.trayId];
+        tray = game.trays[parent.dataset.index];
       } else {
-        recipe = playerdata.recipes[parent.dataset.trayId];
+        recipe = playerdata.recipes[parent.dataset.index];
         tray = recipe.tray;
       }
 
