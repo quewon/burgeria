@@ -1,3 +1,20 @@
+function deleteRecipe() {
+  playerdata.recipes[game.recipeIndex].delete();
+  sfx('click');
+}
+
+function createNewRecipe() {
+  new Recipe({ name: 'Untitled Burger', addToMenu: true, open: true });
+  updateRecipes();
+}
+
+function renameRecipe() {
+  sfx('click');
+  playerdata.recipes[game.recipeIndex].startRename();
+}
+
+var recipeRotation = 0;
+
 class RecipeTray extends Tray {
   constructor(construction) {
     super(true);
@@ -10,6 +27,36 @@ class RecipeTray extends Tray {
         for (let itemname of side) {
           new Item(itemname, this.collections[sidename]);
         }
+      }
+    }
+  }
+
+  addMesh(item, col) {
+    switch (col.side) {
+      case "burger":
+        item.mesh.position.set(1.5, 0, 0);
+        break;
+      case "drink":
+        item.mesh.position.set(-1.5, 0, 1);
+        break;
+      case "side":
+        item.mesh.position.set(-1.5, 0, -1);
+        break;
+    }
+
+    this.mesh.add(item.mesh);
+    item.ground = col.groundheight;
+    col.groundheight += item.height;
+    item.mesh.position.y = item.ground;
+  }
+
+  resetMeshes() {
+    this.mesh.rotation.y = recipeRotation;
+    for (let side in this.collections) {
+      const col = this.collections[side];
+      for (let item of col.items) {
+        item.mesh.position.y = item.ground;
+        item.velocity = 0;
       }
     }
   }
@@ -113,15 +160,15 @@ class Recipe {
   }
 
   addToMenu() {
-    this.id = playerdata.recipes.length;
+    this.index = playerdata.recipes.length;
 
     this.element = document.createElement("li");
-    this.element.id = this.id;
+    this.element.index = this.index;
     let button = document.createElement("button");
     button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
-    button.dataset.id = this.id;
+    button.dataset.index = this.index;
     button.onclick = function(e) {
-      const recipe = playerdata.recipes[this.dataset.id];
+      const recipe = playerdata.recipes[this.dataset.index];
       recipe.previewRecipe();
     }
     this.element.appendChild(button);
@@ -131,14 +178,14 @@ class Recipe {
     this.input.className = "gone";
     this.input.type = "text";
     this.input.value = this.name;
-    this.input.dataset.id = this.id;
+    this.input.dataset.index = this.index;
     this.input.addEventListener("blur", function(e) {
-      const recipe = playerdata.recipes[this.dataset.id];
+      const recipe = playerdata.recipes[this.dataset.index];
       recipe.rename();
     });
     this.input.addEventListener("keydown", function(e) {
       if (e.key == "Enter") {
-        const recipe = playerdata.recipes[this.dataset.id];
+        const recipe = playerdata.recipes[this.dataset.index];
         recipe.rename();
       }
     });
@@ -146,10 +193,10 @@ class Recipe {
 
     playerdata.recipes.push(this);
 
-    this.tray.id = this.id;
+    this.tray.index = this.index;
     for (let side in this.tray.collections) {
       const el = this.tray.collections[side].element;
-      el.dataset.trayId = this.tray.id;
+      el.dataset.trayId = this.tray.index;
     }
   }
 
@@ -161,9 +208,13 @@ class Recipe {
     }
   }
 
-  previewRecipe(dontClose) {
-    if (!dontClose && game.recipeIndex < playerdata.recipes.length) playerdata.recipes[game.recipeIndex].closePreview();
-    game.recipeIndex = this.id;
+  previewRecipe() {
+    if (game.recipeIndex < playerdata.recipes.length) {
+      var previousRecipe = playerdata.recipes[game.recipeIndex];
+      previousRecipe.closePreview();
+      recipeRotation = previousRecipe.tray.mesh.rotation.y;
+    }
+    game.recipeIndex = this.index;
 
     this.button.classList.add("selected");
     this.button.setAttribute("disabled", true);
@@ -261,17 +312,16 @@ class Recipe {
   }
 
   delete() {
-    spliceIndexedObject(playerdata.recipes, this.id, function(recipe) {
-      recipe.button.dataset.id = recipe.id;
-      recipe.input.dataset.id = recipe.id;
+    spliceIndexedObject(playerdata.recipes, this.index, function(recipe) {
+      recipe.button.dataset.index = recipe.index;
+      recipe.input.dataset.index = recipe.index;
     });
-    
+
     this.element.remove();
 
     if (playerdata.recipes.length == 0) {
-      const newRecipe = new Recipe({ addToMenu: true });
+      const newRecipe = new Recipe({ name: 'Untitled Burger', addToMenu: true, open: true });
       updateRecipes();
-      newRecipe.previewRecipe(true);
     } else {
       updateRecipes();
 

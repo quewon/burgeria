@@ -174,13 +174,11 @@ class Tray {
   }
 
   resetMeshes() {
-    const editmode = ui.storefront.recipePreview.classList.contains("editmode");
-
     this.mesh.rotation.y = 0;
     for (let side in this.collections) {
       const col = this.collections[side];
       for (let item of col.items) {
-        item.mesh.position.y = editmode ? item.ground : 7 + item.ground;
+        item.mesh.position.y = 7 + item.ground;
         item.velocity = 0;
       }
     }
