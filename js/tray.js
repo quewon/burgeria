@@ -122,6 +122,12 @@ class Tray {
   }
 
   updateGlobalBlockPosition(block, button) {
+    if (ui.currentScene != "storefront") {
+      var currentScene = ui.scenes[ui.currentScene];
+      currentScene.classList.add("hidden");
+      ui.scenes.storefront.classList.remove("hidden");
+    }
+
     const parent = ui.storefront[block+"Tray"];
 
     if (parent != this) return;
@@ -129,6 +135,12 @@ class Tray {
     let rect = button.getBoundingClientRect();
     ui.storefront[block].style.left = (rect.left + window.scrollX)+"px";
     ui.storefront[block].style.top = (rect.bottom + window.scrollY)+"px";
+
+    if (ui.currentScene != "storefront") {
+      var currentScene = ui.scenes[ui.currentScene];
+      currentScene.classList.remove("hidden");
+      ui.scenes.storefront.classList.add("hidden");
+    }
   }
 
   toggleGlobalBlock(block, button) {

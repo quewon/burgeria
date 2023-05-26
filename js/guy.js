@@ -1,50 +1,51 @@
+var ARCHETYPES = [
+  {
+    name: "fish",
+    source: "img/fish.png",
+    chime: 0,
+    complexity: 0,
+    talkInterval: .7,
+    voice: "ka"
+  },
+  {
+    name: "dog",
+    source: "img/dog.png",
+    chime: 0,
+    complexity: 1,
+    talkInterval: 1.5,
+    voice: "wa"
+  },
+  {
+    name: "monkeey",
+    source: "img/monkey.png",
+    chime: 1,
+    complexity: 1,
+    talkInterval: 1,
+    voice: "pa"
+  },
+  {
+    name: "cat",
+    source: "img/cat.png",
+    chime: 2,
+    complexity: 2,
+    talkInterval: 2,
+    voice: "pa"
+  },
+  {
+    name: "mouse",
+    source: "img/mouse.png",
+    chime: 3,
+    complexity: 3,
+    talkInterval: .5,
+    voice: "wa"
+  },
+];
+
 class Guy {
   constructor() {
     this.id = game.guys.length;
 
-    const archs = [
-      {
-        name: "cat",
-        source: "img/cat.png",
-        chime: 0,
-        complexity: 2,
-        talkInterval: 2,
-        voice: "pa"
-      },
-      {
-        name: "fish",
-        source: "img/fish.png",
-        chime: 1,
-        complexity: 0,
-        talkInterval: .7,
-        voice: "ka"
-      },
-      {
-        name: "monkeey",
-        source: "img/monkey.png",
-        chime: 2,
-        complexity: 1,
-        talkInterval: 1,
-        voice: "pa"
-      },
-      {
-        name: "mouse",
-        source: "img/mouse.png",
-        chime: 3,
-        complexity: 3,
-        talkInterval: .5,
-        voice: "wa"
-      },
-      {
-        name: "dog",
-        source: "img/dog.png",
-        chime: 0,
-        complexity: 1,
-        talkInterval: 1.5,
-        voice: "wa"
-      }
-    ];
-    const arch = archs[Math.random() * archs.length | 0];
+    const arch = ARCHETYPES[Math.random() * ARCHETYPES.length | 0];
 
     //
 
@@ -93,6 +94,8 @@ class Guy {
     this.currentTalkInterval = 20 + 10 * this.talkInterval;
     this.voice = arch.voice;
     this.soundId = null;
+
+    this.active = true;
 
     _sounds.chime[arch.chime].play();
 
@@ -287,6 +290,8 @@ class Guy {
   }
 
   draw() {
+    if (!this.active) return;
+
     if (this.words.length == 0) {
       if (this.rejected) {
         this.delete();
@@ -342,13 +347,15 @@ class Guy {
   }
 
   delete() {
+    this.active = false;
+
     this.element.remove();
 
     // check: am i done serving everybody?
     // if so, allow player to start the day up again!
     if (game.storetime == -1) {
       for (let guy of game.guys) {
-        if (!guy.served && !guy.rejected) return;
+        if (guy.active) return;
       }
       game.beginDay();
     }

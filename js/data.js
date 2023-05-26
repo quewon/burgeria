@@ -2,16 +2,11 @@ var playerdata;
 
 function init_default_playerdata() {
   playerdata = {
-    // daytime: true, //
     day: 1,
-    // storetime: -1, //
     prices: {},
     recipes: [],
-    // trays: [], //
-    // guys: [], //
 
     points: 0,
-    // unbankedPoints: 0, //
     bankbook: [],
     inventory: new Collection(),
     letters: {},
@@ -22,6 +17,8 @@ function init_default_playerdata() {
     libraryIndex: 0,
 
     themeIndex: 0,
+
+    volume: .2
   }
 
   playerdata.points = 10;
@@ -48,7 +45,7 @@ function init_default_playerdata() {
     playerdata.letters[char]++;
   }
 
-  const piece1 = new WorkshopPiece("ahhhhhhhh\n\ni'm a long way from home\n\nthere was so much i wanted to tell you");
+  const piece1 = new WorkshopPiece("i'm a long way from home\nthere was so much i wanted to tell you");
   const piece2 = new WorkshopPiece();
   piece1.addToWorkshop();
   piece2.addToWorkshop();
@@ -69,41 +66,41 @@ function init_default_playerdata() {
     geometry: "patty",
     color: 0x8b4513
   });
-  new Ingredient({
-    name: "ketchup",
-    geometry: "condiment",
-    color: 0xff0000
-  });
-  new Ingredient({
-    name: "pickle",
-    geometry: "pickle",
-    color: 0x3CB371
-  });
+  // new Ingredient({
+  //   name: "ketchup",
+  //   geometry: "condiment",
+  //   color: 0xff0000
+  // });
+  // new Ingredient({
+  //   name: "pickle",
+  //   geometry: "pickle",
+  //   color: 0x3CB371
+  // });
   new Ingredient({
     name: "onion",
     geometry: "onion",
     color: 0xffffe0,
   });
-  new Ingredient({
-    name: "cheese",
-    geometry: "cheese",
-    color: 0xffd700
-  });
-  new Ingredient({
-    name: "tomato",
-    geometry: "tomato",
-    color: 0xff0000
-  });
-  new Ingredient({
-    name: "lettuce",
-    geometry: "lettuce",
-    color: 0x90ee90
-  });
-  new Ingredient({
-    name: "mayo",
-    geometry: "condiment",
-    color: 0xffffe0
-  });
+  // new Ingredient({
+  //   name: "cheese",
+  //   geometry: "cheese",
+  //   color: 0xffd700
+  // });
+  // new Ingredient({
+  //   name: "tomato",
+  //   geometry: "tomato",
+  //   color: 0xff0000
+  // });
+  // new Ingredient({
+  //   name: "lettuce",
+  //   geometry: "lettuce",
+  //   color: 0x90ee90
+  // });
+  // new Ingredient({
+  //   name: "mayo",
+  //   geometry: "condiment",
+  //   color: 0xffffe0
+  // });
 
   new Ingredient({
     name: "fries",
@@ -165,4 +162,6 @@ function init_default_playerdata() {
     },
     addToMenu: true
   });
+
+  Howler.volume(playerdata.volume);
 }

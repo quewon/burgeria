@@ -61,6 +61,8 @@ var ui = {
       overtimeMessage: document.getElementById("burgeria-overtime-message"),
       counter: document.getElementById("day-counter"),
     },
+    lettersList: document.getElementById("storefront-letters-list"),
+    lettersContainer: document.getElementById("storefront-letters-list-block")
   },
   "kitchen": {
     sceneButton: document.getElementById("kitchen-scene-button"),
@@ -119,12 +121,15 @@ function setScene(name) {
   ui.currentScene = name;
   ui.currentSceneLabel.textContent = name;
 
-  if (name == "kitchen") {
-    ui.kitchen.lettersContainer.classList.add("gone");
-    ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.offsetWidth+"px";
-    ui.kitchen.bankbook.parentNode.scrollTop = ui.kitchen.bankbook.parentNode.scrollHeight;
-  } else if (name == "workshop") {
-    ui.workshop.textarea.focus();
+  switch (name) {
+    case "kitchen":
+      ui.kitchen.lettersContainer.classList.add("gone");
+      ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.offsetWidth+"px";
+      ui.kitchen.bankbook.parentNode.scrollTop = ui.kitchen.bankbook.parentNode.scrollHeight;
+      break;
+    case "workshop":
+      ui.workshop.textarea.focus();
+      break;
   }
 }
 
@@ -469,6 +474,7 @@ function addEmptyLabel(element) {
 function updateBankbook() {
   const table = ui.kitchen.bankbook;
   const bankbook = playerdata.bankbook;
+  const label = ui.kitchen.bankbookLabel;
 
   while (table.lastElementChild) {
     table.lastElementChild.remove();
@@ -492,6 +498,8 @@ function updateBankbook() {
     }
     table.appendChild(tr);
   }
+
+  ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.getBoundingClientRect().width+"px";
 }
 
 function toggleDropdown(button) {

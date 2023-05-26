@@ -178,18 +178,20 @@ class Recipe {
     this.input.className = "gone";
     this.input.type = "text";
     this.input.value = this.name;
-    this.input.dataset.index = this.index;
+    this.input.dataset.recipeIndex = this.index;
     this.input.addEventListener("blur", function(e) {
-      const recipe = playerdata.recipes[this.dataset.index];
+      const recipe = playerdata.recipes[this.dataset.recipeIndex];
       recipe.rename();
     });
     this.input.addEventListener("keydown", function(e) {
       if (e.key == "Enter") {
-        const recipe = playerdata.recipes[this.dataset.index];
+        const recipe = playerdata.recipes[this.dataset.recipeIndex];
         recipe.rename();
       }
     });
     this.element.appendChild(this.input);
+
+    this.inputManager = new InputManager(this.input, this.name);
 
     playerdata.recipes.push(this);
 
@@ -312,6 +314,8 @@ class Recipe {
   }
 
   delete() {
+    this.inputManager.delete();
+
     spliceIndexedObject(playerdata.recipes, this.index, function(recipe) {
       recipe.button.dataset.index = recipe.index;
       recipe.input.dataset.index = recipe.index;
@@ -343,6 +347,7 @@ class Recipe {
     this.input.classList.remove("gone");
     this.button.classList.add("gone");
     this.input.focus();
+    ui.storefront.lettersContainer.classList.remove("gone");
   }
 
   rename(value) {
@@ -352,6 +357,7 @@ class Recipe {
 
     this.input.classList.add("gone");
     this.button.classList.remove("gone");
+    ui.storefront.lettersContainer.classList.add("gone");
   }
 
   update() {

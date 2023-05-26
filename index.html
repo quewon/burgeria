@@ -12,7 +12,7 @@
 
     <header>
       <h1 onclick="setScene('workshop');">BURGERIA!</h1>
-      <h2 class="top right">이게 바로 버거야!<br>버거리아</h2>
+      <!-- <h2 class="top right">이게 바로 버거야!<br>버거리아</h2> -->
     </header>
 
     <div id="navbar" class="block">
@@ -76,6 +76,12 @@
             <button class="top right" id="menu-edit-button" onclick="toggleMenuEditMode(); sfx('click');" title="toggle edit mode">✎</button>
           </div>
         </div>
+
+        <div class="block dashed attached-above gone" id="storefront-letters-list-block">
+          <b>INK</b>
+          <ul id="storefront-letters-list" class="flexbox"></ul>
+        </div>
+
         <div id="guys-container" class="flexbox wrap attached-above marginbelow">
         </div>
 
@@ -167,8 +173,7 @@
             </div>
             <div id="kitchen-letterstock" class="block attached-above">
               <b>INK</b>
-              <ul id="kitchen-letters-list" class="flexbox">
-              </ul>
+              <ul id="kitchen-letters-list" class="flexbox"></ul>
             </div>
           </div>
 
@@ -226,9 +231,9 @@
             <div class="dropdown-container">
               <button class="dropdown-anchor" onclick="toggleDropdown(this);">edit</button>
               <div class="dropdown">
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].undo();">undo</button>
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].redo();">redo</button>
-                <button onclick="playerdata.workshop[playerdata.workshopIndex].clear();">clear piece</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].inputManager.undo();">undo</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].inputManager.redo();">redo</button>
+                <button onclick="playerdata.workshop[playerdata.workshopIndex].inputManager.clear();">clear piece</button>
                 <!-- <button>copy selected</button> -->
                 <!-- <button>cut selected</button> -->
                 <!-- <button>paste text in clipboard</button> -->
@@ -272,10 +277,18 @@
         </div>
       </div>
       <div class="column">
+        <!-- <div class="block transparent">
+          <img data-latesrc="img/letter_closed.png" alt="a closed envelope">
+          <button class="center">open letter</button>
+        </div>
+
+        <div class="block transparent" style="position: relative; line-height: 0;">
+          <p class="block" style="border: 1px solid var(--borders); background: var(--newsgray); margin: 0; line-height: 1rem;"><span>ahaha</span><br><span style="display: block; width: 100%; text-align: center; margin-top: var(--gap)"><button>close letter</button></span></p>
+        </div> -->
+
         <div class="block transparent">
           <b>INK</b>
-          <ul id="workshop-letters-list" class="flexbox">
-          </ul>
+          <ul id="workshop-letters-list" class="flexbox"></ul>
         </div>
       </div>
     </div>
@@ -539,7 +552,8 @@
   <script type="text/javascript" src="js/tray.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
 
-  <script type="text/javascript" src="js/workshop.js"></script>
+  <script type="text/javascript" src="js/input.js"></script>
+  <script type="text/javascript" src="js/piece.js"></script>
 
   <script type="text/javascript" src="js/guy.js"></script>
   <script type="text/javascript" src="js/news.js"></script>
@@ -559,7 +573,7 @@
       });
 
       // workshop
-      updateList(ui.workshop.lettersList, playerdata.letters);
+      updateLettersLists();
       setScene("workshop");
 
       // storefront
@@ -578,7 +592,6 @@
       updatePoints();
       updateBankbook();
       updateRecipes();
-      updateList(ui.kitchen.lettersList, playerdata.letters);
       updateBookshelf();
 
       //
@@ -586,7 +599,10 @@
       window.addEventListener("resize", function() {
         if (ui.storefront.ministockTray) ui.storefront.ministockTray.updateGlobalBlockPosition("ministock", ui.storefront.ministockTray.stockbutton)
         if (ui.storefront.guysListTray) ui.storefront.guysListTray.updateGlobalBlockPosition("guysList", ui.storefront.guysListTray.sendbutton)
+        ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.getBoundingClientRect().width+"px";
       });
+
+      ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.getBoundingClientRect().width+"px";
 
       animate();
       setInterval(update, 1);

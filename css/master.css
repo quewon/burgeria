@@ -869,7 +869,7 @@ span[name="title"] {
 #workshop-textarea {
   /* border-bottom: none; */
 }
-#workshop-textarea.rejected {
+.rejected {
   color: var(--burgeria);
   outline-style: solid;
   outline-color: var(--burgeria);
