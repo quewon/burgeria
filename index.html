@@ -171,7 +171,7 @@
             <h1 class="marginbelow">R&D</h1>
             <div class="flexbox gap">
               <b>develop new ingredient</b>
-              <input type="text" name="" value="" placeholder="click here to start developing...">
+              <input type="text" name="" value="" placeholder="Click here to start developing...">
             </div>
           </div>
         </div>
@@ -252,7 +252,7 @@
             <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
             <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal(); ui.dialogs['help-burgeria-canvas'].activate();">about <em>Burgeria!</em></button>
           </div>
-          <textarea id="workshop-textarea" placeholder="click here to start writing..."></textarea>
+          <textarea id="workshop-textarea" placeholder="Click here to start writing..."></textarea>
         </div>
 
         <div class="block">
@@ -283,6 +283,10 @@
     </div>
 
     <div id="scene-facade" class="scene">
+      <div class="center" style="text-align: center; background: var(--bg)">
+        <i style="opacity: .5;">Display the words that you want to share.<br>Customers will see them before they enter.</i>
+      </div>
+
       <div class="block transparent">
         <div class="dropdown-container">
           <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>

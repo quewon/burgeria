@@ -1072,7 +1072,6 @@ dialog.piece {
   border-color: var(--newsgray);
   overflow: hidden;
   resize: both;
-  z-index: -1;
 }
 .facadepiece.dragging {
 }

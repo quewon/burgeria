@@ -440,6 +440,8 @@ class FacadePiece {
     message.style.paddingRight = "calc(1.5rem + var(--padding))";
     message.appendChild(closebutton);
     ui.scenes.facade.appendChild(message);
+
+    updateFacadeList();
   }
 
   drag() {
