@@ -400,6 +400,7 @@ class FacadePiece {
     this.element = div;
     this.block = block;
     this.ghost = ghost;
+    this.returnbutton = returnbutton;
   }
 
   resize() {
