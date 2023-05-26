@@ -4,7 +4,7 @@ function deleteRecipe() {
 }
 
 function createNewRecipe() {
-  new Recipe({ name: 'Untitled Burger', addToMenu: true, open: true });
+  new Recipe({ addToMenu: true, open: true });
   updateRecipes();
 }
 
@@ -211,6 +211,8 @@ class Recipe {
   }
 
   previewRecipe() {
+    ui.storefront.lettersContainer.classList.add("gone");
+
     if (game.recipeIndex < playerdata.recipes.length) {
       var previousRecipe = playerdata.recipes[game.recipeIndex];
       previousRecipe.closePreview();
@@ -314,6 +316,7 @@ class Recipe {
   }
 
   delete() {
+    this.inputManager.clear();
     this.inputManager.delete();
 
     spliceIndexedObject(playerdata.recipes, this.index, function(recipe) {
@@ -324,7 +327,7 @@ class Recipe {
     this.element.remove();
 
     if (playerdata.recipes.length == 0) {
-      const newRecipe = new Recipe({ name: 'Untitled Burger', addToMenu: true, open: true });
+      const newRecipe = new Recipe({ addToMenu: true, open: true });
       updateRecipes();
     } else {
       updateRecipes();
@@ -341,6 +344,8 @@ class Recipe {
         }
       }
     }
+
+    ui.storefront.lettersContainer.classList.remove("gone");
   }
 
   startRename() {

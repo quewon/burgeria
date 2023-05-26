@@ -231,6 +231,10 @@ function toggleMenuEditMode() {
     tray.toggleGlobalBlock("ministock", tray.stockbutton);
   }
 
+  if (!preview.classList.contains("editmode")) {
+    ui.storefront.lettersContainer.classList.add("gone");
+  }
+
   // if (!preview.classList.contains("editmode")) {
   //   for (let i=playerdata.recipes.length-1; i>=0; i--) {
   //     const recipe = playerdata.recipes[i];
