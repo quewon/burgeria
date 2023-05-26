@@ -248,6 +248,12 @@ class InputManager {
     updateLettersLists();
   }
 
+  burn() {
+    this.history = [];
+    this.newState();
+    if (this.oninput) this.oninput();
+  }
+
   delete() {
     this.clear();
 

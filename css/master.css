@@ -152,8 +152,11 @@ h2 {
   border-bottom: none;
   border-right: none;
 }
-#storefront-scene-button {
-  border-right: 1px solid var(--burgeria) !important;
+#navbar button:first-child {
+  border-left: none;
+}
+#navbar button:last-child {
+  border-right: none;
 }
 
 .menu b {
@@ -483,7 +486,7 @@ li button {
   -ms-user-select: none;
   -webkit-user-select: none;
 }
-.draggable:hover {
+li.draggable:hover {
   background: var(--burgeria);
   color: var(--bg);
 }
@@ -1058,4 +1061,38 @@ dialog.piece {
 .capscroll {
   max-height: 15rem;
   overflow-y: scroll;
+}
+
+.facadepiece {
+  width: 15rem;
+  height: 15rem;
+  min-width: 10rem;
+  min-height: 5rem;
+  position: absolute;
+  border-color: var(--newsgray);
+  overflow: hidden;
+  resize: both;
+  z-index: -1;
+}
+.facadepiece.dragging {
+}
+.facadepiece.ghost {
+  background: transparent;
+  border-color: var(--burgeria);
+}
+
+.facadepiece p {
+  position: absolute;
+  top: 0;
+  padding-top: calc(1.5rem + var(--padding));
+  width: 100%;
+  height: 100%;
+  border: none;
+  /* overflow-y: scroll; */
+  box-sizing: border-box;
+}
+
+#facade-list {
+  translate: 0 -1px;
+  width: max-content;
 }

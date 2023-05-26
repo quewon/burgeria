@@ -29,14 +29,15 @@ var ui = {
     "feedback-napkin": document.getElementById("template-feedback-napkin"),
     "writing-alert": document.getElementById("template-writing-alert"),
     "market-alert": document.getElementById("template-market-alert"),
+    "facade-piece": document.getElementById("template-facade-piece")
   },
   scenes: {
     "storefront": document.getElementById("scene-storefront"),
     "kitchen": document.getElementById("scene-kitchen"),
-    "workshop": document.getElementById("scene-workshop")
+    "workshop": document.getElementById("scene-workshop"),
+    "facade": document.getElementById("scene-facade")
   },
   currentScene: "storefront",
-  currentSceneLabel: document.getElementById("current-scene-label"),
   themeName: document.getElementById("theme-name"),
   "storefront": {
     sceneButton: document.getElementById("storefront-scene-button"),
@@ -97,6 +98,10 @@ var ui = {
     wordsCount: document.getElementById("workshop-words"),
     lettersCount: document.getElementById("workshop-letters"),
     kitchenLibraryButton: document.getElementById("market-library-button")
+  },
+  "facade": {
+    sceneButton: document.getElementById("facade-scene-button"),
+    list: document.getElementById("facade-list")
   }
 };
 
@@ -119,10 +124,15 @@ function setScene(name) {
     }
   }
   ui.currentScene = name;
-  ui.currentSceneLabel.textContent = name;
+
+  var temps = document.getElementsByClassName("temp");
+  for (let i=temps.length-1; i>=0; i--) {
+    temps[i].remove();
+  }
 
   switch (name) {
     case "kitchen":
+      if (playerdata.library.length == 0) ui.kitchen.libraryBlock.classList.add("gone");
       ui.kitchen.lettersContainer.classList.add("gone");
       ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.offsetWidth+"px";
       ui.kitchen.bankbook.parentNode.scrollTop = ui.kitchen.bankbook.parentNode.scrollHeight;
@@ -210,9 +220,12 @@ function updateBookshelf(dontHideLibrary) {
   createSystemBook(ui.kitchen.bankbookBlock, "bankbook", "✸");
   createSystemBook(ui.kitchen.inventoryBlock, "stock", "☰");
   createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
-  if (playerdata.library.length == 0) {
-    const book = createSystemBook(ui.kitchen.libraryBlock, "library", "");
-    if (!dontHideLibrary) book.onclick();
+  // if (playerdata.library.length == 0) {
+  //   const book = createSystemBook(ui.kitchen.libraryBlock, "library", "");
+  //   if (!dontHideLibrary) book.onclick();
+  // }
+  if (!dontHideLibrary) {
+    ui.kitchen.libraryBlock.classList.add("gone");
   }
 
   for (let book of playerdata.library) {
@@ -504,6 +517,75 @@ function updateBankbook() {
   }
 
   ui.kitchen.bankbookLabel.style.width = ui.kitchen.bankbook.getBoundingClientRect().width+"px";
+}
+
+function updateFacadeList() {
+  const list = ui.facade.list;
+
+  const workshopList = list.querySelector("[name='workshop']");
+  const workshopEmptyMessage = list.querySelector("[name='workshop-none']")
+  while (workshopList.lastElementChild) {
+    workshopList.lastElementChild.remove();
+  }
+
+  var workshopPiecesListed = 0;
+  for (let piece of playerdata.workshop) {
+    if (piece.lettersCount() == 0) continue;
+    workshopPiecesListed++;
+
+    var li = document.createElement("li");
+
+    var button = document.createElement("button");
+    button.textContent = piece.title;
+    button.dataset.index = piece.index;
+    button.onclick = function() {
+      const piece = playerdata.workshop[this.dataset.index];
+      new FacadePiece(piece.text, "workshop");
+      piece.inputManager.burn();
+      piece.removeFromWorkshop();
+      updateFacadeList();
+    }
+    li.appendChild(button);
+
+    workshopList.appendChild(li);
+  }
+
+  if (workshopPiecesListed == 0) {
+    workshopEmptyMessage.classList.remove("gone");
+  } else {
+    workshopEmptyMessage.classList.add("gone");
+  }
+
+  const libraryList = list.querySelector("[name='library']");
+  const libraryEmptyMessage = list.querySelector("[name='library-none']");
+  if (playerdata.library.length > 0) {
+    libraryList.classList.remove("gone");
+    libraryEmptyMessage.classList.add("gone");
+
+    while (libraryList.lastElementChild) {
+      libraryList.lastElementChild.remove();
+    }
+
+    for (let piece of playerdata.library) {
+      var li = document.createElement("li");
+
+      var button = document.createElement("button");
+      button.textContent = piece.title;
+      button.dataset.index = piece.index;
+      button.onclick = function() {
+        const piece = playerdata.library[this.dataset.index];
+        new FacadePiece(piece.text, "library");
+        piece.removeFromLibrary();
+        updateFacadeList();
+      }
+      li.appendChild(button);
+
+      libraryList.appendChild(li);
+    }
+  } else {
+    libraryList.classList.add("gone");
+    libraryEmptyMessage.classList.remove("gone");
+  }
 }
 
 function toggleDropdown(button) {

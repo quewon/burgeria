@@ -16,6 +16,8 @@ function init_default_playerdata() {
     library: [],
     libraryIndex: 0,
 
+    facade: [],
+
     themeIndex: 0,
 
     volume: .2
@@ -41,7 +43,7 @@ function init_default_playerdata() {
     playerdata.letters[char] = 0;
   }
 
-  for (let char of "abcde") {
+  for (let char of "aeiou") {
     playerdata.letters[char]++;
   }
 

@@ -701,3 +701,49 @@ class Item {
     this.dragGhost.classList.add("gone");
   }
 }
+
+var _dragdrop = {
+  itemInHand: null,
+  facadePieceInHand: null,
+  mouse: { x:0, y:0, xp: 0, yp: 0 }
+};
+
+function init_dragdrop() {
+  window.addEventListener("mousemove", function(e) {
+    let x = e.pageX;
+    let y = e.pageY;
+    _dragdrop.mouse.x = x;
+    _dragdrop.mouse.y = y;
+    _dragdrop.mouse.xp = x/document.documentElement.clientWidth * 100;
+    _dragdrop.mouse.yp = y/document.documentElement.clientHeight * 100;
+
+    let item = _dragdrop.itemInHand;
+    if (item) {
+      let ghost = item.dragGhost;
+      ghost.style.left = x+"px";
+      ghost.style.top = y+"px";
+    }
+
+    let piece = _dragdrop.facadePieceInHand;
+    if (piece) {
+      piece.moveToMouse();
+    }
+  });
+
+  function mouseup() {
+    let grabbing = document.querySelector(".grabbing");
+    if (grabbing) grabbing.classList.remove("grabbing");
+
+    let item = _dragdrop.itemInHand;
+    if (item) {
+      item.drop();
+    }
+
+    let piece = _dragdrop.facadePieceInHand;
+    if (piece) {
+      piece.drop();
+    }
+  }
+  window.addEventListener("mouseup", mouseup);
+  window.addEventListener("blur", mouseup);
+}

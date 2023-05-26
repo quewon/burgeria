@@ -15,24 +15,13 @@
       <!-- <h2 class="top right">이게 바로 버거야!<br>버거리아</h2> -->
     </header>
 
-    <div id="navbar" class="block">
-      <div class="flexbox gap">
-        <div class="flexbox grow">
-        </div>
-        <div class="flexbox" style="text-align: center;">
-          <!-- <span style="color: var(--burgeria);">:&nbsp</span> -->
-          <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
-          <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">kitchen</button>
-          <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">storefront</button>
-          <!-- <span style="color: var(--burgeria);">&nbsp:</span> -->
-        </div>
-        <div class="grow" style="text-align: right;">
-          <button onclick="toggleTheme(); sfx('click');" title="toggle theme" style="border-right: none;"><span id="theme-name">☼</span></button>
-        </div>
-      </div>
-      <div class="gone">
-        <i>You are in the <b id="current-scene-label">WORKSHOP</b>.</i>
-      </div>
+    <div id="navbar" class="block flexbox">
+      <button onclick="setScene('workshop'); sfx('click');" id="workshop-scene-button">workshop</button>
+      <button onclick="setScene('kitchen'); sfx('click');" id="kitchen-scene-button">back of house</button>
+      <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">front of house</button>
+      <button onclick="setScene('facade'); sfx('click');" id="facade-scene-button" style="border-right: 1px solid var(--burgeria)">exterior</button>
+      <div class="grow"></div>
+      <button onclick="toggleTheme(); sfx('click');" title="toggle theme"><span id="theme-name">☼</span></button>
     </div>
 
     <div id="scene-storefront" class="scene hidden">
@@ -293,6 +282,31 @@
       </div>
     </div>
 
+    <div id="scene-facade" class="scene">
+      <div class="block transparent">
+        <div class="dropdown-container">
+          <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>
+          <div class="dropdown">
+            <div class="block" id="facade-list">
+              <b>PIECES</b>
+              <ul name="workshop">
+              </ul>
+              <div name="workshop-none">
+                <i>You don't have any pieces that contain letters.</i>
+              </div>
+              <br>
+              <b>PAGES</b>
+              <ul name="library">
+              </ul>
+              <div name="library-none">
+                <i>Your library is empty.</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <template id="template-tray">
       <div class="flexbox">
         <button style="border: 1px solid var(--borders)" name="close" class="top right" title="clear and remove tray">x</button>
@@ -311,7 +325,7 @@
             </div>
           </main>
           <div class="buttonbar bottom border-above">
-            <button name="send">send off</button>
+            <button name="send">☰ send off</button>
             <button name="clear">clear</button>
             <div class="grow"></div>
             <button name="stock">stock ☰</button>
@@ -319,6 +333,13 @@
         </div>
         <div name="canvascontainer">
         </div>
+      </div>
+    </template>
+
+    <template id="template-facade-piece">
+      <div class="block facadepiece draggable">
+        <p class="block"></p>
+        <button name="return" class="top right">←</button>
       </div>
     </template>
 
@@ -573,11 +594,13 @@
       });
 
       // workshop
+      init_workshop();
       updateLettersLists();
       setScene("workshop");
 
       // storefront
       init_3d();
+      init_dragdrop();
 
       playerdata.themeIndex--;
       toggleTheme();
@@ -586,8 +609,6 @@
       updateDayUI();
 
       // kitchen
-
-      init_workshop();
       updateLibrary();
       updatePoints();
       updateBankbook();
