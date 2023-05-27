@@ -24,11 +24,13 @@
       <button onclick="toggleTheme(); sfx('click');" title="toggle theme"><span id="theme-name">☼</span></button>
     </div>
 
-    <div id="scene-facade" class="scene" style="gap: 0;">
-      <div class="center placeholder" style="text-align: center; background: var(--bg)">
-        Display the words that you want to share.<br>Customers will see them before they enter.
+    <div id="facade-piece-container" class="disabled">
+      <div id="facade-piece-placeholder" class="center" style="text-align: center; background: var(--bg)">
+        <span class="placeholder">Display the words that you want to share.<br>Customers will see them before they enter.</span>
       </div>
+    </div>
 
+    <div id="scene-facade" class="scene">
       <div class="block transparent">
         <div class="dropdown-container">
           <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>
@@ -51,10 +53,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div id="facade-piece-container" class="disabled">
-
     </div>
 
     <div id="scene-storefront" class="scene hidden">

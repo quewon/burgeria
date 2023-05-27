@@ -19,7 +19,7 @@ function animate() {
   }
 
   for (let guy of game.guys) {
-    if (!guy.served) guy.draw();
+    if (guy.active) guy.draw();
   }
 
   requestAnimationFrame(animate);
@@ -86,6 +86,7 @@ const game = {
     newRandomWWWPiece();
 
     for (let i=game.guys.length-1; i>=0; i--) {
+      game.guys[i].delete(true);
       game.guys.splice(i, 1);
     }
 

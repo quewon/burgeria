@@ -241,6 +241,7 @@ class WorkshopPiece {
 
     sellText(this.text);
 
+    this.inputManager.burn();
     this.removeFromWorkshop();
     let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
     for (let anchor of dropdownAnchors) {
@@ -263,6 +264,7 @@ class WorkshopPiece {
 
     sellText(this.text);
 
+    this.inputManager.burn();
     this.removeFromWorkshop();
     let dropdownAnchors = document.getElementsByClassName("dropdown-anchor");
     for (let anchor of dropdownAnchors) {

@@ -283,6 +283,7 @@ h2 {
   padding-left: .25rem;
 }
 button {
+  position: relative;
   margin: 0;
   border: 1px solid var(--lines);
   font-family: inherit;
@@ -1047,6 +1048,7 @@ dialog.piece {
   position: absolute;
   top: 1.5rem;
   box-sizing: border-box;
+  z-index: 1;
 }
 .dropdown button {
   border: 1px solid var(--borders);
@@ -1105,9 +1107,6 @@ dialog.piece {
   width: max-content;
 }
 
-#facade-piece-container.disabled {
-  pointer-events: none;
-}
 #facade-piece-container.disabled .facadepiece {
   background: color-mix(in srgb, var(--newsgray) 25%, var(--bg));
   border-color: color-mix(in srgb, var(--newsgray) 25%, var(--bg));
@@ -1116,6 +1115,36 @@ dialog.piece {
 #facade-piece-container.disabled p {
   opacity: .05;
 }
-#facade-piece-container.disabled button {
+#facade-piece-container.disabled button, #facade-piece-container.disabled #facade-piece-placeholder {
   display: none;
+}
+
+#scene-facade {
+  gap: 0;
+}
+#scene-facade .guy {
+  width: 5rem;
+}
+#scene-facade .guy div[name='number'] {
+  display: none;
+}
+#scene-facade .guy div[name='text'] {
+  position: absolute;
+  width: max-content;
+  border-top: 1px dashed var(--lines);
+  bottom: calc(var(--gap) + 100%);
+  left: 50%;
+  border-radius: 1rem;
+  translate: -50%;
+  padding: var(--padding);
+  pointer-events: none;
+}
+#scene-facade .guy div[name='text']::after {
+  content: "";
+  border-left: 1px dashed var(--lines);
+  position: absolute;
+  width: 0px;
+  height: calc(var(--gap) * 2);
+  bottom: calc(var(--gap) * -2);
+  left: 50%;
 }

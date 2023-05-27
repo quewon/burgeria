@@ -147,6 +147,13 @@ function setScene(name) {
     case "workshop":
       ui.workshop.textarea.focus();
       break;
+    case "facade":
+      for (let guy of game.guys) {
+        if (!guy.enteredStore) {
+          guy.visitFacade();
+        }
+      }
+      break;
   }
 }
 
@@ -374,14 +381,13 @@ function updateGuysList() {
     list.lastElementChild.remove();
   }
 
-  if (game.guys.length > 0) {
-    list.innerHTML = "";
-  } else {
-    list.innerHTML = "<div class='block'><i>Nobody to serve.</i></div>";
-  }
-
+  var guysListed = 0;
   for (let i=0; i<game.guys.length; i++) {
-    if (game.guys[i].served) continue;
+    const guy = game.guys[i];
+
+    if (!guy.enteredStore || !guy.active) continue;
+
+    guysListed++;
 
     let button = document.createElement("button");
     button.dataset.id = i;
@@ -391,6 +397,10 @@ function updateGuysList() {
       tray.send(Number(button.dataset.id));
     }
     list.appendChild(button);
+  }
+
+  if (guysListed == 0) {
+    list.innerHTML = "<div class='block'><i>Nobody to serve.</i></div>";
   }
 }
 

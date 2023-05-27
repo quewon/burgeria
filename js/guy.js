@@ -53,7 +53,6 @@ class Guy {
 
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
-    this.currentTalkInterval = 20 + 10 * this.talkInterval;
     this.voice = arch.voice;
     this.soundId = null;
     this.chime = _sounds.chime[arch.chime];
@@ -64,7 +63,7 @@ class Guy {
 
     game.guys.push(this);
 
-    // this.enterStore();
+    this.hangAround();
   }
 
   createElement(arch) {
@@ -89,9 +88,34 @@ class Guy {
     this.element = div;
   }
 
+  visitFacade() {
+    let x = Math.random() * 50 + 25;
+    let y = Math.random() * 50 + 10;
+
+    this.element.style.left = x+"%";
+    this.element.style.top = y+"%";
+
+    this.currentTalkInterval = Math.random() * 20 + 10 * this.talkInterval;
+
+    this.clearDialogue();
+    if (Math.random() < .5) {
+      this.createExteriorDialogue();
+    }
+  }
+
+  hangAround() {
+    this.element.style.position = "absolute";
+
+    this.textElement.classList.add("gone");
+
+    ui.scenes.facade.appendChild(this.element);
+  }
+
   enterStore() {
+    this.element.style.position = "unset";
+    this.clearDialogue();
+    this.textElement.classList.remove("gone");
     ui.storefront.day.guysContainer.appendChild(this.element);
-    updateGuysList();
 
     // this is only necessary if scrolling happens
     // wish there was a 'did the scrollbar appear/disappear' event listener in js
@@ -104,13 +128,15 @@ class Guy {
       tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
     }
 
-    this.createDialogue();
+    this.createOrderDialogue();
     this.served = false;
     this.enteredStore = true;
 
     this.chime.play();
 
     updateGuysList();
+
+    this.currentTalkInterval = 20 + 10 * this.talkInterval;
   }
 
   generateDesiredMenu(complexity) {
@@ -147,6 +173,13 @@ class Guy {
     return text;
   }
 
+  clearDialogue() {
+    while (this.textElement.lastElementChild) {
+      this.textElement.lastElementChild.remove();
+    }
+    this.textElement.classList.add("gone");
+  }
+
   randomPunctuateLine(line) {
     const punctuation = [
       ".", ".", ".",
@@ -173,7 +206,28 @@ class Guy {
     return text!="" && "...???!!!".includes(text.charAt(text.length - 1));
   }
 
-  createDialogue() {
+  createExteriorDialogue() {
+    this.words = [];
+    this.addPause(Math.random() * 5);
+
+    const dialogue = this.randomLine([
+      "hello", "hi", "hallo", "greetings", "!", "!!!",
+      "wonder what i'll get",
+      "what's on the menu?",
+      "i love Burgeria",
+      "i hate burgeria",
+      "i am indifferent to Burgeria",
+      "boo",
+      "bored",
+      "zzz",
+      "hungry",
+      "so hungry",
+    ]);
+
+    this.addString(dialogue);
+  }
+
+  createOrderDialogue() {
     let menu = this.desiredMenu;
     this.words = [];
 
@@ -278,9 +332,15 @@ class Guy {
   updateTalk() {
     let el = this.words.shift();
     el.classList.remove("gone");
+    if (this.textElement.classList.contains("gone")) {
+      this.textElement.classList.remove("gone");
+    }
 
     if (!el.classList.contains("pause")) {
       this.soundId = sfx_talk(this.voice, this.soundId);
+      if (!this.enteredStore) {
+        ui.scenes.facade.appendChild(this.element);
+      }
     }
 
     if (this.words.length > 0) {
@@ -344,9 +404,7 @@ class Guy {
       this.addString(dialogue);
       this.addPause(10);
     } else {
-      while (this.textElement.lastElementChild) {
-        this.textElement.lastElementChild.remove();
-      }
+      this.clearDialogue();
       this.addString("bye bye");
       this.addPause(15);
     }
@@ -356,10 +414,12 @@ class Guy {
     this.rejectbutton.setAttribute("disabled", true);
   }
 
-  delete() {
+  delete(simpleDelete) {
     this.active = false;
 
     this.element.remove();
+
+    if (simpleDelete) return;
 
     // check: am i done serving everybody?
     // if so, allow player to start the day up again!
