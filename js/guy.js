@@ -109,21 +109,40 @@ class Guy {
     this.words = [];
     this.addPause(Math.random() * 5);
 
-    const dialogue = this.randomLine([
-      "", "",
-      "hello", "hi", "hallo", "morning", "good morning",
-      "wonder what i'll get",
-      "what's on the menu",
-      "i love Burgeria",
-      "i hate burgeria",
-      "i am indifferent to Burgeria",
-      "boo",
-      "bored", "kinda bored", "i'm bored",
-      "zzz",
-      "hungry", "i'm hungry",
-      "so hungry",
-      "open the store", "when does the store open",
-    ]);
+    var dialogue;
+    if (game.storetime == -1) {
+      if (game.daytime) {
+        // waiting for the store to open
+
+        dialogue = this.randomLine([
+          "", "",
+          "hello", "hi", "hallo", "morning", "good morning",
+          "open the store", "when does the store open",
+          "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
+          "hungry", "i'm hungry", "so hungry",
+          "bored", "kinda bored", "i'm bored",
+          "boo",
+        ]);
+      } else {
+        // overtime
+
+        dialogue = this.randomLine([
+          "", "",
+          "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
+          "zzz", "sleepy",
+          "i've been waiting for so long", "how much longer", "what's the hold up"
+        ]);
+      }
+    } else {
+      // store is open
+
+      dialogue = this.randomLine([
+        "", "",
+        "wonder what i'll get", "what's on the menu", "wait for me",
+        "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
+        "hungry", "i'm hungry", "so hungry",
+      ]);
+    }
 
     if (dialogue == "") {
       this.addString(this.randomPunctuateLine(""));
@@ -134,7 +153,7 @@ class Guy {
 
   hangAround() {
     this.element.style.position = "absolute";
-    this.element.classList.add("disabled");
+    // this.element.classList.add("disabled");
 
     this.textElement.classList.add("gone");
 
@@ -143,7 +162,7 @@ class Guy {
 
   enterStore() {
     this.element.style.position = "unset";
-    this.element.classList.remove("disabled");
+    // this.element.classList.remove("disabled");
     this.clearDialogue();
     this.textElement.classList.remove("gone");
     ui.storefront.day.guysContainer.appendChild(this.element);
