@@ -1122,8 +1122,9 @@ dialog.piece {
 #scene-facade {
   gap: 0;
 }
-#scene-facade .guy {
+#scene-facade .guy, #scene-facade .guy * {
   width: 5rem;
+  pointer-events: none;
 }
 #scene-facade .guy div[name='number'] {
   display: none;
@@ -1137,7 +1138,6 @@ dialog.piece {
   border-radius: 1rem;
   translate: -50%;
   padding: var(--padding);
-  pointer-events: none;
 }
 #scene-facade .guy div[name='text']::after {
   content: "";

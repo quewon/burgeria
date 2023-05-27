@@ -60,6 +60,8 @@ class Guy {
     this.enteredStore = false;
     this.active = true;
     this.words = [];
+    this.punctuate = Math.random() < .5 ? true : false;
+    this.capitalize = Math.random() < .5 ? true : false;
 
     game.guys.push(this);
 
@@ -98,13 +100,41 @@ class Guy {
     this.currentTalkInterval = Math.random() * 20 + 10 * this.talkInterval;
 
     this.clearDialogue();
-    if (Math.random() < .5) {
+    if (Math.random() < .3) {
       this.createExteriorDialogue();
+    }
+  }
+
+  createExteriorDialogue() {
+    this.words = [];
+    this.addPause(Math.random() * 5);
+
+    const dialogue = this.randomLine([
+      "", "",
+      "hello", "hi", "hallo", "morning", "good morning",
+      "wonder what i'll get",
+      "what's on the menu",
+      "i love Burgeria",
+      "i hate burgeria",
+      "i am indifferent to Burgeria",
+      "boo",
+      "bored", "kinda bored", "i'm bored",
+      "zzz",
+      "hungry", "i'm hungry",
+      "so hungry",
+      "open the store", "when does the store open",
+    ]);
+
+    if (dialogue == "") {
+      this.addString(this.randomPunctuateLine(""));
+    } else {
+      this.addString(this.styleText(dialogue, true, null));
     }
   }
 
   hangAround() {
     this.element.style.position = "absolute";
+    this.element.classList.add("disabled");
 
     this.textElement.classList.add("gone");
 
@@ -113,6 +143,7 @@ class Guy {
 
   enterStore() {
     this.element.style.position = "unset";
+    this.element.classList.remove("disabled");
     this.clearDialogue();
     this.textElement.classList.remove("gone");
     ui.storefront.day.guysContainer.appendChild(this.element);
@@ -206,33 +237,9 @@ class Guy {
     return text!="" && "...???!!!".includes(text.charAt(text.length - 1));
   }
 
-  createExteriorDialogue() {
-    this.words = [];
-    this.addPause(Math.random() * 5);
-
-    const dialogue = this.randomLine([
-      "hello", "hi", "hallo", "greetings", "!", "!!!",
-      "wonder what i'll get",
-      "what's on the menu?",
-      "i love Burgeria",
-      "i hate burgeria",
-      "i am indifferent to Burgeria",
-      "boo",
-      "bored",
-      "zzz",
-      "hungry",
-      "so hungry",
-    ]);
-
-    this.addString(dialogue);
-  }
-
   createOrderDialogue() {
     let menu = this.desiredMenu;
     this.words = [];
-
-    this.punctuate = Math.random() < .5 ? true : false;
-    this.capitalize = Math.random() < .5 ? true : false;
 
     const greeting = this.randomLine([
       "", "",
