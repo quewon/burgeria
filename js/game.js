@@ -42,6 +42,7 @@ const game = {
   storetime: -1, //
   trays: [], //
   guys: [], //
+  guyIndex: 0,
   unbankedPoints: 0, //
   market: [],
   tomorrowsPrices: {},
@@ -88,6 +89,10 @@ const game = {
       game.guys.splice(i, 1);
     }
 
+    for (let i=0; i<5; i++) {
+      new Guy();
+    }
+
     game.updatePrices();
 
     new MarketAlert();
@@ -102,6 +107,7 @@ const game = {
   },
 
   openStore: function() {
+    game.guyIndex = 0;
     game.storetime = 0;
     game.updateStore();
     ui.storefront.menuEditButton.setAttribute("disabled", true);
@@ -135,7 +141,10 @@ const game = {
       game.closeStore();
     } else {
       if (game.storetime % game.config.guyInterval == 0) {
-        new Guy();
+        if (game.guyIndex < game.guys.length - 2) {
+          game.guys[game.guyIndex].enterStore();
+          game.guyIndex++;
+        }
       }
     }
 

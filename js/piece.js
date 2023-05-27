@@ -389,13 +389,13 @@ class FacadePiece {
 
     let ghost = document.createElement("div");
     ghost.className = "block facadepiece ghost front";
-    ui.scenes.facade.appendChild(ghost);
+    ui.facade.pieceContainer.appendChild(ghost);
 
     div.querySelector("p").textContent = this.text;
 
     facadePieceResizeObserver.observe(block, { attributes: true });
 
-    ui.scenes.facade.appendChild(div);
+    ui.facade.pieceContainer.appendChild(div);
 
     this.element = div;
     this.block = block;
@@ -404,9 +404,9 @@ class FacadePiece {
   }
 
   resize() {
-    this.drop();
     this.ghost.style.width = this.block.style.width;
     this.ghost.style.height = this.block.style.height;
+    this.drop(true);
   }
 
   returnToOrigin() {
@@ -440,7 +440,7 @@ class FacadePiece {
     message.style.left = this.x+"%";
     message.style.paddingRight = "calc(1.5rem + var(--padding))";
     message.appendChild(closebutton);
-    ui.scenes.facade.appendChild(message);
+    ui.facade.pieceContainer.appendChild(message);
 
     updateFacadeList();
   }
@@ -469,12 +469,14 @@ class FacadePiece {
     this.move(_dragdrop.mouse.xp + this.offset.x, _dragdrop.mouse.yp + this.offset.y);
   }
 
-  drop() {
+  drop(dontRestack) {
     _dragdrop.facadePieceInHand = null;
     this.block.classList.remove("dragging");
     document.documentElement.classList.remove("grabbing");
     this.block.style.left = this.ghost.style.left;
     this.block.style.top = this.ghost.style.top;
     this.ghost.classList.add("gone");
+
+    if (!dontRestack) ui.facade.pieceContainer.appendChild(this.element);
   }
 }

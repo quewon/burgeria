@@ -24,6 +24,39 @@
       <button onclick="toggleTheme(); sfx('click');" title="toggle theme"><span id="theme-name">☼</span></button>
     </div>
 
+    <div id="scene-facade" class="scene" style="gap: 0;">
+      <div class="center placeholder" style="text-align: center; background: var(--bg)">
+        Display the words that you want to share.<br>Customers will see them before they enter.
+      </div>
+
+      <div class="block transparent">
+        <div class="dropdown-container">
+          <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>
+          <div class="dropdown">
+            <div class="block" id="facade-list">
+              <b>PIECES</b>
+              <ul name="workshop">
+              </ul>
+              <div name="workshop-none">
+                <i>You don't have any pieces that contain letters.</i>
+              </div>
+              <br>
+              <b>PAGES</b>
+              <ul name="library">
+              </ul>
+              <div name="library-none">
+                <i>Your library is empty.</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="facade-piece-container" class="disabled">
+
+    </div>
+
     <div id="scene-storefront" class="scene hidden">
       <div class="column">
         <div class="menu flexbox">
@@ -252,7 +285,7 @@
             <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
             <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal(); ui.dialogs['help-burgeria-canvas'].activate();">about <em>Burgeria!</em></button>
           </div>
-          <textarea id="workshop-textarea" placeholder="Click here to start writing..."></textarea>
+          <textarea id="workshop-textarea" placeholder="Click here to start writing..." autofocus></textarea>
         </div>
 
         <div class="block">
@@ -278,35 +311,6 @@
         <div class="block transparent">
           <b>INK</b>
           <ul id="workshop-letters-list" class="flexbox"></ul>
-        </div>
-      </div>
-    </div>
-
-    <div id="scene-facade" class="scene">
-      <div class="center" style="text-align: center; background: var(--bg)">
-        <i style="opacity: .5;">Display the words that you want to share.<br>Customers will see them before they enter.</i>
-      </div>
-
-      <div class="block transparent">
-        <div class="dropdown-container">
-          <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>
-          <div class="dropdown">
-            <div class="block" id="facade-list">
-              <b>PIECES</b>
-              <ul name="workshop">
-              </ul>
-              <div name="workshop-none">
-                <i>You don't have any pieces that contain letters.</i>
-              </div>
-              <br>
-              <b>PAGES</b>
-              <ul name="library">
-              </ul>
-              <div name="library-none">
-                <i>Your library is empty.</i>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -618,6 +622,11 @@
       updateBankbook();
       updateRecipes();
       updateBookshelf();
+
+      // facade
+      for (let i=0; i<5; i++) {
+        new Guy();
+      }
 
       //
 

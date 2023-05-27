@@ -47,9 +47,9 @@ function init_default_playerdata() {
     playerdata.letters[char]++;
   }
 
-  const piece1 = new WorkshopPiece("i'm a long way from home\nthere was so much i wanted to tell you");
+  // const piece1 = new WorkshopPiece("i don't know how long i can be here for");
+  // piece1.addToWorkshop();
   const piece2 = new WorkshopPiece();
-  piece1.addToWorkshop();
   piece2.addToWorkshop();
 
   new Ingredient({

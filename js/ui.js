@@ -101,7 +101,8 @@ var ui = {
   },
   "facade": {
     sceneButton: document.getElementById("facade-scene-button"),
-    list: document.getElementById("facade-list")
+    list: document.getElementById("facade-list"),
+    pieceContainer: document.getElementById("facade-piece-container")
   }
 };
 
@@ -128,6 +129,12 @@ function setScene(name) {
   var temps = document.getElementsByClassName("temp");
   for (let i=temps.length-1; i>=0; i--) {
     temps[i].remove();
+  }
+
+  if (name == "facade") {
+    ui.facade.pieceContainer.classList.remove("disabled");
+  } else {
+    ui.facade.pieceContainer.classList.add("disabled");
   }
 
   switch (name) {
@@ -294,7 +301,7 @@ function updateDayUI() {
   if (game.storetime == -1) {
     let all_served = true;
     for (let guy of game.guys) {
-      if (!guy.served) {
+      if (guy.enteredStore && guy.active) {
         all_served = false;
         break;
       }
@@ -577,6 +584,7 @@ function updateFacadeList() {
         new FacadePiece(piece.text, "library");
         piece.removeFromLibrary();
         updateFacadeList();
+        updateLibrary();
       }
       li.appendChild(button);
 

@@ -47,8 +47,27 @@ class Guy {
 
     const arch = ARCHETYPES[Math.random() * ARCHETYPES.length | 0];
 
-    //
+    this.generateDesiredMenu(arch.complexity);
 
+    this.createElement(arch);
+
+    this.talkInterval = arch.talkInterval * 3;
+    this.talkTime = 0;
+    this.currentTalkInterval = 20 + 10 * this.talkInterval;
+    this.voice = arch.voice;
+    this.soundId = null;
+    this.chime = _sounds.chime[arch.chime];
+
+    this.enteredStore = false;
+    this.active = true;
+    this.words = [];
+
+    game.guys.push(this);
+
+    // this.enterStore();
+  }
+
+  createElement(arch) {
     let div = divContainingTemplate("guy");
     let img = div.querySelector("img");
     img.src = arch.source;
@@ -68,7 +87,9 @@ class Guy {
     this.imageElement = img;
     this.textElement = text;
     this.element = div;
+  }
 
+  enterStore() {
     ui.storefront.day.guysContainer.appendChild(this.element);
     updateGuysList();
 
@@ -83,23 +104,12 @@ class Guy {
       tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
     }
 
-    //
-
-    this.generateDesiredMenu(arch.complexity);
     this.createDialogue();
     this.served = false;
+    this.enteredStore = true;
 
-    this.talkInterval = arch.talkInterval * 3;
-    this.talkTime = 0;
-    this.currentTalkInterval = 20 + 10 * this.talkInterval;
-    this.voice = arch.voice;
-    this.soundId = null;
+    this.chime.play();
 
-    this.active = true;
-
-    _sounds.chime[arch.chime].play();
-
-    game.guys.push(this);
     updateGuysList();
   }
 
@@ -355,7 +365,7 @@ class Guy {
     // if so, allow player to start the day up again!
     if (game.storetime == -1) {
       for (let guy of game.guys) {
-        if (guy.active) return;
+        if (guy.enteredStore && guy.active) return;
       }
       game.beginDay();
     }
