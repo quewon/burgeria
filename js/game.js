@@ -19,7 +19,10 @@ function animate() {
   }
 
   for (let guy of game.guys) {
-    if (guy.active) guy.draw();
+    if (!guy.active) return;
+    if (guy.enteredStore || ui.currentScene == "facade") {
+      guy.draw();
+    }
   }
 
   requestAnimationFrame(animate);

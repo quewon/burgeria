@@ -350,13 +350,6 @@ class WorkshopPiece {
   }
 }
 
-const facadePieceResizeObserver = new ResizeObserver(function(mutations) {
-  for (let mutation of mutations) {
-    const piece = playerdata.facade[mutation.target.dataset.index];
-    if (piece) piece.resize();
-  }
-});
-
 class FacadePiece {
   constructor(text, origin) {
     this.text = text || "";
@@ -389,28 +382,27 @@ class FacadePiece {
       playerdata.facade[this.dataset.index].returnToOrigin();
     }
 
-    let ghost = document.createElement("div");
-    ghost.className = "block facadepiece ghost front";
-    ui.facade.pieceContainer.appendChild(ghost);
-
-    div.querySelector("p").textContent = this.text;
-
-    facadePieceResizeObserver.observe(block, { attributes: true });
+    const textElement = div.querySelector("p");
+    textElement.textContent = this.text;
 
     ui.facade.pieceContainer.appendChild(div);
+
+    let ghost = document.createElement("div");
+    ghost.className = "block facadepiece ghost front";
+
+    ui.facade.pieceContainer.appendChild(ghost);
 
     this.element = div;
     this.block = block;
     this.ghost = ghost;
     this.returnbutton = returnbutton;
-  }
+    this.textElement = textElement;
 
-  resize() {
-    this.ghost.style.width = this.block.style.width;
-    this.ghost.style.height = this.block.style.height;
-    this.drop(true);
+    const rect = this.textElement.getBoundingClientRect();
+    this.ghost.style.width = rect.width+"px";
+    this.ghost.style.height = rect.height+"px";
   }
-
+  
   returnToOrigin() {
     spliceIndexedObject(playerdata.facade, this.index, function(piece) {
       piece.block.dataset.index = piece.index;
@@ -431,7 +423,7 @@ class FacadePiece {
     }
 
     var message = document.createElement("div");
-    message.className = "block temp";
+    message.className = "block front temp";
     var closebutton = document.createElement("button");
     closebutton.className = "top right front";
     closebutton.textContent = "x";

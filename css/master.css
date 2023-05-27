@@ -1,5 +1,6 @@
 :root {
   --line-height: 1.1rem;
+  --line-height: 1.1rlh;
   --padding: .5rem;
   --gap: .5rem;
 
@@ -40,7 +41,7 @@ body {
 
   animation: burgeria-bg 2s linear infinite;
 
-  font-family: serif;
+  /* font-family: serif; */
   text-rendering: optimizeLegibility;
 
   word-break: keep-all;
@@ -1070,15 +1071,17 @@ dialog.piece {
 }
 
 .facadepiece {
-  width: 15rem;
-  height: 15rem;
   min-width: 6rem;
   min-height: 5rem;
+  max-width: 25rem;
+
+  margin: 0;
+
   position: absolute;
   border-color: var(--newsgray);
   background: var(--newsgray);
-  overflow: hidden;
-  resize: both;
+  /* overflow: hidden; */
+  /* resize: both; */
 }
 .facadepiece button {
   border: 1px solid var(--borders);
@@ -1092,14 +1095,11 @@ dialog.piece {
 
 .facadepiece p {
   background: transparent;
-  position: absolute;
-  top: 0;
   padding-top: calc(1.5rem + var(--padding));
-  width: 100%;
-  height: 100%;
+  padding-bottom: calc(1.5rem + var(--padding));
   border: none;
-  /* overflow-y: scroll; */
   box-sizing: border-box;
+  margin: 0;
 }
 
 #facade-list {
@@ -1122,11 +1122,10 @@ dialog.piece {
 #scene-facade {
   gap: 0;
 }
-#scene-facade .guy {
-  width: 5rem;
-}
 #scene-facade .guy img {
-  pointer-events: none;
+  width: 4rem;
+  margin: auto;
+  border: 1px solid var(--bg);
 }
 #scene-facade .guy div[name='number'] {
   display: none;
@@ -1140,7 +1139,6 @@ dialog.piece {
   border-radius: 1rem;
   translate: -50%;
   padding: var(--padding);
-  pointer-events: none;
 }
 #scene-facade .guy div[name='text']::after {
   content: "";

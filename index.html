@@ -181,9 +181,9 @@
 
             <div class="block attached-above has-buttonbar" id="library-page-container">
               <nav id="library-nav" style="text-align: center; margin-bottom: var(--gap);">
-                <button class="disabled" title="go to previous page" onclick="navigateLibrary(-1);">←</button>
+                <button title="go to previous page" onclick="navigateLibrary(-1);">←</button>
                 <span id="library-index"></span>/<span id="library-pages-total"></span>
-                <button class="disabled" title="go to next page" onclick="navigateLibrary(1);">→</button>
+                <button title="go to next page" onclick="navigateLibrary(1);">→</button>
               </nav>
               <p id="library-page" class="block"></p>
               <button class="bottom right" onclick="playerdata.library[playerdata.libraryIndex].disintegrate();" style="border-top: none;">disintegrate</button>
@@ -198,7 +198,7 @@
           </div>
 
           <!-- this is for LATER game stuff -->
-          <div class="block" id="research-block">
+          <div class="block gone" id="research-block">
             <h1 class="marginbelow">R&D</h1>
             <div class="flexbox gap">
               <b>develop new ingredient</b>

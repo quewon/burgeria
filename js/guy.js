@@ -118,17 +118,16 @@ class Guy {
           "", "",
           "hello", "hi", "hallo", "morning", "good morning",
           "open the store", "when does the store open",
-          "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
           "hungry", "i'm hungry", "so hungry",
           "bored", "kinda bored", "i'm bored",
           "boo",
+          "Burgeria"
         ]);
       } else {
         // overtime
 
         dialogue = this.randomLine([
           "", "",
-          "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
           "zzz", "sleepy",
           "i've been waiting for so long", "how much longer", "what's the hold up"
         ]);
@@ -139,8 +138,8 @@ class Guy {
       dialogue = this.randomLine([
         "", "",
         "wonder what i'll get", "what's on the menu", "wait for me",
-        "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
         "hungry", "i'm hungry", "so hungry",
+        "time to eat"
       ]);
     }
 
@@ -149,6 +148,14 @@ class Guy {
     } else {
       this.addString(this.styleText(dialogue, true, null));
     }
+  }
+
+  createLeavingDialogue() {
+    var dialogue = this.randomLine([
+      "goodbye", "bye bye", "bye", "farewell", "see ya", "see you", "aw man"
+    ]);
+
+    this.addString(this.styleText(dialogue, true, null));
   }
 
   hangAround() {
@@ -425,13 +432,19 @@ class Guy {
 
   reject() {
     if (this.words.length > 0) {
-      const dialogue = "wait i wasn't done talking";
+      const dialogue = this.randomLine([
+        "wait i wasn't done talking",
+        "what",
+        "wait what",
+        "oh ok",
+        "ah excuse me"
+      ]);
       this.words = [];
       this.addString(dialogue);
       this.addPause(10);
     } else {
       this.clearDialogue();
-      this.addString("bye bye");
+      this.createLeavingDialogue();
       this.addPause(15);
     }
 

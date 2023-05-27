@@ -231,9 +231,9 @@ function updateBookshelf(dontHideLibrary) {
 
   bookshelf.innerHTML = "";
 
+  createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
   createSystemBook(ui.kitchen.bankbookBlock, "bankbook", "✸");
   createSystemBook(ui.kitchen.inventoryBlock, "stock", "☰");
-  createSystemBook(ui.kitchen.researchBlock, "r&d", "⚙");
   // if (playerdata.library.length == 0) {
   //   const book = createSystemBook(ui.kitchen.libraryBlock, "library", "");
   //   if (!dontHideLibrary) book.onclick();
