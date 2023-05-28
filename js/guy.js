@@ -100,13 +100,14 @@ class Guy {
     this.currentTalkInterval = Math.random() * 20 + 10 * this.talkInterval;
 
     this.clearDialogue();
+    this.words = [];
     if (Math.random() < .3) {
       this.createExteriorDialogue();
     }
   }
 
   createExteriorDialogue() {
-    this.words = [];
+    // this.words = [];
     this.addPause(Math.random() * 5);
 
     var dialogue;
@@ -160,16 +161,16 @@ class Guy {
 
   hangAround() {
     this.element.style.position = "absolute";
-    // this.element.classList.add("disabled");
-
-    this.textElement.classList.add("gone");
+    this.element.onclick = function() {
+      ui.scenes.facade.appendChild(this);
+    }
 
     ui.scenes.facade.appendChild(this.element);
   }
 
   enterStore() {
+    this.element.onclick = null;
     this.element.style.position = "unset";
-    // this.element.classList.remove("disabled");
     this.clearDialogue();
     this.textElement.classList.remove("gone");
     ui.storefront.day.guysContainer.appendChild(this.element);

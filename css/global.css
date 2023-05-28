@@ -2,6 +2,10 @@
   pointer-events: none;
 }
 
+.monospace {
+  font-family: monospace;
+}
+
 .center {
   position: absolute;
   top: 50%;

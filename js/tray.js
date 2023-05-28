@@ -14,7 +14,7 @@ class Tray {
 
   init_tray() {
     this.element = divContainingTemplate("tray");
-    this.element.classList.add("slide-down");
+    this.element.classList.add("slide-up");
 
     let cons = this.element.querySelectorAll(".collection");
     for (let con of cons) {

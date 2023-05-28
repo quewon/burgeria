@@ -42,7 +42,6 @@ body {
   animation: burgeria-bg 2s linear infinite;
 
   /* font-family: serif; */
-  text-rendering: optimizeLegibility;
 
   word-break: keep-all;
 }
@@ -519,7 +518,7 @@ canvas {
   height: 100%;
 }
 
-ul {
+ul, ol {
   margin: 0;
 }
 ul.flexbox {
@@ -531,8 +530,8 @@ ul.flexbox {
 ul.flexbox > li {
   width: 30%;
 }
-#storefront-ministock li {
-  list-style: inside;
+ul li {
+  list-style-position: inside;
 }
 
 #storefront-guys-list button:not(button:first-child) {
@@ -636,21 +635,21 @@ input::placeholder, textarea::placeholder, .placeholder {
   opacity: .5;
 }
 
-p.block {
+p {
+  padding: var(--gap);
   padding-left: 3rem;
   padding-right: 3rem;
   background: var(--newsgray);
+  margin: 0;
   white-space: pre-wrap;
   text-align: justify;
-  margin: 0;
+}
+#library-page {
   margin-left: calc(-1 * var(--padding));
   margin-right: calc(-1 * var(--padding));
+  border: 1px solid var(--borders);
   border-left: none;
   border-right: none;
-}
-dialog p.block {
-  border-bottom: none;
-  border-top: none;
 }
 
 .lettericon {
@@ -826,26 +825,28 @@ em, .em, .order {
 
 table, th, td {
   border-collapse: collapse;
+  padding: 0;
 }
 table {
-  font-family: monospace;
   width: 100%;
+}
+th, td {
+  display: table-cell;
+  padding: 3px;
 }
 .bankbook th:nth-child(2n), .bankbook td:nth-child(2n) {
   border-right: 1px solid var(--lines);
 }
 th {
-  text-transform: uppercase;
   font-weight: normal;
+  text-align: left;
 }
 .bankbook th {
+  text-transform: uppercase;
   background: var(--newsgray);
 }
-th, td {
-  padding-left: var(--padding);
-}
 .bankbook th, .bankbook td {
-  padding: .2rem;
+  font-family: monospace;
   white-space: nowrap;
   text-align: center;
 }

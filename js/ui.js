@@ -39,6 +39,7 @@ var ui = {
   },
   currentScene: "storefront",
   themeName: document.getElementById("theme-name"),
+  volumeIcon: document.getElementById("volume-icon"),
   "storefront": {
     sceneButton: document.getElementById("storefront-scene-button"),
     body: document.getElementById("scene-storefront-body"),
@@ -177,6 +178,12 @@ function divContainingPerfectClone(element) {
 }
 
 // update functions
+
+function updateVolumeUI() {
+  ui.volumeIcon.textContent = (playerdata.volume * 100);
+
+  Howler.volume(playerdata.volume);
+}
 
 function selectBook(el, index) {
   el.classList.toggle("selected");

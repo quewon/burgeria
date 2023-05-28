@@ -12,7 +12,7 @@
 
     <header>
       <h1 onclick="setScene('workshop');">BURGERIA!</h1>
-      <!-- <h2 class="top right">이게 바로 버거야!<br>버거리아</h2> -->
+      <!-- <button class="top right" style="border: 1px solid var(--burgeria)">save current state</button> -->
     </header>
 
     <div id="navbar" class="block flexbox">
@@ -21,6 +21,9 @@
       <button onclick="setScene('storefront'); sfx('click');" id="storefront-scene-button">front of house</button>
       <button onclick="setScene('facade'); sfx('click');" id="facade-scene-button" style="border-right: 1px solid var(--burgeria)">exterior</button>
       <div class="grow"></div>
+      <button onclick="game.load()">load file</button>
+      <button onclick="game.save()">save file</button>
+      <button onclick="toggleVolume(); sfx('click');" title="change volume"><i>volume:</i> <span class="monospace" id="volume-icon"></span>%</button>
       <button onclick="toggleTheme(); sfx('click');" title="toggle theme"><span id="theme-name">☼</span></button>
     </div>
 
@@ -185,7 +188,7 @@
                 <span id="library-index"></span>/<span id="library-pages-total"></span>
                 <button title="go to next page" onclick="navigateLibrary(1);">→</button>
               </nav>
-              <p id="library-page" class="block"></p>
+              <p id="library-page"></p>
               <button class="bottom right" onclick="playerdata.library[playerdata.libraryIndex].disintegrate();" style="border-top: none;">disintegrate</button>
             </div>
             <div id="library-page-empty" class="block attached-above">
@@ -226,11 +229,11 @@
         <div style="width: 100%; text-align: left; float: left; font-family: monospace;">
           <table>
             <tr>
-              <th>day</th>
+              <th>DAY</th>
               <td><span id="day-counter"></span></td>
             </tr>
             <tr>
-              <th>burgerpoints</th>
+              <th>BURGERPOINTS</th>
               <td><span class="burgerpoints" title="BurgerPoints"></span><span id="points-counter"> </span></td>
             </tr>
           </table>
@@ -280,7 +283,6 @@
 
             <div class="grow"></div>
 
-            <!-- <button style="border: 1px solid var(--borders); border-bottom: none; border-right: none;">import state</button> -->
             <button style="border: 1px solid var(--borders); border-bottom: none;" onclick="ui.dialogs['help-burgeria'].showModal(); ui.dialogs['help-burgeria-canvas'].activate();">about <em>Burgeria!</em></button>
           </div>
           <textarea id="workshop-textarea" placeholder="Click here to start writing..." autofocus></textarea>
@@ -297,21 +299,76 @@
         </div>
       </div>
       <div class="column">
-        <!-- <div class="block transparent">
-          <img data-latesrc="img/letter_closed.png" alt="a closed envelope">
-          <button class="center">open letter</button>
-        </div>
-
-        <div class="block transparent" style="position: relative; line-height: 0;">
-          <p class="block" style="border: 1px solid var(--borders); background: var(--newsgray); margin: 0; line-height: 1rem;"><span>ahaha</span><br><span style="display: block; width: 100%; text-align: center; margin-top: var(--gap)"><button>close letter</button></span></p>
-        </div> -->
-
         <div class="block transparent">
           <b>INK</b>
           <ul id="workshop-letters-list" class="flexbox"></ul>
         </div>
+
+        <div id="request-block" class="gone">
+          <div class="block flexbox gap centeraligned">
+            <b>REQUESTS</b>
+            <div class="grow"></div>
+            <div>
+              <button disabled>←</button>
+              1/1
+              <button disabled>→</button>
+            </div>
+          </div>
+          <div id="request-container">
+
+          </div>
+        </div>
       </div>
     </div>
+
+    <template id="template-request">
+      <div class="block attached-above dashed">
+        <table>
+          <tr>
+            <th><i>title:</i></th>
+            <td class="monospace" name="title">A LETTER FOR MOM</td>
+          </tr>
+          <tr>
+            <th><i>from:</i></th>
+            <td class="monospace" name="guy">CAT</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <i>requirements:</i>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <ol name="requirements">
+                <li>must contain the word <span class="monospace"><em>MOTHER</em></span>.</li>
+                <li>must be <em>30 characters or longer</em>.</li>
+              </ol>
+            </td>
+          </tr>
+          <tr>
+            <th><i>status:</i></th>
+            <td class="monospace" name="status">UNWRITTEN</td>
+          </tr>
+          <tr>
+            <th><i>attach piece:</i></th>
+            <td>
+              <div class="dropdown-container">
+                <button name="attachment"><span class="monospace">SELECT PIECE</span></button>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="block attached-above">
+        <b>PIECES</b>
+        <ul name="piece-list">
+          <li><button>a</button></li>
+        </ul>
+      </div>
+      <div class="block attached-above" style="padding: 0;">
+        <p name="piece">hello</p>
+      </div>
+    </template>
 
     <template id="template-tray">
       <div class="flexbox">
@@ -344,7 +401,7 @@
 
     <template id="template-facade-piece">
       <div class="block facadepiece draggable">
-        <p class="block"></p>
+        <p></p>
         <button name="return" class="top right">←</button>
       </div>
     </template>
@@ -460,7 +517,7 @@
         <div class="grow" id="dialog-read-text-title"></div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
-      <p class="block" id="dialog-read-text-content"></p>
+      <p id="dialog-read-text-content"></p>
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>
@@ -551,7 +608,7 @@
         <div class="grow">You successfully published this piece!</div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
-      <p class="block" id="dialog-publishing-success-content"></p>
+      <p id="dialog-publishing-success-content"></p>
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>
@@ -562,7 +619,7 @@
         <div class="grow">Gone with the wind...</div>
         <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
-      <p class="block" id="dialog-wind-content"></p>
+      <p id="dialog-wind-content"></p>
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>

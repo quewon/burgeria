@@ -20,7 +20,7 @@ function init_default_playerdata() {
 
     themeIndex: 0,
 
-    volume: .2
+    volume: .5
   }
 
   playerdata.points = 10;
@@ -166,4 +166,5 @@ function init_default_playerdata() {
   });
 
   Howler.volume(playerdata.volume);
+  updateVolumeUI();
 }

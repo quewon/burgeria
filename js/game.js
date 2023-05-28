@@ -69,7 +69,7 @@ const game = {
       "lines": "#291e2c",
       "newsgray": "#c0d0cf",
       "graph-positive": "#5B7553",
-    }
+    },
   },
 
   config: {
@@ -245,6 +245,14 @@ const game = {
 
       playerdata.prices[char].push(todaysPrice);
     }
+  },
+
+  load: function() {
+
+  },
+
+  save: function() {
+
   }
 }
 
@@ -295,4 +303,15 @@ function spliceIndexedObject(array, objectIndex, objectFunction) {
   }
 
   array.splice(objectIndex, 1);
+}
+
+function toggleVolume() {
+  if (playerdata.volume < 1) {
+    playerdata.volume += .1;
+    playerdata.volume = Math.floor(playerdata.volume * 100) / 100;
+  } else {
+    playerdata.volume = 0;
+  }
+
+  updateVolumeUI();
 }
