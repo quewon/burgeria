@@ -19,7 +19,7 @@ function animate() {
   }
 
   for (let guy of game.guys) {
-    if (!guy.active) return;
+    if (!guy.active) continue;
     if (guy.enteredStore || ui.currentScene == "facade") {
       guy.draw();
     }
@@ -122,7 +122,7 @@ const game = {
 
     let everyoneserved = true;
     for (let guy of game.guys) {
-      if (!guy.served) {
+      if (guy.active) {
         everyoneserved = false;
         break;
       }
@@ -145,7 +145,7 @@ const game = {
       game.closeStore();
     } else {
       if (game.storetime % game.config.guyInterval == 0) {
-        if (game.guyIndex < game.guys.length - 2) {
+        if (game.guyIndex < game.guys.length) {
           game.guys[game.guyIndex].enterStore();
           game.guyIndex++;
         }

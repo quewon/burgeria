@@ -88,6 +88,12 @@ class Guy {
     this.imageElement = img;
     this.textElement = text;
     this.element = div;
+
+    let x = Math.random() * 50 + 25;
+    let y = Math.random() * 50 + 10;
+
+    this.element.style.left = x+"%";
+    this.element.style.top = y+"%";
   }
 
   visitFacade() {
@@ -412,7 +418,6 @@ class Guy {
 
   receive(tray) {
     this.served = true;
-    updateGuysList();
     this.element.dataset.id = this.id;
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
@@ -458,6 +463,8 @@ class Guy {
     this.active = false;
 
     this.element.remove();
+
+    updateGuysList();
 
     if (simpleDelete) return;
 

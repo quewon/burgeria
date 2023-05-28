@@ -1084,6 +1084,9 @@ dialog.piece {
   /* overflow: hidden; */
   /* resize: both; */
 }
+.facadepiece:not(.ghost) {
+  box-shadow: var(--bg) 0px 0px 2px 0px;
+}
 .facadepiece button {
   border: 1px solid var(--borders);
 }
@@ -1126,7 +1129,7 @@ dialog.piece {
 #scene-facade .guy img {
   width: 4rem;
   margin: auto;
-  border: 1px solid var(--bg);
+  box-shadow: var(--bg) 0px 0px 2px 0px;
 }
 #scene-facade .guy div[name='number'] {
   display: none;

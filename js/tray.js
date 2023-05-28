@@ -85,7 +85,7 @@ class Tray {
     closebutton.onclick = function() {
       const tray = game.trays[this.dataset.index];
       tray.clear(true);
-      tray.prepareDeletion();
+      tray.delete();
       return;
     }
     this.closebutton = closebutton;
@@ -283,7 +283,7 @@ class Tray {
       col.clear(true);
     }
 
-    if (!dontOpenStock) this.openGlobalBlock("ministock", stockbutton || this.stockbutton);
+    if (!dontOpenStock) this.openGlobalBlock("ministock", this.stockbutton);
   }
 
   getConstruction() {
