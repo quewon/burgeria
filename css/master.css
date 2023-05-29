@@ -345,11 +345,11 @@ li button {
 @keyframes slide-up {
   0% {
     opacity: 0;
-    transform: translate(0, 1rem);
+    translate: 0 1rem;
   }
   100% {
     opacity: 1;
-    transform: translate(0, 0);
+    translate: 0 0;
   }
 }
 
@@ -359,11 +359,11 @@ li button {
 @keyframes slide-down {
   0% {
     opacity: 0;
-    transform: translate(0, -1rem);
+    translate: 0 -1rem;
   }
   100% {
     opacity: 1;
-    transform: translate(0, 0);
+    translate: 0 0;
   }
 }
 
@@ -1129,11 +1129,13 @@ dialog.piece {
 
 #scene-facade div:has(.guy) {
   translate: -50% -50%;
-}
-
-#scene-facade.hide-guys div:has(.guy) {
   pointer-events: none;
 }
+
+#scene-facade:not(.hide-guys) .guy * {
+  pointer-events: auto;
+}
+
 #scene-facade.hide-guys .guy {
   opacity: 0;
 }
@@ -1190,6 +1192,7 @@ button.burgerpoints::after {
     rotate: 360deg;
   }
 }
+
 div.has-request div[name='text'] {
   border-color: var(--burgeria) !important;
 }
@@ -1197,14 +1200,21 @@ div.has-request div[name='text']::after {
   border-color: var(--burgeria) !important;
 }
 
+
 #dialog-preview-request .attached-above {
   border-top: 1px dashed var(--borders);
   margin-top: var(--gap);
 }
-#dialog-preview-request table tr:nth-child(n+5) {
+#dialog-preview-request table tr:nth-child(n+6) {
   display: none;
 }
 
 .temp {
   translate: calc(-100% + 1.75rem) -.75rem;
+}
+.temp, .temp * {
+  background: transparent;
+}
+#scene-storefront-news .temp {
+  translate: unset;
 }

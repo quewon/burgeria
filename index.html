@@ -342,7 +342,7 @@
       <div class="block attached-above dashed">
         <table>
           <tr>
-            <th><i>title:</i></th>
+            <th><i>request:</i></th>
             <td class="monospace" name="title">A LETTER FOR MOM</td>
           </tr>
           <tr>
@@ -353,16 +353,19 @@
           </tr>
           <tr>
             <td colspan="2">
-              <i>requirements:</i>
+              <i>rules:</i>
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <ol name="requirements">
-                <li>must contain the word <span class="monospace"><em>MOTHER</em></span>.</li>
-                <li>must be <em>30 characters or longer</em>.</li>
+              <ol name="rules">
+
               </ol>
             </td>
+          </tr>
+          <tr>
+            <th><i>compensation:</i></th>
+            <td class="monospace" name="compensation">...</td>
           </tr>
           <tr>
             <th><i>status:</i></th>
@@ -430,7 +433,7 @@
     </template>
 
     <template id="template-market-alert">
-      <div class="block dashed">
+      <div class="block dashed slide-down">
         <div class="buttonbar top right front">
           <button onclick="setScene('workshop'); this.parentNode.parentNode.remove();">→ check the market</button>
           <button title="close" onclick="this.parentNode.parentNode.remove();">x</button>
@@ -527,7 +530,7 @@
       </div>
 
       <div class="margintop" style="text-align: center;">
-        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+        <button onclick="this.parentNode.parentNode.close();" autofocus>cancel</button>
         <button name="accept">accept</button>
       </div>
     </dialog>

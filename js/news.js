@@ -2,6 +2,7 @@ class MarketAlert {
   constructor() {
     let div = divContainingTemplate("market-alert");
     ui.storefront.news.appendChild(div);
+    div.classList.add("temp");
   }
 }
 

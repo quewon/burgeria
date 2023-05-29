@@ -83,6 +83,7 @@ const game = {
     }
 
     game.guys[Math.random() * 5 | 0].appreciatesText = true;
+
     game.guys[Math.random() * 5 | 0].createRequest();
   },
 

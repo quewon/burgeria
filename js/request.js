@@ -1,6 +1,6 @@
-class RequestRequirement {
+class RequestRule {
   constructor() {
-    this.text = "undefined requirement";
+    this.text = "undefined rule";
   }
 }
 
@@ -8,12 +8,13 @@ class Request {
   constructor(guy, title) {
     this.guy = guy;
     this.title = title || "A PIECE OF WRITING";
-    this.requirements = [];
+    this.rules = [];
     this.accepted = false;
+    this.compensation = "...";
   }
 
-  addRequirement() {
-    this.requirements.push(new RequestRequirement(
+  addRule() {
+    this.rules.push(new RequestRule(
 
     ));
   }
@@ -27,10 +28,10 @@ class Request {
       this.createElement();
     }
 
+    //<li>must contain the word <span class="monospace"><em>MOTHER</em></span>.</li>
+    //<li>must be <em>30 characters or longer</em>.</li>
+
     const request = dialog.querySelector("[name='request']");
-    if (request.lastElementChild) {
-      request.lastElementChild.remove();
-    }
     request.appendChild(this.element);
 
     const accept = dialog.querySelector("[name='accept']");
@@ -38,7 +39,6 @@ class Request {
     accept.onclick = function() {
       const guy = game.guys[this.dataset.index];
       guy.acceptRequest();
-      sfx("click");
       this.parentNode.parentNode.close();
     };
 
@@ -65,14 +65,14 @@ class Request {
     guy.src = this.guy.imageElement.src;
     guy.alt = this.guy.imageElement.alt;
 
-    const requirements = this.element.querySelector("[name='requirements']");
-    while (requirements.lastElementChild) {
-      requirements.lastElementChild.remove();
+    const rules = this.element.querySelector("[name='rules']");
+    while (rules.lastElementChild) {
+      rules.lastElementChild.remove();
     }
-    for (let req of this.requirements) {
+    for (let rule of this.rules) {
       const li = document.createElement("li");
-      li.textContent = req.text;
-      requirements.appendChild(li);
+      li.innerHTML = rule.html;
+      rules.appendChild(li);
     }
 
     const status = this.element.querySelector("[name='status']");

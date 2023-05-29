@@ -78,26 +78,40 @@ class Guy {
     this.element.classList.add("has-request");
     this.request = new Request(this);
 
-    this.request.addRequirement();
-    this.request.addRequirement();
-    this.request.addRequirement();
+    this.request.addRule();
+    this.request.addRule();
+    this.request.addRule();
 
     this.viewRequestButton.classList.remove("gone");
     this.viewRequestButton.dataset.index = this.index;
     this.viewRequestButton.onclick = function() {
       const guy = game.guys[this.dataset.index];
       guy.request.previewForAcceptance();
-    }
+    };
 
     this.rejectRequestButton.classList.remove("gone");
     this.rejectRequestButton.dataset.index = this.index;
     this.rejectRequestButton.onclick = function() {
       const guy = game.guys[this.dataset.index];
       guy.removeRequest();
-    }
+    };
+
+    this.viewRequestButton.onmousedown =
+    this.rejectRequestButton.onmousedown = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.dontBringToFront = true;
+    };
+    this.viewRequestButton.onmouseleave = this.viewRequestButton.onblur = this.viewRequestButton.onmouseup =
+    this.rejectRequestButton.onmouseleave = this.rejectRequestButton.onblur = this.rejectRequestButton.onmouseup =
+    function() {
+      const guy = game.guys[this.dataset.index];
+      guy.dontBringToFront = false;
+    };
   }
 
   removeRequest() {
+    sfx("click");
+
     this.hasRequest = false;
     this.request = null;
     this.element.classList.remove("has-request");
@@ -106,12 +120,20 @@ class Guy {
 
     // rejection dialogue
 
-    this.clearDialogue();
-    this.addString(this.styleText("aw man", true, null));
-    this.addPause(10);
+    if (this.enteredStore) {
+      this.clearDialogue();
+      this.addString(this.styleText("aw man", true, null));
+      this.createOrderDialogue(true);
+    } else {
+      this.clearDialogue();
+      this.addString(this.styleText("aw man", true, null));
+      this.addPause(10);
+    }
   }
 
   acceptRequest() {
+    sfx("click");
+
     this.request.accept();
     this.element.classList.remove("has-request");
     this.viewRequestButton.classList.add("gone");
@@ -119,9 +141,15 @@ class Guy {
 
     // accepted dialogue
 
-    this.clearDialogue();
-    this.addString(this.styleText("thank you", true, null));
-    this.addPause(10);
+    if (this.enteredStore) {
+      this.clearDialogue();
+      this.addString(this.styleText("thank you", true, null));
+      this.createOrderDialogue(true);
+    } else {
+      this.clearDialogue();
+      this.addString(this.styleText("thank you", true, null));
+      this.addPause(10);
+    }
 
     tempMessage("<i>A request has been added to your <button onclick='setScene(`workshop`)'>→ workshop</button>.</i>");
   }
@@ -147,6 +175,15 @@ class Guy {
       game.guys[this.dataset.index].reject();
     }
     this.rejectbutton = rejectbutton;
+    this.rejectbutton.onmousedown = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.dontBringToFront = true;
+    };
+    this.rejectbutton.onmouseleave = this.rejectbutton.onblur = this.rejectbutton.onmouseup =
+    function() {
+      const guy = game.guys[this.dataset.index];
+      guy.dontBringToFront = false;
+    };
 
     let viewRequestButton = div.querySelector("[name='view-request']");
     this.viewRequestButton = viewRequestButton;
@@ -164,6 +201,8 @@ class Guy {
   }
 
   visitFacade() {
+    this.dontBringToFront = false;
+
     let x = Math.random() * 50 + 25;
     let y = Math.random() * 50 + 10;
 
@@ -272,7 +311,15 @@ class Guy {
   enterStore() {
     this.element.onclick = null;
     this.element.style.position = "unset";
+
     this.clearDialogue();
+    if (!this.hasRequest || this.request.accepted) {
+      this.words = [];
+      this.createOrderDialogue();
+    } else {
+      this.createRequestDialogue();
+    }
+
     this.textElement.classList.remove("gone");
     ui.storefront.day.guysContainer.appendChild(this.element);
 
@@ -287,7 +334,6 @@ class Guy {
       tray.updateGlobalBlockPosition("ministock", tray.stockbutton);
     }
 
-    this.createOrderDialogue();
     this.served = false;
     this.enteredStore = true;
 
@@ -365,9 +411,8 @@ class Guy {
     return text!="" && "...???!!!".includes(text.charAt(text.length - 1));
   }
 
-  createOrderDialogue() {
+  createOrderDialogue(skipGreeting) {
     let menu = this.desiredMenu;
-    this.words = [];
 
     const greeting = this.randomLine([
       "", "",
@@ -402,7 +447,7 @@ class Guy {
       ":)", ":D"
     ]);
 
-    this.addString(greeting);
+    if (!skipGreeting) this.addString(greeting);
     this.addString(request);
     this.addString(menu.name, "order");
     this.addString(this.randomPunctuateLine(""));
@@ -473,7 +518,7 @@ class Guy {
 
     if (!el.classList.contains("pause")) {
       this.soundIndex = sfx_talk(this.voice, this.soundIndex);
-      if (!this.enteredStore) {
+      if (!this.enteredStore && !this.dontBringToFront) {
         ui.scenes.facade.appendChild(this.element);
       }
       this.element.firstElementChild.classList.add("speaking");
