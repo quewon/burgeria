@@ -446,19 +446,7 @@ class FacadePiece {
         break;
     }
 
-    var message = document.createElement("div");
-    message.className = "block front temp";
-    var closebutton = document.createElement("button");
-    closebutton.className = "top right front";
-    closebutton.textContent = "x";
-    closebutton.onclick = function() { this.parentNode.remove() };
-    message.innerHTML = "<i>This piece has been returned to the <button onclick='setScene(`"+this.originScene+"`)'>→ "+this.origin+"</button>.</i>";
-    message.style.position = "absolute";
-    message.style.top = this.y+"%";
-    message.style.left = this.x+"%";
-    message.style.paddingRight = "calc(1.5rem + var(--padding))";
-    message.appendChild(closebutton);
-    ui.facade.pieceContainer.appendChild(message);
+    tempMessage("<i>This piece has been returned to the <button onclick='setScene(`"+this.originScene+"`)'>→ "+this.origin+"</button>.</i>");
 
     updateFacadeList();
   }

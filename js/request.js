@@ -1,27 +1,58 @@
 class RequestRequirement {
   constructor() {
-
+    this.text = "undefined requirement";
   }
 }
 
 class Request {
-  constructor() {
-    this.guy = new Guy();
-    this.title = "haha";
+  constructor(guy, title) {
+    this.guy = guy;
+    this.title = title || "A PIECE OF WRITING";
     this.requirements = [];
-
-    this.createElement();
-
-    this.index = playerdata.requests.length;
-    playerdata.requests.push(this);
-
-    this.select();
+    this.accepted = false;
   }
 
   addRequirement() {
     this.requirements.push(new RequestRequirement(
 
     ));
+  }
+
+  previewForAcceptance() {
+    const dialog = ui.dialogs["preview-request"];
+
+    dialog.querySelector("[name='dialogue']").textContent = "i have a request for you.";
+
+    if (!this.element) {
+      this.createElement();
+    }
+
+    const request = dialog.querySelector("[name='request']");
+    if (request.lastElementChild) {
+      request.lastElementChild.remove();
+    }
+    request.appendChild(this.element);
+
+    const accept = dialog.querySelector("[name='accept']");
+    accept.dataset.index = this.guy.index;
+    accept.onclick = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.acceptRequest();
+      sfx("click");
+      this.parentNode.parentNode.close();
+    };
+
+    dialog.showModal();
+  }
+
+  accept() {
+    this.accepted = true;
+
+    this.index = playerdata.requests.length;
+    playerdata.requests.push(this);
+
+    this.addToWorkshop();
+    this.select();
   }
 
   createElement() {
@@ -31,16 +62,28 @@ class Request {
     title.textContent = this.title;
 
     const guy = this.element.querySelector("[name='guy']");
-    guy.textContent = this.guy.name;
+    guy.src = this.guy.imageElement.src;
+    guy.alt = this.guy.imageElement.alt;
 
     const requirements = this.element.querySelector("[name='requirements']");
-    const status = this.element.querySelector("[name='status']");
+    while (requirements.lastElementChild) {
+      requirements.lastElementChild.remove();
+    }
+    for (let req of this.requirements) {
+      const li = document.createElement("li");
+      li.textContent = req.text;
+      requirements.appendChild(li);
+    }
 
-    ui.workshop.requestContainer.appendChild(this.element);
-    this.element.classList.add("gone");
+    const status = this.element.querySelector("[name='status']");
 
     this.pieceSelectButton = this.element.querySelector("[name='piece-name']");
     this.statusElement = status;
+  }
+
+  addToWorkshop() {
+    ui.workshop.requestContainer.appendChild(this.element);
+    this.element.classList.add("gone");
 
     ui.workshop.requestBlock.classList.remove("gone");
   }
@@ -52,11 +95,10 @@ class Request {
     }
     playerdata.requestIndex = this.index;
     this.element.classList.remove("gone");
+    ui.workshop.requestPieceBlock.classList.add("gone");
     if (this.piece) {
       ui.workshop.requestPiece.textContent = this.piece.text;
       ui.workshop.requestPieceBlock.classList.remove("gone");
-    } else {
-      ui.workshop.requestPieceBlock.classList.add("gone");
     }
 
     updateRequestContainer();
@@ -64,6 +106,7 @@ class Request {
 
   deselect() {
     this.element.classList.add("gone");
+    ui.workshop.requestPieceListBlock.classList.add("gone");
   }
 
   applyPiece(piece) {
@@ -81,7 +124,10 @@ class Request {
       return;
     }
 
-    this.piece = new WorkshopPiece(piece.text);
+    this.piece = {
+      text: piece.text,
+      title: piece.title
+    };
 
     this.pieceSelectButton.parentNode.setAttribute("title", "detach piece");
 
@@ -111,7 +157,9 @@ function updateRequestPieceList() {
   }
 
   if (piecesCounted == 0) {
-    ui.workshop.requestPieceList.innerHTML = "<i>You don't have any pieces that contain letters.</i>";
+    ui.workshop.requestPieceListBlock.querySelector("[name='request-pieces-none']").classList.remove("gone");
+  } else {
+    ui.workshop.requestPieceListBlock.querySelector("[name='request-pieces-none']").classList.add("gone");
   }
 }
 

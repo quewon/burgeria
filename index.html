@@ -326,6 +326,9 @@
             <ul id="request-piece-list">
               <li><button>a</button></li>
             </ul>
+            <div class="gone" name="request-pieces-none">
+              <i>You don't have any pieces that contain letters.</i>
+            </div>
             <button onclick="this.parentNode.classList.add('gone')" class="top right" title="close">x</button>
           </div>
           <div class="block attached-above gone" style="padding: 0;" id="request-piece-block">
@@ -344,7 +347,9 @@
           </tr>
           <tr>
             <th><i>from:</i></th>
-            <td class="monospace" name="guy">CAT</td>
+            <td class="monospace">
+              <img name="guy" src="" alt="" class="little">
+            </td>
           </tr>
           <tr>
             <td colspan="2">
@@ -452,6 +457,8 @@
         <img src="" alt="" title="">
         <div name="text" class="block attached-top"></div>
         <button name="reject" class="gone" style="margin-top: var(--gap)">turn away</button>
+        <button name="view-request" class="gone burgerpoints" style="margin-top: var(--gap); border-color: var(--burgeria)">view request</button>
+        <button name="reject-request" class="gone" style="margin-top: var(--gap); border-color: var(--burgeria)">reject request</button>
       </div>
     </template>
 
@@ -503,6 +510,25 @@
 
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();" autofocus>close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dialog-preview-request">
+      <div class="flexbox">
+        <div class="grow">piece request</div>
+        <button title="close" onclick="this.parentNode.parentNode.close();">x</button>
+      </div>
+
+      <div name="dialogue">
+
+      </div>
+      <div name="request">
+
+      </div>
+
+      <div class="margintop" style="text-align: center;">
+        <button onclick="this.parentNode.parentNode.close();" autofocus>close</button>
+        <button name="accept">accept</button>
       </div>
     </dialog>
 
@@ -686,9 +712,7 @@
       updateBookshelf();
 
       // facade
-      for (let i=0; i<5; i++) {
-        new Guy();
-      }
+      game.generateGuys();
 
       //
 

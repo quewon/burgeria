@@ -19,7 +19,9 @@ var ui = {
     "publishing-success": document.getElementById("dialog-publishing-success"),
     "publishing-success-content": document.getElementById("dialog-publishing-success-content"),
     "wind": document.getElementById("dialog-wind"),
-    "wind-content": document.getElementById("dialog-wind-content")
+    "wind-content": document.getElementById("dialog-wind-content"),
+
+    "preview-request": document.getElementById("dialog-preview-request")
   },
   templates: {
     "tray": document.getElementById("template-tray"),
@@ -168,6 +170,23 @@ function setScene(name) {
 }
 
 // utility functions
+
+function tempMessage(innerHTML, x, y) {
+  var message = document.createElement("div");
+  message.className = "block front temp";
+  var closebutton = document.createElement("button");
+  closebutton.className = "top right front";
+  closebutton.textContent = "x";
+  closebutton.onclick = function() { this.parentNode.remove() };
+  message.innerHTML = innerHTML;
+  message.style.position = "absolute";
+  message.style.top = y || _dragdrop.mouse.y+"px";
+  message.style.left = x || _dragdrop.mouse.x+"px";
+  message.style.paddingRight = "calc(1.5rem + var(--padding))";
+  message.appendChild(closebutton);
+
+  document.documentElement.appendChild(message);
+}
 
 function divContainingTemplate(templateName) {
   let div = document.createElement("div");

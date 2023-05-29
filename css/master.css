@@ -864,7 +864,7 @@ span[name="title"] {
   white-space: nowrap;
 }
 
-#scene-workshop img {
+#scene-workshop > .column > .block > img {
   width: 100%;
   object-fit: scale-down;
 }
@@ -1127,17 +1127,21 @@ dialog.piece {
   gap: 0;
 }
 
+#scene-facade div:has(.guy) {
+  translate: -50% -50%;
+}
+
 #scene-facade.hide-guys div:has(.guy) {
   pointer-events: none;
 }
-#scene-facade.hide-guys div:has(.guy) {
+#scene-facade.hide-guys .guy {
   opacity: 0;
 }
 #scene-facade.hide-guys .guy.speaking {
-  opacity: .3;
+  opacity: .5;
 }
 
-#scene-facade .guy img {
+#scene-facade .guy img, img.little {
   width: 4rem;
   margin: auto;
   box-shadow: var(--bg) 0px 0px 2px 0px;
@@ -1163,4 +1167,44 @@ dialog.piece {
   height: calc(var(--gap) * 2);
   bottom: calc(var(--gap) * -2);
   left: 50%;
+}
+
+button.burgerpoints::after {
+  content: "✸";
+  display: block;
+  font-size: 2rem;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  translate: -50% -50%;
+  color: var(--burgeria);
+  text-align: center;
+  pointer-events: none;
+  animation: spin 5s linear infinite;
+}
+@keyframes spin {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+div.has-request div[name='text'] {
+  border-color: var(--burgeria) !important;
+}
+div.has-request div[name='text']::after {
+  border-color: var(--burgeria) !important;
+}
+
+#dialog-preview-request .attached-above {
+  border-top: 1px dashed var(--borders);
+  margin-top: var(--gap);
+}
+#dialog-preview-request table tr:nth-child(n+5) {
+  display: none;
+}
+
+.temp {
+  translate: calc(-100% + 1.75rem) -.75rem;
 }

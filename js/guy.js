@@ -63,9 +63,72 @@ class Guy {
     this.punctuate = Math.random() < .5 ? true : false;
     this.capitalize = Math.random() < .5 ? true : false;
 
+    this.appreciatesText = false;
+    this.expressedAppreciation = 0;
+
+    this.hasRequest = false;
+
     game.guys.push(this);
 
     this.hangAround();
+  }
+
+  createRequest() {
+    this.hasRequest = true;
+    this.element.classList.add("has-request");
+    this.request = new Request(this);
+
+    this.request.addRequirement();
+    this.request.addRequirement();
+    this.request.addRequirement();
+
+    this.viewRequestButton.classList.remove("gone");
+    this.viewRequestButton.dataset.index = this.index;
+    this.viewRequestButton.onclick = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.request.previewForAcceptance();
+    }
+
+    this.rejectRequestButton.classList.remove("gone");
+    this.rejectRequestButton.dataset.index = this.index;
+    this.rejectRequestButton.onclick = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.removeRequest();
+    }
+  }
+
+  removeRequest() {
+    this.hasRequest = false;
+    this.request = null;
+    this.element.classList.remove("has-request");
+    this.viewRequestButton.classList.add("gone");
+    this.rejectRequestButton.classList.add("gone");
+
+    // rejection dialogue
+
+    this.clearDialogue();
+    this.addString(this.styleText("aw man", true, null));
+    this.addPause(10);
+  }
+
+  acceptRequest() {
+    this.request.accept();
+    this.element.classList.remove("has-request");
+    this.viewRequestButton.classList.add("gone");
+    this.rejectRequestButton.classList.add("gone");
+
+    // accepted dialogue
+
+    this.clearDialogue();
+    this.addString(this.styleText("thank you", true, null));
+    this.addPause(10);
+
+    tempMessage("<i>A request has been added to your <button onclick='setScene(`workshop`)'>→ workshop</button>.</i>");
+  }
+
+  createRequestDialogue() {
+    this.addString(this.styleText("i have a request for you", true, null));
+    this.addPause(15);
   }
 
   createElement(arch) {
@@ -84,6 +147,10 @@ class Guy {
       game.guys[this.dataset.index].reject();
     }
     this.rejectbutton = rejectbutton;
+
+    let viewRequestButton = div.querySelector("[name='view-request']");
+    this.viewRequestButton = viewRequestButton;
+    this.rejectRequestButton = div.querySelector("[name='reject-request']");
 
     this.imageElement = img;
     this.textElement = text;
@@ -107,10 +174,35 @@ class Guy {
 
     this.clearDialogue();
     this.words = [];
-    if (Math.random() < .3) {
-      this.createExteriorDialogue();
-      this.addPause(15);
+
+    if (this.hasRequest && !this.request.accepted) {
+      this.createRequestDialogue();
+      return;
     }
+
+    if (this.appreciatesText && this.expressedAppreciation < 3 && playerdata.facade.length > 0) {
+      this.reactToFacadePiece();
+      this.expressedAppreciation++;
+    } else {
+      if (Math.random() < .3) {
+        this.createExteriorDialogue();
+      }
+    }
+  }
+
+  reactToFacadePiece() {
+    const piece = playerdata.facade.length[playerdata.facade.length * Math.random() | 0];
+
+    var dialogue = this.randomLine([
+      "hey, nice writing",
+      "i like this text on the wall",
+      "did you write this"
+    ]);
+
+    this.addString(this.styleText(dialogue, true, null));
+    this.addPause(15);
+
+    this.appreciatesText = true;
   }
 
   createExteriorDialogue() {
@@ -156,6 +248,8 @@ class Guy {
     } else {
       this.addString(this.styleText(dialogue, true, null));
     }
+
+    this.addPause(15);
   }
 
   createLeavingDialogue() {

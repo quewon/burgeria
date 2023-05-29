@@ -77,6 +77,15 @@ const game = {
     guyInterval: 12 * 250,
   },
 
+  generateGuys() {
+    for (let i=0; i<5; i++) {
+      new Guy();
+    }
+
+    game.guys[Math.random() * 5 | 0].appreciatesText = true;
+    game.guys[Math.random() * 5 | 0].createRequest();
+  },
+
   beginDay: function() {
     bankPoints(game.unbankedPoints, "BURGERIA");
     playerdata.unbankedPoints = 0;
@@ -93,9 +102,7 @@ const game = {
       game.guys.splice(i, 1);
     }
 
-    for (let i=0; i<5; i++) {
-      new Guy();
-    }
+    game.generateGuys();
 
     game.updatePrices();
 
