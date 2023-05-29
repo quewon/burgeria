@@ -169,9 +169,28 @@ class WorkshopPiece {
       const title = this.piece.text.split("\n")[0];
       this.piece.title = title == "" ? "Empty note" : title;
       this.piece.updateUI();
+      updateRequestPieceList();
     });
     this.inputManager.piece = this;
     this.inputManager.oninput();
+  }
+
+  createRequestListItem() {
+    const li = document.createElement("li");
+
+    const button = document.createElement("button"); button.textContent = this.title;
+
+    button.dataset.index = this.index;
+    button.onclick = function() {
+      const request = playerdata.requests[playerdata.requestIndex];
+      const piece = playerdata.workshop[this.dataset.index];
+      request.applyPiece(piece);
+    }
+
+    li.appendChild(button);
+
+    this.requestListItem = li;
+    this.requestListButton = button;
   }
 
   updateUI() {
@@ -187,6 +206,8 @@ class WorkshopPiece {
       playerdata.workshop[playerdata.workshopIndex] == this
     )
       lib.children[playerdata.workshopIndex].textContent = this.title;
+
+    if (this.requestListButton) this.requestListButton.textContent = this.title;
   }
 
   wordsCount() {
@@ -289,13 +310,16 @@ class WorkshopPiece {
     this.element = button;
 
     this.buttonSelect();
+
+    this.createRequestListItem();
   }
 
   removeFromWorkshop() {
     this.inputManager.delete();
 
-    spliceIndexedObject(playerdata.workshop, this.index, function(obj) {
-      obj.element.dataset.index = obj.index;
+    spliceIndexedObject(playerdata.workshop, this.index, function(piece) {
+      piece.element.dataset.index = piece.index;
+      piece.requestListButton.dataset.index = piece.index;
     });
 
     if (playerdata.workshopIndex >= playerdata.workshop.length) playerdata.workshopIndex--;
@@ -402,7 +426,7 @@ class FacadePiece {
     this.ghost.style.width = rect.width+"px";
     this.ghost.style.height = rect.height+"px";
   }
-  
+
   returnToOrigin() {
     spliceIndexedObject(playerdata.facade, this.index, function(piece) {
       piece.block.dataset.index = piece.index;

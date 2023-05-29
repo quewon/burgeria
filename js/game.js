@@ -122,11 +122,12 @@ const game = {
 
     let everyoneserved = true;
     for (let guy of game.guys) {
-      if (guy.active) {
+      if (guy.enteredStore && guy.active) {
         everyoneserved = false;
         break;
       }
     }
+
     if (everyoneserved) {
       game.beginDay();
     } else {

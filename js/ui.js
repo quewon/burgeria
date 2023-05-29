@@ -29,7 +29,8 @@ var ui = {
     "feedback-napkin": document.getElementById("template-feedback-napkin"),
     "writing-alert": document.getElementById("template-writing-alert"),
     "market-alert": document.getElementById("template-market-alert"),
-    "facade-piece": document.getElementById("template-facade-piece")
+    "facade-piece": document.getElementById("template-facade-piece"),
+    "request": document.getElementById("template-request")
   },
   scenes: {
     "storefront": document.getElementById("scene-storefront"),
@@ -98,7 +99,15 @@ var ui = {
     library: document.getElementById("workshop-library"),
     wordsCount: document.getElementById("workshop-words"),
     lettersCount: document.getElementById("workshop-letters"),
-    kitchenLibraryButton: document.getElementById("market-library-button")
+    kitchenLibraryButton: document.getElementById("market-library-button"),
+    requestBlock: document.getElementById("request-block"),
+    requestContainer: document.getElementById("request-container"),
+    requestsTotal: document.getElementById("requests-total"),
+    requestsIndex: document.getElementById("requests-index"),
+    requestPieceListBlock: document.getElementById("request-piece-list-block"),
+    requestPieceList: document.getElementById("request-piece-list"),
+    requestPieceBlock: document.getElementById("request-piece-block"),
+    requestPiece: document.getElementById("request-piece")
   },
   "facade": {
     sceneButton: document.getElementById("facade-scene-button"),

@@ -33,8 +33,8 @@
       </div>
     </div>
 
-    <div id="scene-facade" class="scene">
-      <div class="block transparent">
+    <div id="scene-facade" class="scene gone">
+      <div class="block transparent flexbox gap" style="width: 100%;">
         <div class="dropdown-container">
           <button class="dropdown-anchor" onclick="updateFacadeList(); toggleDropdown(this)">☰ pieces & pages</button>
           <div class="dropdown">
@@ -55,6 +55,10 @@
             </div>
           </div>
         </div>
+
+        <div class="grow"></div>
+
+        <button onclick="this.parentNode.parentNode.classList.toggle('hide-guys'); this.textContent=this.parentNode.parentNode.classList.contains('hide-guys') ? 'show guys' : 'hide guys'">hide guys</button>
       </div>
     </div>
 
@@ -309,13 +313,23 @@
             <b>REQUESTS</b>
             <div class="grow"></div>
             <div>
-              <button disabled>←</button>
-              1/1
-              <button disabled>→</button>
+              <button onclick="navigateRequestContainer(-1)" disabled>←</button>
+              <span id="requests-index">1</span>/<span id="requests-total">1</span>
+              <button onclick="navigateRequestContainer(1)" disabled>→</button>
             </div>
           </div>
           <div id="request-container">
 
+          </div>
+          <div class="block attached-above gone" name="piece-list-block" id="request-piece-list-block">
+            <b>PIECES</b>
+            <ul id="request-piece-list">
+              <li><button>a</button></li>
+            </ul>
+            <button onclick="this.parentNode.classList.add('gone')" class="top right" title="close">x</button>
+          </div>
+          <div class="block attached-above gone" style="padding: 0;" id="request-piece-block">
+            <p id="request-piece">hello</p>
           </div>
         </div>
       </div>
@@ -353,20 +367,11 @@
             <th><i>attach piece:</i></th>
             <td>
               <div class="dropdown-container">
-                <button name="attachment"><span class="monospace">SELECT PIECE</span></button>
+                <button onclick="selectRequestPiece()" name="attachment"><span name="piece-name" class="monospace">SELECT PIECE</span></button>
               </div>
             </td>
           </tr>
         </table>
-      </div>
-      <div class="block attached-above">
-        <b>PIECES</b>
-        <ul name="piece-list">
-          <li><button>a</button></li>
-        </ul>
-      </div>
-      <div class="block attached-above" style="padding: 0;">
-        <p name="piece">hello</p>
       </div>
     </template>
 
@@ -640,6 +645,8 @@
   <script type="text/javascript" src="js/piece.js"></script>
 
   <script type="text/javascript" src="js/guy.js"></script>
+  <script type="text/javascript" src="js/request.js"></script>
+
   <script type="text/javascript" src="js/news.js"></script>
   <script type="text/javascript" src="js/ui.js"></script>
   <script type="text/javascript" src="js/data.js"></script>

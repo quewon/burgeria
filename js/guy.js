@@ -43,7 +43,7 @@ var ARCHETYPES = [
 
 class Guy {
   constructor() {
-    this.id = game.guys.length;
+    this.index = game.guys.length;
 
     const arch = ARCHETYPES[Math.random() * ARCHETYPES.length | 0];
 
@@ -54,7 +54,7 @@ class Guy {
     this.talkInterval = arch.talkInterval * 3;
     this.talkTime = 0;
     this.voice = arch.voice;
-    this.soundId = null;
+    this.soundIndex = null;
     this.chime = _sounds.chime[arch.chime];
 
     this.enteredStore = false;
@@ -76,10 +76,10 @@ class Guy {
 
     let text = div.querySelector("[name='text']");
     let number = div.querySelector("[name='number']");
-    number.textContent = this.id+1;
+    number.textContent = this.index+1;
 
     let rejectbutton = div.querySelector("[name='reject']");
-    rejectbutton.dataset.index = this.id;
+    rejectbutton.dataset.index = this.index;
     rejectbutton.onclick = function() {
       game.guys[this.dataset.index].reject();
     }
@@ -109,6 +109,7 @@ class Guy {
     this.words = [];
     if (Math.random() < .3) {
       this.createExteriorDialogue();
+      this.addPause(15);
     }
   }
 
@@ -377,10 +378,11 @@ class Guy {
     }
 
     if (!el.classList.contains("pause")) {
-      this.soundId = sfx_talk(this.voice, this.soundId);
+      this.soundIndex = sfx_talk(this.voice, this.soundIndex);
       if (!this.enteredStore) {
         ui.scenes.facade.appendChild(this.element);
       }
+      this.element.firstElementChild.classList.add("speaking");
     }
 
     if (this.words.length > 0) {
@@ -403,6 +405,7 @@ class Guy {
     if (!this.active) return;
 
     if (this.words.length == 0) {
+      this.element.firstElementChild.classList.remove("speaking");
       if (this.rejected) {
         this.delete();
       }
@@ -418,10 +421,10 @@ class Guy {
 
   receive(tray) {
     this.served = true;
-    this.element.dataset.id = this.id;
+    this.element.dataset.index = this.index;
     this.element.classList.add("removing-ticket");
     this.element.addEventListener("animationend", function(e) {
-      let guy = game.guys[this.dataset.id];
+      let guy = game.guys[this.dataset.index];
       guy.delete();
     });
 

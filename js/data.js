@@ -12,11 +12,14 @@ function init_default_playerdata() {
     letters: {},
     ingredients: {},
     workshop: [],
-    workshopIndex: 0,
+    workshopIndex: -1,
     library: [],
-    libraryIndex: 0,
+    libraryIndex: -1,
 
     facade: [],
+
+    requests: [],
+    requestIndex: -1,
 
     themeIndex: 0,
 

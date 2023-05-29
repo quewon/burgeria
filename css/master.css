@@ -1126,6 +1126,17 @@ dialog.piece {
 #scene-facade {
   gap: 0;
 }
+
+#scene-facade.hide-guys div:has(.guy) {
+  pointer-events: none;
+}
+#scene-facade.hide-guys div:has(.guy) {
+  opacity: 0;
+}
+#scene-facade.hide-guys .guy.speaking {
+  opacity: .3;
+}
+
 #scene-facade .guy img {
   width: 4rem;
   margin: auto;

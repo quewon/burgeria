@@ -1,9 +1,9 @@
 var _sounds = {
-  click: new Howl({ src: "sound/click/lowpip.mp3" }),
+  click: new Howl({ src: "sound/click/lowpip.mp3", volume: .7 }),
   type: [
-    new Howl({ src: "sound/click/1.wav" }),
-    new Howl({ src: "sound/click/2.wav" }),
-    new Howl({ src: "sound/click/3.wav" })
+    new Howl({ src: "sound/click/1.wav", volume: .7 }),
+    new Howl({ src: "sound/click/2.wav", volume: .7 }),
+    new Howl({ src: "sound/click/3.wav", volume: .7 })
   ],
   error: new Howl({ src: "sound/click/lowerpip.mp3" }),
   disintegrate: new Howl({ src: "sound/disintegrate.wav", loop: true }),
@@ -34,9 +34,9 @@ var _sounds = {
   //   ],
   // },
   talk: [
-    new Howl({ src: "sound/click/1.wav" }),
-    new Howl({ src: "sound/click/2.wav" }),
-    new Howl({ src: "sound/click/3.wav" })
+    new Howl({ src: "sound/click/1.wav", volume: .7 }),
+    new Howl({ src: "sound/click/2.wav", volume: .7 }),
+    new Howl({ src: "sound/click/3.wav", volume: .7 })
   ],
   close_store: new Howl({ src: "sound/click/3.wav" }),
   begin_day: new Howl({ src: "sound/click/3.wav" }),
