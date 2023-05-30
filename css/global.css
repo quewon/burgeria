@@ -4,6 +4,11 @@
 
 .monospace {
   font-family: monospace;
+  text-transform: uppercase;
+}
+
+.strikethrough {
+  text-decoration: line-through;
 }
 
 .center {

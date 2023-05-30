@@ -16,7 +16,7 @@ var ARCHETYPES = [
     voice: "wa"
   },
   {
-    name: "monkeey",
+    name: "monkey",
     source: "img/monkey.png",
     chime: 1,
     complexity: 1,
@@ -46,6 +46,8 @@ class Guy {
     this.index = game.guys.length;
 
     const arch = ARCHETYPES[Math.random() * ARCHETYPES.length | 0];
+
+    this.name = arch.name;
 
     this.generateDesiredMenu(arch.complexity);
 
@@ -79,9 +81,12 @@ class Guy {
     this.element.classList.add("has-request");
     this.request = new Request(this);
 
-    this.request.addRule();
-    this.request.addRule();
-    this.request.addRule();
+    this.request.title = "A LETTER FOR MOM";
+    this.request.addRule({ type: "startString", condition: "to mom" });
+    this.request.addRule({ type: "contain", condition: "miss you" });
+    this.request.addRule({ type: "endString", condition: "love, "+this.name });
+    this.request.addRule({ type: "minLetterCount", condition: 15 });
+    this.request.setCompensation({ type: "pointsPerLetter", condition: 1 });
 
     this.viewRequestButton.classList.remove("gone");
     this.viewRequestButton.dataset.index = this.index;
@@ -352,7 +357,7 @@ class Guy {
   }
 
   visitStorefront() {
-    if (this.request && this.request.piece) {
+    if (this.request && !this.request.fulfilled && this.request.piece) {
       this.clearDialogue();
       this.createAwaitRequestDialogue();
     }

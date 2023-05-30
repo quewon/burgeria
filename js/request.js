@@ -1,6 +1,75 @@
 class RequestRule {
-  constructor() {
-    this.text = "undefined rule";
+  constructor(p) {
+    this.type = p.type;
+    this.condition = p.condition;
+
+    //<li>must contain the word <span class="monospace"><em>MOTHER</em></span>.</li>
+    //<li>must be <em>30 characters or longer</em>.</li>
+
+    this.element = document.createElement("div");
+    switch (this.type) {
+      case "startString":
+        this.element.innerHTML = "must begin with <span class='monospace'><em>"+this.condition+"</em></span>.";
+        break;
+
+      case "endString":
+        this.element.innerHTML = "must end with <span class='monospace'><em>"+this.condition+"</em></span>.";
+        break;
+
+      case "contain":
+        this.element.innerHTML = "must contain <span class='monospace'><em>"+this.condition+"</em></span>.";
+        break;
+
+      case "minLetterCount":
+        this.element.innerHTML = "must be "+p.condition+" letters or longer.";
+        break;
+    }
+  }
+
+  check(text) {
+    text = text.toLowerCase();
+
+    this.element.classList.remove("strikethrough");
+
+    switch (this.type) {
+      case "startString":
+        if (text.indexOf(this.condition) == 0) {
+          this.element.classList.add("strikethrough");
+          return true;
+        }
+        break;
+
+      case "endString":
+        if (text.indexOf(this.condition) == text.length - this.condition.length) {
+          this.element.classList.add("strikethrough");
+          return true;
+        }
+        break;
+
+      case "contain":
+        if (text.indexOf(this.condition) != -1) {
+          this.element.classList.add("strikethrough");
+          return true;
+        }
+        break;
+
+      case "minLetterCount":
+        let letters = 0;
+        for (let char of text) {
+          const letter = char.toLowerCase();
+          if (letter in playerdata.prices) {
+            letters++;
+          }
+        }
+
+        if (letters >= this.condition) {
+          this.element.classList.add("strikethrough");
+          return true;
+        }
+        break;
+    }
+
+    return false;
   }
 }
 
@@ -14,10 +83,15 @@ class Request {
     this.compensation = "...";
   }
 
-  addRule() {
-    this.rules.push(new RequestRule(
+  addRule(p) {
+    this.rules.push(new RequestRule(p));
+  }
 
-    ));
+  setCompensation(p) {
+    this.compensation = {
+      type: p.type,
+      condition: p.condition
+    }
   }
 
   previewForAcceptance() {
@@ -28,9 +102,6 @@ class Request {
     if (!this.element) {
       this.createElement();
     }
-
-    //<li>must contain the word <span class="monospace"><em>MOTHER</em></span>.</li>
-    //<li>must be <em>30 characters or longer</em>.</li>
 
     const request = dialog.querySelector("[name='request']");
 
@@ -77,7 +148,7 @@ class Request {
     }
     for (let rule of this.rules) {
       const li = document.createElement("li");
-      li.innerHTML = rule.html;
+      li.appendChild(rule.element);
       rules.appendChild(li);
     }
 
@@ -85,6 +156,25 @@ class Request {
 
     this.pieceSelectButton = this.element.querySelector("[name='piece-name']");
     this.statusElement = status;
+
+    const comp = this.element.querySelector("[name='compensation']");
+    switch (this.compensation.type) {
+      case "pointsPerLetter":
+        comp.innerHTML = "<span class='burgerpoints' title='BurgerPoints'></span>"+this.compensation.condition+" PER LETTER";
+        break;
+
+      case "points":
+        comp.innerHTML = "<span class='burgerpoints' title='BurgerPoints'></span>"+this.compensation.condition;
+        break;
+
+      case "gift":
+        comp.textContent = "A GIFT";
+        break;
+
+      case "piece":
+        comp.textContent = "A PIECE";
+        break;
+    }
   }
 
   addToWorkshop() {
@@ -116,6 +206,10 @@ class Request {
   }
 
   applyPiece(piece) {
+    for (let rule of this.rules) {
+      rule.check(piece ? piece.text : "");
+    }
+
     if (!piece) {
       if (this.piece) {
         const wp = new WorkshopPiece(this.piece.text);
@@ -161,11 +255,48 @@ class Request {
     this.pieceSelectButton.parentNode.removeAttribute("title");
     this.fulfilled = true;
 
-    //todo compensate the player
-  }
+    var allgood = true;
+    for (let rule of this.rules) {
+      if (!rule.check(this.piece.text)) {
+        allgood = false;
+      }
+    }
+    if (allgood) {
+      // compensate the player
 
-  delete() {
+      switch (this.compensation.type) {
+        case "pointsPerLetter":
+          let letters = 0;
+          for (let char of this.piece.text) {
+            const letter = char.toLowerCase();
+            if (letter in playerdata.prices) {
+              letters++;
+            }
+          }
 
+          const points = letters * this.compensation.condition;
+
+          for (let i=0; i<points; i++) {
+            setTimeout(burgerpointParticle, Math.random() * 100 * points);
+          }
+
+          break;
+
+        case "points":
+          for (let i=0; i<this.compensation.condition; i++) {
+            setTimeout(burgerpointParticle, Math.random() * 100 * this.compensation.condition);
+          }
+          break;
+
+        case "gift":
+          // todo
+          break;
+
+        case "piece":
+          // todo
+          break;
+      }
+    }
   }
 }
 

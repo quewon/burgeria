@@ -84,11 +84,7 @@ const game = {
 
     game.guys[Math.random() * 5 | 0].appreciatesText = true;
 
-    for (let guy of game.guys) {
-      guy.createRequest();
-    }
-
-    // game.guys[Math.random() * 5 | 0].createRequest();
+    game.guys[Math.random() * 5 | 0].createRequest();
   },
 
   beginDay: function() {
