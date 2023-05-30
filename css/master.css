@@ -1193,10 +1193,10 @@ button.burgerpoints::after {
   }
 }
 
-div.has-request div[name='text'] {
+div.has-request div[name='text'], div.awaiting-request div[name='text'] {
   border-color: var(--burgeria) !important;
 }
-div.has-request div[name='text']::after {
+div.has-request div[name='text']::after, div.awaiting-request div[name='text']::after {
   border-color: var(--burgeria) !important;
 }
 

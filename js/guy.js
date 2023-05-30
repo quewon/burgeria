@@ -67,6 +67,7 @@ class Guy {
     this.expressedAppreciation = 0;
 
     this.hasRequest = false;
+    this.awaitingRequest = false;
 
     game.guys.push(this);
 
@@ -96,22 +97,49 @@ class Guy {
       guy.removeRequest();
     };
 
+    this.fulfillRequestButton.dataset.index = this.index;
+    this.fulfillRequestButton.onclick = function() {
+      const guy = game.guys[this.dataset.index];
+      guy.fulfillRequest();
+    }
+
     this.viewRequestButton.onmousedown =
-    this.rejectRequestButton.onmousedown = function() {
+    this.rejectRequestButton.onmousedown =
+    this.fulfillRequestButton.onmousedown =
+    function() {
       const guy = game.guys[this.dataset.index];
       guy.dontBringToFront = true;
     };
     this.viewRequestButton.onmouseleave = this.viewRequestButton.onblur = this.viewRequestButton.onmouseup =
     this.rejectRequestButton.onmouseleave = this.rejectRequestButton.onblur = this.rejectRequestButton.onmouseup =
+    this.fulfillRequestButton.onmouseleave = this.fulfillRequestButton.onblur = this.fulfillRequestButton.onmouseup =
     function() {
       const guy = game.guys[this.dataset.index];
       guy.dontBringToFront = false;
     };
   }
 
-  removeRequest() {
+  fulfillRequest() {
     sfx("click");
 
+    this.request.fulfill();
+    this.element.classList.remove("awaiting-request");
+    this.fulfillRequestButton.classList.add("gone");
+
+    // accepted dialogue
+
+    if (this.enteredStore) {
+      this.clearDialogue();
+      this.addString(this.styleText("thank you", true, null));
+      this.createOrderDialogue(true);
+    } else {
+      this.clearDialogue();
+      this.addString(this.styleText("thank you", true, null));
+      this.addPause(10);
+    }
+  }
+
+  removeRequest() {
     this.hasRequest = false;
     this.request = null;
     this.element.classList.remove("has-request");
@@ -132,8 +160,6 @@ class Guy {
   }
 
   acceptRequest() {
-    sfx("click");
-
     this.request.accept();
     this.element.classList.remove("has-request");
     this.viewRequestButton.classList.add("gone");
@@ -189,6 +215,9 @@ class Guy {
     this.viewRequestButton = viewRequestButton;
     this.rejectRequestButton = div.querySelector("[name='reject-request']");
 
+    let fulfillRequestButton = div.querySelector("[name='fulfill-request']");
+    this.fulfillRequestButton = fulfillRequestButton;
+
     this.imageElement = img;
     this.textElement = text;
     this.element = div;
@@ -203,34 +232,50 @@ class Guy {
   visitFacade() {
     this.dontBringToFront = false;
 
-    let x = Math.random() * 50 + 25;
-    let y = Math.random() * 50 + 10;
-
-    this.element.style.left = x+"%";
-    this.element.style.top = y+"%";
-
-    this.currentTalkInterval = Math.random() * 20 + 10 * this.talkInterval;
+    this.currentTalkInterval = (Math.random() * 10 + 10) * this.talkInterval;
 
     this.clearDialogue();
-    this.words = [];
 
     if (this.hasRequest && !this.request.accepted) {
       this.createRequestDialogue();
       return;
     }
 
-    if (this.appreciatesText && this.expressedAppreciation < 3 && playerdata.facade.length > 0) {
+    if (this.request && !this.request.fulfilled && this.request.piece) {
+      this.createAwaitRequestDialogue();
+    } else if (this.appreciatesText && this.expressedAppreciation < 3 && playerdata.facade.length > 0) {
       this.reactToFacadePiece();
       this.expressedAppreciation++;
     } else {
+      let x = Math.random() * 50 + 25;
+      let y = Math.random() * 50 + 10;
+
+      this.element.style.left = x+"%";
+      this.element.style.top = y+"%";
+
       if (Math.random() < .3) {
         this.createExteriorDialogue();
       }
     }
   }
 
+  createAwaitRequestDialogue() {
+    var dialogue = this.randomLine([
+      "have you fulfilled my request"
+    ]);
+
+    this.addString(this.styleText(dialogue, true, null));
+    this.addPause(15);
+  }
+
   reactToFacadePiece() {
-    const piece = playerdata.facade.length[playerdata.facade.length * Math.random() | 0];
+    const piece = playerdata.facade[playerdata.facade.length * Math.random() | 0];
+
+    let x = Math.random() * piece.width;
+    let y = Math.random() * piece.height;
+
+    this.element.style.left = "calc("+piece.x+"% + "+x+"px)";
+    this.element.style.top = "calc("+piece.y+"% + "+y+"px)";
 
     var dialogue = this.randomLine([
       "hey, nice writing",
@@ -240,8 +285,6 @@ class Guy {
 
     this.addString(this.styleText(dialogue, true, null));
     this.addPause(15);
-
-    this.appreciatesText = true;
   }
 
   createExteriorDialogue() {
@@ -308,13 +351,21 @@ class Guy {
     ui.scenes.facade.appendChild(this.element);
   }
 
+  visitStorefront() {
+    if (this.request && this.request.piece) {
+      this.clearDialogue();
+      this.createAwaitRequestDialogue();
+    }
+  }
+
   enterStore() {
     this.element.onclick = null;
     this.element.style.position = "unset";
 
     this.clearDialogue();
-    if (!this.hasRequest || this.request.accepted) {
-      this.words = [];
+    if (this.request && !this.request.fulfilled && this.request.piece) {
+      this.createAwaitRequestDialogue();
+    } else if (!this.hasRequest || this.request.accepted) {
       this.createOrderDialogue();
     } else {
       this.createRequestDialogue();
@@ -383,6 +434,7 @@ class Guy {
       this.textElement.lastElementChild.remove();
     }
     this.textElement.classList.add("gone");
+    this.words = [];
   }
 
   randomPunctuateLine(line) {

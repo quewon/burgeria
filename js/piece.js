@@ -423,6 +423,8 @@ class FacadePiece {
     this.textElement = textElement;
 
     const rect = this.textElement.getBoundingClientRect();
+    this.width = rect.width;
+    this.height = rect.height;
     this.ghost.style.width = rect.width+"px";
     this.ghost.style.height = rect.height+"px";
   }

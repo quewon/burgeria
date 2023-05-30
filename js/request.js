@@ -10,6 +10,7 @@ class Request {
     this.title = title || "A PIECE OF WRITING";
     this.rules = [];
     this.accepted = false;
+    this.fulfilled = false;
     this.compensation = "...";
   }
 
@@ -32,6 +33,11 @@ class Request {
     //<li>must be <em>30 characters or longer</em>.</li>
 
     const request = dialog.querySelector("[name='request']");
+
+    if (request.lastElementChild) {
+      request.lastElementChild.remove();
+    }
+
     request.appendChild(this.element);
 
     const accept = dialog.querySelector("[name='accept']");
@@ -121,8 +127,15 @@ class Request {
       this.pieceSelectButton.textContent = "SELECT PIECE";
       this.pieceSelectButton.parentNode.removeAttribute("title");
       ui.workshop.requestPieceBlock.classList.add("gone");
+
+      this.guy.element.classList.remove("awaiting-request");
+      this.guy.fulfillRequestButton.classList.add("gone");
+
       return;
     }
+
+    this.guy.element.classList.add("awaiting-request");
+    this.guy.fulfillRequestButton.classList.remove("gone");
 
     this.piece = {
       text: piece.text,
@@ -140,6 +153,19 @@ class Request {
     ui.workshop.requestPieceBlock.classList.remove("gone");
 
     ui.workshop.requestPiece.textContent = this.piece.text;
+  }
+
+  fulfill() {
+    this.statusElement.textContent = "DELIVERED";
+    this.pieceSelectButton.parentNode.setAttribute("disabled", true);
+    this.pieceSelectButton.parentNode.removeAttribute("title");
+    this.fulfilled = true;
+
+    //todo compensate the player
+  }
+
+  delete() {
+
   }
 }
 

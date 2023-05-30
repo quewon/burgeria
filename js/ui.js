@@ -166,12 +166,24 @@ function setScene(name) {
         }
       }
       break;
+    case "storefront":
+      for (let guy of game.guys) {
+        if (guy.enteredStore) {
+          guy.visitStorefront();
+        }
+      }
+      break;
   }
 }
 
 // utility functions
 
 function tempMessage(innerHTML, x, y) {
+  var temps = document.getElementsByClassName("temp");
+  for (let i=temps.length-1; i>=0; i--) {
+    temps[i].remove();
+  }
+
   var message = document.createElement("div");
   message.className = "block front temp";
   var closebutton = document.createElement("button");
