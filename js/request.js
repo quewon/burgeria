@@ -250,11 +250,6 @@ class Request {
   }
 
   fulfill() {
-    this.statusElement.textContent = "DELIVERED";
-    this.pieceSelectButton.parentNode.setAttribute("disabled", true);
-    this.pieceSelectButton.parentNode.removeAttribute("title");
-    this.fulfilled = true;
-
     var allgood = true;
     for (let rule of this.rules) {
       if (!rule.check(this.piece.text)) {
@@ -298,7 +293,16 @@ class Request {
         }
         bankPoints(points, "COMMISSION");
       }
+
+      this.statusElement.textContent = "DELIVERED";
+      this.fulfilled = true;
+      this.pieceSelectButton.parentNode.setAttribute("disabled", true);
+      this.pieceSelectButton.parentNode.removeAttribute("title");
+    } else {
+      this.statusElement.textContent = "REJECTED";
     }
+
+    this.guy.fulfillRequest(allgood);
   }
 }
 

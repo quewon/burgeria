@@ -86,7 +86,7 @@ class Guy {
     this.request.addRule({ type: "contain", condition: "miss you" });
     this.request.addRule({ type: "endString", condition: "love, "+this.name });
     this.request.addRule({ type: "minLetterCount", condition: 15 });
-    this.request.setCompensation({ type: "pointsPerLetter", condition: 1 });
+    this.request.setCompensation({ type: "points", condition: 25 });
 
     this.viewRequestButton.classList.remove("gone");
     this.viewRequestButton.dataset.index = this.index;
@@ -105,7 +105,7 @@ class Guy {
     this.fulfillRequestButton.dataset.index = this.index;
     this.fulfillRequestButton.onclick = function() {
       const guy = game.guys[this.dataset.index];
-      guy.fulfillRequest();
+      guy.request.fulfill();
     }
 
     this.viewRequestButton.onmousedown =
@@ -124,22 +124,23 @@ class Guy {
     };
   }
 
-  fulfillRequest() {
+  fulfillRequest(meetsRules) {
     sfx("click");
-
-    this.request.fulfill();
-    this.element.classList.remove("awaiting-request");
-    this.fulfillRequestButton.classList.add("gone");
 
     // accepted dialogue
 
-    if (this.enteredStore) {
-      this.clearDialogue();
+    this.clearDialogue();
+    if (meetsRules) {
       this.addString(this.styleText("thank you", true, null));
+      this.element.classList.remove("awaiting-request");
+      this.fulfillRequestButton.classList.add("gone");
+    } else {
+      this.addString(this.styleText("sorry, this isn't what i wanted", true, null));
+    }
+
+    if (this.enteredStore) {
       this.createOrderDialogue(true);
     } else {
-      this.clearDialogue();
-      this.addString(this.styleText("thank you", true, null));
       this.addPause(10);
     }
   }
