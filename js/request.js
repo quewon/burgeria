@@ -264,6 +264,8 @@ class Request {
     if (allgood) {
       // compensate the player
 
+      let points = 0;
+
       switch (this.compensation.type) {
         case "pointsPerLetter":
           let letters = 0;
@@ -274,18 +276,11 @@ class Request {
             }
           }
 
-          const points = letters * this.compensation.condition;
-
-          for (let i=0; i<points; i++) {
-            setTimeout(burgerpointParticle, Math.random() * 100 * points);
-          }
-
+          points = letters * this.compensation.condition;
           break;
 
         case "points":
-          for (let i=0; i<this.compensation.condition; i++) {
-            setTimeout(burgerpointParticle, Math.random() * 100 * this.compensation.condition);
-          }
+          points = this.compensation.condition;
           break;
 
         case "gift":
@@ -295,6 +290,13 @@ class Request {
         case "piece":
           // todo
           break;
+      }
+
+      if (points > 0) {
+        for (let i=0; i<points; i++) {
+          setTimeout(burgerpointParticle, Math.random() * 100 * points);
+        }
+        bankPoints(points, "COMMISSION");
       }
     }
   }
