@@ -9,6 +9,49 @@ function calculatePieceCost(text) {
   return Math.ceil(cost);
 }
 
+function randomLine(text) {
+  var lines = text.match(/\(?[^\.\?\!]+[\.!\?]\)?/g);
+
+  console.log(lines);
+
+  for (let i=lines.length-1; i>=0; i--) {
+    const line = lines[i];
+
+    var containsAnyLetter = false;
+    for (let letter in playerdata.letters) {
+      if (line.includes(letter)) {
+        containsAnyLetter = true;
+        break;
+      }
+    }
+
+    if (!containsAnyLetter) {
+      lines.splice(i, 1);
+    }
+  }
+
+  var randomLine = lines[lines.length * Math.random() | 0];
+  var words = randomLine.split(" ");
+
+  if (words.length > 5) {
+    var randomStart = Math.random() * (words.length-6) | 0;
+    var randomEnd = randomStart + 5;
+    randomLine = "";
+    for (let i=randomStart; i<=randomEnd; i++) {
+      randomLine += words[i];
+      if (i<randomEnd) randomLine += " ";
+    }
+    if (randomStart != 0) {
+      randomLine = "... " + randomLine;
+    }
+    if (randomEnd != words.length - 1) {
+      randomLine += " ...";
+    }
+  }
+
+  return randomLine.trim();
+}
+
 class PieceAlert {
   constructor(text, cost) {
     text = text || "";

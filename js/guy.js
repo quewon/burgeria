@@ -1,46 +1,3 @@
-var ARCHETYPES = [
-  {
-    name: "fish",
-    source: "img/fish.png",
-    chime: 0,
-    complexity: 0,
-    talkInterval: .7,
-    voice: "ka"
-  },
-  {
-    name: "dog",
-    source: "img/dog.png",
-    chime: 0,
-    complexity: 1,
-    talkInterval: 1.5,
-    voice: "wa"
-  },
-  {
-    name: "monkey",
-    source: "img/monkey.png",
-    chime: 1,
-    complexity: 1,
-    talkInterval: 1,
-    voice: "pa"
-  },
-  {
-    name: "cat",
-    source: "img/cat.png",
-    chime: 2,
-    complexity: 2,
-    talkInterval: 2,
-    voice: "pa"
-  },
-  {
-    name: "mouse",
-    source: "img/mouse.png",
-    chime: 3,
-    complexity: 3,
-    talkInterval: .5,
-    voice: "wa"
-  },
-];
-
 class Guy {
   constructor() {
     this.index = game.guys.length;
@@ -81,12 +38,11 @@ class Guy {
     this.element.classList.add("has-request");
     this.request = new Request(this);
 
-    this.request.title = "A LETTER FOR MOM";
-    this.request.addRule({ type: "startString", condition: "to mom" });
-    this.request.addRule({ type: "contain", condition: "miss you" });
-    this.request.addRule({ type: "endString", condition: "love, "+this.name });
-    this.request.addRule({ type: "minLetterCount", condition: 15 });
-    this.request.setCompensation({ type: "points", condition: 25 });
+    //
+
+    REQUESTS[Math.random() * REQUESTS.length | 0].init(this);
+
+    //
 
     this.viewRequestButton.classList.remove("gone");
     this.viewRequestButton.dataset.index = this.index;
@@ -131,7 +87,25 @@ class Guy {
 
     this.clearDialogue();
     if (meetsRules) {
-      this.addString(this.styleText("thank you", true, null));
+      var dialogue;
+
+      switch (this.request.compensation.type) {
+        case "gift":
+          dialogue = "thanks, here's something thing i found";
+          tempMessage("<i>An item has been added to your <button onclick='setScene(`kitchen`)'>→ stock</button>.</i>");
+          break;
+
+        case "piece":
+          dialogue = "thanks. this is for you";
+          tempMessage("<i>A piece has been added to your <button onclick='setScene(`kitchen`)'>→ library</button>.</i>");
+          break;
+
+        default:
+          dialogue = "thank you";
+          break;
+      }
+
+      this.addString(this.styleText(dialogue, true, null));
       this.element.classList.remove("awaiting-request");
       this.fulfillRequestButton.classList.add("gone");
     } else {
@@ -283,13 +257,20 @@ class Guy {
     this.element.style.left = "calc("+piece.x+"% + "+x+"px)";
     this.element.style.top = "calc("+piece.y+"% + "+y+"px)";
 
+    var style = null;
     var dialogue = this.randomLine([
-      "hey, nice writing",
-      "i like this text on the wall",
-      "did you write this"
+      // "hey, nice writing",
+      // "i like this text on the wall",
+      // "did you write this",
+      '"[random line]"...'
     ]);
 
-    this.addString(this.styleText(dialogue, true, null));
+    if (dialogue.includes("[random line]")) {
+      dialogue = dialogue.replace("[random line]", randomLine(piece.text));
+      style = "italicized";
+    }
+
+    this.addString(this.styleText(dialogue, true, null), style);
     this.addPause(15);
   }
 

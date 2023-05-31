@@ -80,7 +80,8 @@ class Request {
     this.rules = [];
     this.accepted = false;
     this.fulfilled = false;
-    this.compensation = "...";
+    this.rejectionCount = 0;
+    this.setCompensation({ type: null, condition: null });
   }
 
   addRule(p) {
@@ -279,11 +280,11 @@ class Request {
           break;
 
         case "gift":
-          // todo
+          playerdata.inventory.addItem(this.compensation.condition);
           break;
 
         case "piece":
-          // todo
+          new LibraryPiece(this.compensation.condition);
           break;
       }
 
@@ -298,8 +299,11 @@ class Request {
       this.fulfilled = true;
       this.pieceSelectButton.parentNode.setAttribute("disabled", true);
       this.pieceSelectButton.parentNode.removeAttribute("title");
+
+      sellText(this.piece.text);
     } else {
       this.statusElement.textContent = "REJECTED";
+      this.rejectionCount++;
     }
 
     this.guy.fulfillRequest(allgood);

@@ -147,12 +147,7 @@ class Recipe {
     for (let sidename in this.construction) {
       const side = this.construction[sidename];
       for (let item of side) {
-        for (let char of item) {
-          if (char in playerdata.prices) {
-            const prices = playerdata.prices[char];
-            ingredientCost += prices[prices.length - 1];
-          }
-        }
+        ingredientCost += calculateCost(item);
       }
     }
 

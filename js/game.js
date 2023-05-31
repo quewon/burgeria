@@ -90,6 +90,7 @@ const game = {
   beginDay: function() {
     bankPoints(game.unbankedPoints, "BURGERIA");
     playerdata.unbankedPoints = 0;
+    game.updatePrices();
 
     ui.storefront.menuEditButton.removeAttribute("disabled");
 
@@ -104,8 +105,6 @@ const game = {
     }
 
     game.generateGuys();
-
-    game.updatePrices();
 
     new MarketAlert();
     new Headline("SMALL BURGERS...", "... ARE IN!");
@@ -302,6 +301,20 @@ function sellText(text) {
       game.tomorrowsPrices[char] = Math.max(.01, game.tomorrowsPrices[char] - .01);
     }
   }
+}
+
+function calculateCost(text) {
+  var cost = 0;
+
+  for (let char of text) {
+    const letter = char.toLowerCase();
+    if (letter in playerdata.prices) {
+      const prices = playerdata.prices[letter];
+      cost += prices[prices.length - 1];
+    }
+  }
+
+  return cost;
 }
 
 function spliceIndexedObject(array, objectIndex, objectFunction) {
