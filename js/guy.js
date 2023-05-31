@@ -41,6 +41,9 @@ class Guy {
     //
 
     REQUESTS[Math.random() * REQUESTS.length | 0].init(this);
+    if (this.request.compensation.type == "piece") {
+      // this.request.compensation.condition = "";
+    }
 
     //
 

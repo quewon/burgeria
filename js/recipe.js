@@ -392,7 +392,7 @@ class Ingredient {
   }
 
   createMeshRules(geoname, color, rx) {
-    let def = new Geometry(geoname, rx);
+    let def = new Geometry(geoname || "bun", rx || 0);
     color = color || 0xff0000;
     this.mesh = {
       geometry: def.geometry,

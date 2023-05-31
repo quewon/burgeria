@@ -585,7 +585,7 @@ class Item {
     this.createGhost();
     this.createMesh(name);
 
-    this.setCollection(collection);
+    if (collection) this.setCollection(collection);
   }
 
   createElement() {
@@ -618,7 +618,11 @@ class Item {
   }
 
   createMesh() {
-    const ing = playerdata.ingredients[this.name];
+    var ing = playerdata.ingredients[this.name];
+
+    if (!ing) {
+      ing = new Ingredient({ name: this.name });
+    }
 
     const geo = ing.mesh.geometry;
     const material = new THREE.MeshStandardMaterial({ color: ing.mesh.color });

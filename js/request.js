@@ -280,11 +280,36 @@ class Request {
           break;
 
         case "gift":
-          playerdata.inventory.addItem(this.compensation.condition);
+          const gift = new Item(this.compensation.condition);
+          playerdata.inventory.addItem(gift);
           break;
 
         case "piece":
-          new LibraryPiece(this.compensation.condition);
+          if (this.compensation.condition) {
+            new LibraryPiece(this.compensation.condition);
+          } else {
+            if (WWW.length != 0) {
+              var pieceIndex = Math.random() * WWW.length | 0;
+
+              var i=1;
+              while (game.market.includes(WWW[pieceIndex].text)) {
+                pieceIndex++;
+                if (pieceIndex >= WWW.length) pieceIndex = 0;
+                i++;
+                if (i > WWW.length) break;
+              }
+
+              if (i > WWW.length) {
+                console.log("you have every single www piece in your market...?!");
+                new LibraryPiece("from "+this.guy.name+":\n\nwhat to write for the writer that can has everything");
+              } else {
+                new LibraryPiece("found by "+this.guy.name+":\n\n"+WWW[pieceIndex].text);
+              }
+            } else {
+              console.log("probably not connected to the internet...");
+              new LibraryPiece("from "+this.guy.name+":\n\nplease turn on your internet...");
+            }
+          }
           break;
       }
 

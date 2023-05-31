@@ -69,9 +69,22 @@ var REQUESTS = [
       guy.request.addRule({ type: "startString", condition: title });
       guy.request.addRule({ type: "contain", condition: message });
       guy.request.addRule({ type: "minLetterCount", condition: (title+message).length + 10 });
+      // guy.request.setCompensation({
+      //   type: "points",
+      //   condition: Math.ceil(calculateCost(title+message) * 3)
+      // });
+
+      const gift = randomFromArray([
+        "scratched up disk",
+        "photograph of a home",
+        "portrait of you at the storefront",
+        "ugly knit sweater",
+        "mittens",
+      ]);
+
       guy.request.setCompensation({
-        type: "points",
-        condition: Math.ceil(calculateCost(title+message) * 3)
+        type: "gift",
+        condition: gift
       });
     }
   },
@@ -99,9 +112,14 @@ var REQUESTS = [
       guy.request.title = title;
       // if (contain != "") guy.request.addRule({ type: "contain", condition: contain });
       guy.request.addRule({ type: "minLetterCount", condition: 20 });
+      // guy.request.setCompensation({
+      //   type: "points",
+      //   condition: Math.ceil(calculateCost(subject) * 5)
+      // });
+
       guy.request.setCompensation({
-        type: "points",
-        condition: Math.ceil(calculateCost(subject) * 5)
+        type: "piece",
+        condition: null
       });
     }
   },
