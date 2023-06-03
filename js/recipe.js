@@ -13,6 +13,11 @@ function renameRecipe() {
   playerdata.recipes[game.recipeIndex].startRename();
 }
 
+function repriceRecipe() {
+  sfx("click");
+  playerdata.recipes[game.recipeIndex].startReprice();
+}
+
 var recipeRotation = 0;
 
 class RecipeTray extends Tray {
@@ -160,7 +165,6 @@ class Recipe {
     this.element = document.createElement("li");
     this.element.index = this.index;
     let button = document.createElement("button");
-    button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
     button.dataset.index = this.index;
     button.onclick = function(e) {
       const recipe = playerdata.recipes[this.dataset.index];
@@ -168,6 +172,10 @@ class Recipe {
     }
     this.element.appendChild(button);
     this.button = button;
+
+    this.labelElement = document.createElement("span");
+    this.labelElement.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+    this.button.appendChild(this.labelElement);
 
     this.input = document.createElement("input");
     this.input.className = "gone";
@@ -184,24 +192,46 @@ class Recipe {
         recipe.rename();
       }
     });
-    this.element.appendChild(this.input);
+    this.button.appendChild(this.input);
 
     this.inputManager = new InputManager(this.input, this.name);
+
+    this.priceInput = document.createElement("input");
+    this.priceInput.type = "number";
+    this.priceInput.value = this.cost;
+    this.priceInput.dataset.recipeIndex = this.index;
+    this.priceInput.addEventListener("keydown", function(e) {
+      if (e.key == "Enter") {
+        const recipe = playerdata.recipes[this.dataset.recipeIndex];
+        recipe.reprice();
+      }
+    });
+    this.priceInput.addEventListener("blur", function(e) {
+      const recipe = playerdata.recipes[this.dataset.recipeIndex];
+      recipe.reprice();
+    });
+    this.priceInput.classList.add("gone");
+    this.button.appendChild(this.priceInput);
+
+    this.basePriceElement = document.createElement("div");
+    this.basePriceElement.className = "block gone transparent monospace";
+    this.basePriceElement.innerHTML = "ingredients price <span class='burgerpoints' title='BurgerPoints'></span>"+this.calculateIdealCost();
+    this.element.appendChild(this.basePriceElement);
 
     playerdata.recipes.push(this);
 
     this.tray.index = this.index;
     for (let side in this.tray.collections) {
       const el = this.tray.collections[side].element;
-      el.dataset.trayId = this.tray.index;
+      el.dataset.index = this.tray.index;
     }
   }
 
   setDiscounted(discounted) {
     if (discounted) {
-      this.button.innerHTML = this.name+" (<s><span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+"</s> <em><span class='burgerpoints' title='BurgerPoints'></span>"+Math.ceil(this.cost/2)+"</em>)";
+      this.labelElement.innerHTML = this.name+" (<s><span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+"</s> <em><span class='burgerpoints' title='BurgerPoints'></span>"+Math.ceil(this.cost/2)+"</em>)";
     } else {
-      this.button.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+      this.labelElement.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
     }
   }
 
@@ -345,18 +375,37 @@ class Recipe {
 
   startRename() {
     this.input.classList.remove("gone");
-    this.button.classList.add("gone");
+    this.labelElement.classList.add("gone");
     this.input.focus();
     ui.storefront.lettersContainer.classList.remove("gone");
+  }
+
+  startReprice() {
+    this.priceInput.classList.remove("gone");
+    this.labelElement.innerHTML = this.name;
+    this.priceInput.focus();
+    this.basePriceElement.classList.remove("gone");
+  }
+
+  reprice(value) {
+    value = value || this.priceInput.value;
+    this.cost = value || 0;
+    this.labelElement.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+") ";
+
+    this.priceInput.value = this.cost;
+    this.basePriceElement.classList.add("gone");
+
+    this.priceInput.classList.add("gone");
+    this.labelElement.classList.remove("gone");
   }
 
   rename(value) {
     value = value || this.input.value;
     this.name = value;
-    this.button.innerHTML = value+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
+    this.labelElement.innerHTML = this.name+" (<span class='burgerpoints' title='BurgerPoints'></span>"+this.cost+")";
 
     this.input.classList.add("gone");
-    this.button.classList.remove("gone");
+    this.labelElement.classList.remove("gone");
     ui.storefront.lettersContainer.classList.add("gone");
   }
 
@@ -365,77 +414,5 @@ class Recipe {
     this.updateCategory();
     this.calculateSize();
     updateRecipes();
-  }
-}
-
-class Ingredient {
-  constructor(p) {
-    this.name = p.name;
-
-    this.createMeshRules(p.geometry, p.color, p.rx);
-
-    let button = document.createElement("button");
-    button.textContent = this.name;
-    ui.kitchen.ingredientButtons.appendChild(button);
-    button.dataset.ingredientName = this.name;
-    button.onclick = function(e) {
-      let success = playerdata.ingredients[this.dataset.ingredientName].create();
-      if (success) {
-        sfx("click");
-      } else {
-        sfx("error");
-      }
-    };
-    this.button = button;
-
-    playerdata.ingredients[this.name] = this;
-  }
-
-  createMeshRules(geoname, color, rx) {
-    let def = new Geometry(geoname || "bun", rx || 0);
-    color = color || 0xff0000;
-    this.mesh = {
-      geometry: def.geometry,
-      height: def.height,
-      color: color,
-      rx: def.rx
-    };
-  }
-
-  create() {
-    let page = playerdata.library[playerdata.libraryIndex];
-    if (!page) {
-      ui.dialogs["no-pages"].showModal();
-      return false;
-    }
-
-    let pagetext = page.text;
-    let lowercase = pagetext.toLowerCase();
-
-    // first check if this ingredient can be made
-    for (let char of this.name) {
-      if (char==" ") continue;
-
-      let index = lowercase.indexOf(char);
-      if (index != -1) {
-        lowercase = lowercase.replace(char, "");
-        pagetext = pagetext.replace(pagetext[index], "");
-      } else {
-        ui.dialogs["no-letters"].showModal();
-        return false;
-      }
-    }
-    page.text = pagetext;
-    ui.kitchen.library.page.textContent = pagetext;
-
-    this.addToInventory();
-
-    return true;
-  }
-
-  addToInventory() {
-    new Item(this.name, playerdata.inventory);
-
-    updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
   }
 }

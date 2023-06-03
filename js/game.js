@@ -50,6 +50,7 @@ const game = {
   market: [],
   tomorrowsPrices: {},
   recipeIndex: 0,
+  researchIndex: 0,
 
   themes: {
     order: ["☼", "☁︎"], //,"☾"
@@ -84,7 +85,7 @@ const game = {
 
     game.guys[Math.random() * 5 | 0].appreciatesText = true;
 
-    game.guys[Math.random() * 5 | 0].createRequest();
+    // game.guys[Math.random() * 5 | 0].createRequest();
   },
 
   beginDay: function() {

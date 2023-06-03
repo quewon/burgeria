@@ -65,7 +65,7 @@
     <div id="scene-storefront" class="scene hidden">
       <div class="column">
         <div class="menu flexbox">
-          <div class="block grow attached-right">
+          <div class="block grow attached-right" style="min-width: 50%;">
             <h1 class="marginbelow">MENU</h1>
             <div id="scene-recipes">
             </div>
@@ -86,11 +86,17 @@
               </div>
             </div>
             <div id="show-on-editmode">
-              <div class="buttonbar left top">
-                <button onclick="createNewRecipe()">+ new recipe</button>
-                <button onclick="deleteRecipe()">delete</button>
-                <button onclick="renameRecipe()">rename</button>
-                <div class="grow"></div>
+              <div class="left top flexbox" style="flex-direction: column">
+                <div class="buttonbar">
+                  <button onclick="createNewRecipe()">+ new recipe</button>
+                  <button onclick="deleteRecipe()">delete</button>
+                  <div class="grow"></div>
+                </div>
+                <div class="buttonbar">
+                  <button onclick="renameRecipe()">rename</button>
+                  <button onclick="repriceRecipe()">reprice</button>
+                  <button class="gone"></button>
+                </div>
               </div>
 
               <div class="buttonbar left bottom border-above">
@@ -183,7 +189,7 @@
               </span>
             </div>
             <div class="block" style="border-bottom: none;">
-              <h1>LIBRARY</h1><div style="font-style: italic;">Transmute words into burgers</div>
+              <h1>LIBRARY</h1><div class="italicized">Transmute words into burgers</div>
             </div>
 
             <div class="block attached-above has-buttonbar" id="library-page-container">
@@ -207,9 +213,34 @@
           <!-- this is for LATER game stuff -->
           <div class="block gone" id="research-block">
             <h1 class="marginbelow">R&D</h1>
+            <nav id="research-nav" style="text-align: center; margin-bottom: var(--gap);">
+              <button title="go to previous page" onclick="navigateRND(-1);" disabled>←</button>
+              <span id="research-index">1</span>/<span id="research-ingredients-total">1</span>
+              <button title="go to next page" onclick="navigateRND(1);" disabled>→</button>
+            </nav>
+            <div class="block transparent" style="text-align: center">
+              <table style="width: auto; margin: auto">
+                <tr name="name">
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">b</td>
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">o</td>
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">t</td>
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">t</td>
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">o</td>
+                  <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">m</td>
+                </tr>
+              </table>
+            </div>
             <div class="flexbox gap">
-              <b>develop new ingredient</b>
-              <input type="text" name="" value="" placeholder="Click here to start developing...">
+              <div name="chart" style="align-self: center;">
+
+              </div>
+              <div class="grow">
+                <table class="monospace" name="table">
+                  <tr>
+                    <th colspan="2" style="background: var(--newsgray); text-align: center;">nutrition facts</th>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -230,7 +261,7 @@
           <img data-latesrc="img/window.png" alt="window overlooking the field" title="window overlooking the field">
         </div>
 
-        <div style="width: 100%; text-align: left; float: left; font-family: monospace;">
+        <div style="width: 100%; text-align: left; float: left; font-family: monospace; z-index: 0; position: relative;">
           <table>
             <tr>
               <th>DAY</th>
@@ -506,11 +537,16 @@
         <button title="close" onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();">x</button>
       </div>
 
-      <div style="text-align: center;" id="help-burgeria-canvas"></div>
+      <div id="help-burgeria-canvas"></div>
 
       <em>Burgeria!</em> is your very own burger-shaped text editor.
       <br><br>
-      Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...
+      Words are scarce. Fortunately, the founders of this House have provided you and I with a way to transmute burgers into words, and vice versa. It's up to us to honor them and show the world what we can write...<br><br>
+      <!-- <div style="text-align: center;">
+        <i>credits</i><br>
+        developed by q1<br>
+        thanks to<br>
+      </div><br> -->
 
       <div class="margintop" style="text-align: center;">
         <button onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();" autofocus>close</button>
@@ -672,6 +708,7 @@
   <script type="text/javascript" src="js/canvas.js"></script>
   <script type="text/javascript" src="js/dragdrop.js"></script>
   <script type="text/javascript" src="js/tray.js"></script>
+  <script type="text/javascript" src="js/ingredient.js"></script>
   <script type="text/javascript" src="js/recipe.js"></script>
 
   <script type="text/javascript" src="js/input.js"></script>
@@ -717,6 +754,7 @@
       updateBankbook();
       updateRecipes();
       updateBookshelf();
+      updateResearchBlock();
 
       // facade
       game.generateGuys();

@@ -262,6 +262,13 @@ class Tray {
   }
 
   delete() {
+    if (ui.storefront.ministockTray == this) {
+      this.toggleGlobalBlock("ministock", this.stockbutton);
+    }
+    if (ui.storefront.guysListTray == this) {
+      this.toggleGlobalBlock("guysList", this.sendbutton);
+    }
+
     spliceIndexedObject(game.trays, this.index, function(tray) {
       tray.element.dataset.index = tray.index;
       tray.stockbutton.dataset.index = tray.index;

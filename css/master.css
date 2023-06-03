@@ -232,22 +232,24 @@ h2 {
 }
 .block .buttonbar {
   width: 100%;
-  position: absolute;
   height: 1.5rem;
 }
 .buttonbar.bottom {
+  position: absolute;
   bottom: 0;
 }
 .buttonbar.bottom button {
   border-bottom: none;
 }
 .buttonbar.top {
+  position: absolute;
   top: 0;
 }
 .buttonbar.top button {
   border-top: none;
 }
 .buttonbar.right {
+  position: absolute;
   right: 0;
   justify-content: end;
 }
@@ -335,8 +337,15 @@ s {
 }
 
 li button {
-  margin-top: 5px;
+  margin: 2px;
   text-align: left;
+}
+li button span {
+  vertical-align: middle;
+}
+li input[type="number"] {
+  margin: 2px;
+  margin-left: 1ch;
 }
 
 .slide-up {
@@ -531,6 +540,9 @@ ul.flexbox > li {
   width: 30%;
 }
 ul li {
+  list-style-position: outside;
+}
+#storefront-ministock li {
   list-style-position: inside;
 }
 
@@ -624,6 +636,12 @@ input, textarea {
   vertical-align: top;
   border: 1px solid var(--borders);
 }
+input[type="number"] {
+  width: 3rem;
+  padding: 0;
+  height: 1.5rem;
+  vertical-align: top;
+}
 textarea {
   min-height: 10rem;
   width: 100%;
@@ -633,6 +651,12 @@ input::placeholder, textarea::placeholder, .placeholder {
   font-style: italic;
   color: var(--lines);
   opacity: .5;
+}
+
+button > input[type="text"] {
+  padding: 0;
+  background: inherit;;
+  color: inherit;
 }
 
 p {
@@ -853,7 +877,7 @@ th {
 .bankbook td:nth-child(n+3) {
   text-align: right;
 }
-td:nth-child(n+3):not(:empty)::before {
+.bankbook td:nth-child(n+3):not(:empty)::before {
   content: "✸";
   font-family: serif;
 }
@@ -1217,4 +1241,12 @@ div.has-request div[name='text']::after, div.awaiting-request div[name='text']::
 }
 #scene-storefront-news .temp {
   translate: unset;
+}
+
+.letterblock {
+  border: 1px solid var(--newsgray);
+  min-width: 1rem;
+  min-height: 1rem;
+  text-align: center;
+  display: inline-block;
 }

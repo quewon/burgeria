@@ -27,7 +27,7 @@ var REQUESTS = [
       guy.request.addRule({ type: "minLetterCount", condition: ("to "+person+" miss you love "+guy.name).length + 5 });
       guy.request.setCompensation({
         type: "points",
-        condition: Math.ceil(calculateCost("to "+person+" "+message+" love "+guy.name) * 1.5)
+        condition: Math.ceil(calculateCost("to "+person+" "+message+" love "+guy.name) * 3)
       });
     }
   },

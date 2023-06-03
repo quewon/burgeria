@@ -273,7 +273,7 @@ class Guy {
       style = "italicized";
     }
 
-    this.addString(this.styleText(dialogue, true, null), style);
+    this.addString(this.styleText(dialogue, null, null), style);
     this.addPause(15);
   }
 

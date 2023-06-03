@@ -90,6 +90,10 @@ var ui = {
     bankbookLabel: document.getElementById("bankbook-label"),
     bankbookBlock: document.getElementById("bankbook-block"),
     researchBlock: document.getElementById("research-block"),
+    researchNavigation: document.getElementById("research-nav"),
+    researchIndex: document.getElementById("research-index"),
+    ingredientsTotal: document.getElementById("research-ingredients-total"),
+
     bookshelf: document.getElementById("bookshelf"),
   },
   "workshop": {
@@ -178,6 +182,109 @@ function setScene(name) {
 
 // utility functions
 
+function createSpiderChart(element, normalizedAxes) {
+  const keys = Object.keys(normalizedAxes);
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', "svg");
+  const path = document.createElementNS('http://www.w3.org/2000/svg', "path");
+
+  const guidelinesPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
+  const valuesPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
+
+  svg.setAttributeNS(null, "viewBox", "0 0 200 150");
+  svg.style.width = "200px";
+  svg.style.height = "150px";
+
+  const cx = 100;
+  const cy = 75;
+  const r = 50;
+  const labelr = 55;
+
+  const theta = -18.2;
+
+  var points = [];
+  var axesPoints = [];
+  var labelPoints = [];
+  let i=0;
+  for (let a=0; a<360; a+=360/keys.length) {
+    const x = Math.cos((theta + a) * Math.PI / 180);
+    const y = Math.sin((theta + a) * Math.PI / 180);
+
+    points.push([
+      cx + x * r,
+      cy + y * r
+    ]);
+
+    axesPoints.push([
+      cx + x * (r * normalizedAxes[keys[i]]),
+      cy + y * (r * normalizedAxes[keys[i]])
+    ]);
+
+    labelPoints.push([
+      cx + x * labelr,
+      cy + y * labelr
+    ]);
+    i++;
+  }
+
+  var d = "M ";
+  var valuesd = "M ";
+  var guidelinesd = "";
+  i=0;
+  for (let point of points) {
+    if (i>0) {
+      d += "L ";
+      valuesd += "L ";
+    }
+    d += point[0]+" "+point[1]+" ";
+    valuesd += axesPoints[i][0]+" "+axesPoints[i][1]+" ";
+    guidelinesd += "M "+cx+" "+cy+" L "+point[0]+" "+point[1]+" Z";
+    i++;
+  }
+  valuesd += "Z";
+  d += "Z";
+
+  guidelinesPath.setAttributeNS(null, "stroke", "var(--newsgray)");
+  guidelinesPath.setAttributeNS(null, "fill", "transparent");
+  guidelinesPath.setAttributeNS(null, "d", guidelinesd);
+  svg.appendChild(guidelinesPath);
+
+  path.setAttributeNS(null, "stroke", "var(--borders)");
+  path.setAttributeNS(null, "fill", "transparent");
+  path.setAttributeNS(null, "d", d);
+  svg.appendChild(path);
+
+  valuesPath.setAttributeNS(null, "stroke", "var(--burgeria)");
+  valuesPath.setAttributeNS(null, "fill", "rgba(255,255,255,.5)");
+  valuesPath.setAttributeNS(null, "d", valuesd);
+  svg.appendChild(valuesPath);
+
+  i=0;
+  for (let axis in normalizedAxes) {
+    const label = document.createElementNS('http://www.w3.org/2000/svg', "text");
+    label.textContent = axis;
+    label.setAttributeNS(null, "x", labelPoints[i][0]);
+    label.setAttributeNS(null, "y", labelPoints[i][1]);
+
+    if (i==4 || i==1 || i==2) {
+      label.setAttributeNS(null, "text-anchor", "middle");
+    } else if (i==3) {
+      label.setAttributeNS(null, "text-anchor", "end");
+    }
+
+    if (i==0 || i==3) {
+      label.setAttributeNS(null, "dominant-baseline", "middle");
+    } else if (i==1 || i==2) {
+      label.setAttributeNS(null, "dominant-baseline", "hanging");
+    }
+
+    svg.appendChild(label);
+    i++;
+  }
+
+  element.appendChild(svg);
+}
+
 function tempMessage(innerHTML, x, y) {
   var temps = document.getElementsByClassName("temp");
   for (let i=temps.length-1; i>=0; i--) {
@@ -223,6 +330,78 @@ function updateVolumeUI() {
   ui.volumeIcon.textContent = (playerdata.volume * 100);
 
   Howler.volume(playerdata.volume);
+}
+
+function navigateRND(value) {
+  game.researchIndex += value;
+
+  updateResearchBlock();
+}
+
+function updateResearchBlock() {
+  const block = ui.kitchen.researchBlock;
+
+  const nav = ui.kitchen.researchNavigation;
+  const nav1 = nav.querySelectorAll("button")[0];
+  const nav2 = nav.querySelectorAll("button")[1];
+  const navIndex = ui.kitchen.researchIndex;
+  const navTotal = ui.kitchen.ingredientsTotal;
+
+  const name = block.querySelector("[name='name']");
+  const chart = block.querySelector("[name='chart']");
+  const table = block.querySelector("[name='table']");
+
+  const ingredients = Object.keys(playerdata.ingredients);
+  const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
+
+  while (name.lastElementChild) {
+    name.lastElementChild.remove();
+  }
+  for (let char of currentIngredient.name) {
+    const td = document.createElement("td");
+    td.style.border = "1px solid var(--borders)";
+    td.style.height = "1rem";
+    td.style.width = "1rem";
+    td.textContent = char;
+    name.appendChild(td);
+  }
+
+  nav1.setAttribute("disabled", "true");
+  nav2.setAttribute("disabled", "true");
+  if (ingredients.length >= 2) {
+    if (game.researchIndex > 0) {
+      nav1.removeAttribute("disabled");
+    }
+    if (game.researchIndex < ingredients.length - 1) {
+      nav2.removeAttribute("disabled");
+    }
+  }
+  navIndex.textContent = game.researchIndex + 1;
+  navTotal.textContent = ingredients.length;
+
+  if (chart.lastElementChild) {
+    chart.lastElementChild.remove();
+  }
+  createSpiderChart(chart, currentIngredient.stats);
+
+  while (table.children.length > 1) {
+    table.lastElementChild.remove();
+  }
+  for (let char in currentIngredient.makeup) {
+    const count = currentIngredient.makeup[char].count;
+    const percentage = Math.round(currentIngredient.makeup[char].percentage * 100) / 100;
+
+    const tr = document.createElement("tr");
+    const th = document.createElement("th");
+    th.textContent = char+" ("+count+")";
+    tr.appendChild(th);
+
+    const td = document.createElement("td");
+    td.textContent = percentage+"%";
+    tr.appendChild(td);
+
+    table.appendChild(tr);
+  }
 }
 
 function selectBook(el, index) {
@@ -508,8 +687,8 @@ function updateLibrary() {
 
 function navigateLibrary(value) {
   playerdata.libraryIndex += value;
-  if (playerdata.libraryIndex < 0) playerdata.libraryIndex = 0;
-  if (playerdata.libraryIndex >= playerdata.library.length) playerdata.libraryIndex = playerdata.library.length - 1;
+  // if (playerdata.libraryIndex < 0) playerdata.libraryIndex = 0;
+  // if (playerdata.libraryIndex >= playerdata.library.length) playerdata.libraryIndex = playerdata.library.length - 1;
   if (document.querySelectorAll("[type='book']").length > 0)
     selectBook(document.querySelectorAll("[type='book']")[playerdata.libraryIndex], playerdata.libraryIndex);
 }
