@@ -1,0 +1,65 @@
+@font-face {
+  font-family: 'Pretendard-Regular';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MapoGoldenPier';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/MapoGoldenPierA.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* @font-face {
+    font-family: 'EF_jejudoldam';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_jejudoldam.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+} */
+
+@font-face {
+    font-family: '-KITA-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/-KITA-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html:lang(kor) {
+  --bodyfont: 'Pretendard-Regular', sans-serif;
+  --newsfont: 'MapoGoldenPier', 'Times', 'Times New Roman', serif;
+}
+
+*:lang(kor), *:lang(kor) *, *:lang(kor)::after, *:lang(kor)::placeholder {
+  font-style: normal !important;
+}
+
+.local-f-displayables-pieces:lang(kor), .local-f-displayables-pages:lang(kor) {
+  font-weight: normal;
+  background: var(--newsgray);
+}
+
+h1:lang(kor) {
+  font-family: '-KITA-Regular', 'Pretendard-Regular', sans-serif;
+  font-size: 4rem;
+  scale: 1 1;
+  margin-top: -.1em;
+  margin-bottom: -.15em;
+  font-weight: normal;
+}
+
+/* b:lang(kor) {
+  font-family: 'EF_jejudoldam', 'MapoGoldenPier', serif;
+  font-size: 1.5rem;
+  font-weight: normal;
+} */
+
+/* .local-title {
+  font-family: 'Times', 'Times New Roman', serif !important;
+  font-size: 3.25em !important;
+  scale: 1 1.7 !important;
+  margin-top: 0 !important;
+  margin-bottom: calc(var(--gap) / 2) !important;
+  font-weight: bold !important;
+} */

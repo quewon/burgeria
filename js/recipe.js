@@ -251,7 +251,7 @@ class Recipe {
 
     const preview = ui.storefront.recipePreview;
     for (let side in this.tray.collections) {
-      const label = preview.querySelector("[placeholder='"+side+"']");
+      const label = preview.querySelector(".local-placeholder-"+side);
       const el = this.tray.collections[side].element;
       label.parentNode.replaceChild(el, label);
       el.classList.add("preview");

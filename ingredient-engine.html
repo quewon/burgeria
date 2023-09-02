@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>flavor analysis</title>
+    <style media="screen">
+      body {
+        display: flex;
+        margin: auto;
+        gap: 1rem;
+        width: fit-content;
+        padding: 1rem;
+        font-family: monospace;
+      }
+
+      input, button {
+        font-family: inherit;
+        font-size: inherit;
+      }
+
+      main, aside {
+        border: 1px solid lightgray;
+        padding: 1rem;
+      }
+      main {
+        max-width: 500px;
+      }
+
+      aside {
+        min-width: 10rem;
+      }
+
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 5px;
+      }
+
+      #flavor-table {
+        width: 100%;
+      }
+      #flavor-table th {
+        width: 1rem;
+      }
+      #flavor-table td {
+        width: 100%;
+        position: relative;
+      }
+      #flavor-table td div {
+        width: 100%;
+        height: 1rem;
+      }
+      .sweet {
+        background: #daaff7;
+      }
+      .sweet::before {
+        content: "sweet";
+        color: black;
+        display: inline-block;
+        width: 7ch;
+        position: absolute;
+        left: 5px;
+      }
+      .spice {
+        background: red;
+      }
+      .spice::before {
+        content: "spice";
+        color: black;
+        display: inline-block;
+        width: 7ch;
+        position: absolute;
+        left: 5px;
+      }
+      .salt {
+        background: lightgray;
+      }
+      .salt::before {
+        content: "salt";
+        color: black;
+        display: inline-block;
+        width: 7ch;
+        position: absolute;
+        left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <main>
+      <h1>letter flavor analysis</h1>
+
+      <table id="flavor-table">
+        <tr>
+          <th>a</th>
+          <td>
+            <div class="sweet" style="width: 50%;"></div>
+            <div class="spice" style="width: 50%;"></div>
+            <div class="salt" style="width: 50%;"></div>
+          </td>
+        </tr>
+      </table>
+    </main>
+
+    <aside>
+      <b>word editor</b>
+
+      <br><br>
+
+      <table>
+        <tr>
+          <th>word</th>
+          <td><input type="text" id="word-input"></td>
+        </tr>
+        <tr>
+          <th>sweet</th>
+          <td><input type="number" id="sweet-input" value="0" step=".1" max="1" min="0"></td>
+        </tr>
+        <tr>
+          <th>spice</th>
+          <td><input type="number" id="spice-input" value="0" step=".1" max="1" min="0"></td>
+        </tr>
+        <tr>
+          <th>salt</th>
+          <td><input type="number" id="salt-input" value="0" step=".1" max="1" min="0"></td>
+        </tr>
+      </table>
+
+      <button onclick="addWord()">add/edit word</button>
+      <br>
+      <button onclick="copy()">copy data</button>
+      <button onclick="read()">set data from clipboard</button>
+      <br>
+      <button onclick="copyLetters()">copy letter data</button>
+
+      <br><br>
+
+      <b>words</b>
+      <ul id="words-list">
+      </ul>
+    </aside>
+
+  </body>
+
+  <script type="text/javascript">
+    var words = {};
+    var flavors = {
+      a: { sweet: 0, spice: 0, salt: 0 },
+      b: { sweet: 0, spice: 0, salt: 0 },
+      c: { sweet: 0, spice: 0, salt: 0 },
+      d: { sweet: 0, spice: 0, salt: 0 },
+      e: { sweet: 0, spice: 0, salt: 0 },
+      f: { sweet: 0, spice: 0, salt: 0 },
+      g: { sweet: 0, spice: 0, salt: 0 },
+      h: { sweet: 0, spice: 0, salt: 0 },
+      i: { sweet: 0, spice: 0, salt: 0 },
+      j: { sweet: 0, spice: 0, salt: 0 },
+      k: { sweet: 0, spice: 0, salt: 0 },
+      l: { sweet: 0, spice: 0, salt: 0 },
+      m: { sweet: 0, spice: 0, salt: 0 },
+      n: { sweet: 0, spice: 0, salt: 0 },
+      o: { sweet: 0, spice: 0, salt: 0 },
+      p: { sweet: 0, spice: 0, salt: 0 },
+      q: { sweet: 0, spice: 0, salt: 0 },
+      r: { sweet: 0, spice: 0, salt: 0 },
+      s: { sweet: 0, spice: 0, salt: 0 },
+      t: { sweet: 0, spice: 0, salt: 0 },
+      u: { sweet: 0, spice: 0, salt: 0 },
+      v: { sweet: 0, spice: 0, salt: 0 },
+      w: { sweet: 0, spice: 0, salt: 0 },
+      x: { sweet: 0, spice: 0, salt: 0 },
+      y: { sweet: 0, spice: 0, salt: 0 },
+      z: { sweet: 0, spice: 0, salt: 0 },
+    };
+
+    function simplify(vec) {
+      vec = {
+        sweet: Math.round(vec.sweet * 100) / 100,
+        spice: Math.round(vec.spice * 100) / 100,
+        salt: Math.round(vec.salt * 100) / 100,
+      };
+
+      var maxValue = 0;
+      for (let property in vec) {
+        if (vec[property] >= maxValue) {
+          maxValue = vec[property];
+        }
+      }
+
+      for (let property in vec) {
+        if (vec[property] != maxValue) {
+          vec[property] = 0;
+        }
+      }
+
+      return vec;
+    }
+
+    function normalize(vec) {
+      let magnitude = Math.sqrt(vec.sweet * vec.sweet + vec.spice * vec.spice + vec.salt * vec.salt);
+      if (magnitude == 0) {
+        magnitude = 1;
+      }
+
+      return {
+        sweet: vec.sweet / magnitude,
+        spice: vec.spice / magnitude,
+        salt: vec.salt / magnitude
+      }
+    }
+
+    const wordsList = document.getElementById("words-list");
+    function updateWordsList() {
+      while (wordsList.lastElementChild) {
+        wordsList.lastElementChild.remove();
+      }
+
+      for (let word in words) {
+        const li = document.createElement("li");
+        li.textContent = word;
+        wordsList.appendChild(li);
+      }
+    }
+
+    const flavorTable = document.getElementById("flavor-table");
+    function updateFlavorTable() {
+      while (flavorTable.lastElementChild) {
+        flavorTable.lastElementChild.remove();
+      }
+
+      for (let letter in flavors) {
+        const tr = document.createElement("tr");
+
+        const th = document.createElement("th");
+        th.textContent = letter;
+        tr.appendChild(th);
+
+        const td = document.createElement("td");
+        const sweet = document.createElement("div"); sweet.className = "sweet"; td.appendChild(sweet);
+        const spice = document.createElement("div"); spice.className = "spice"; td.appendChild(spice);
+        const salt = document.createElement("div"); salt.className = "salt"; td.appendChild(salt);
+
+        sweet.style.width = (flavors[letter].sweet * 100)+"%";
+        spice.style.width = (flavors[letter].spice * 100)+"%";
+        salt.style.width = (flavors[letter].salt * 100)+"%";
+
+        tr.appendChild(td);
+
+        flavorTable.appendChild(tr);
+      }
+    }
+
+    function updateFlavorValues() {
+      var rawFlavors = {};
+      var sweetSum = 0;
+      var spiceSum = 0;
+      var saltSum = 0;
+      for (let word in words) {
+        for (let char of word) {
+          const letter = char.toLowerCase();
+          if (letter in flavors) {
+            if (!(letter in rawFlavors)) {
+              rawFlavors[letter] = { sweet: 0, spice: 0, salt: 0 }
+            }
+            rawFlavors[letter].sweet += words[word].sweet;
+            rawFlavors[letter].spice += words[word].spice;
+            rawFlavors[letter].salt += words[word].salt;
+
+            sweetSum += words[word].sweet;
+            spiceSum += words[word].spice;
+            saltSum += words[word].salt;
+          }
+        }
+      }
+
+      for (let letter in flavors) {
+        if (letter in rawFlavors) {
+          console.log(letter);
+          flavors[letter] = {
+            sweet: sweetSum > 0 ? rawFlavors[letter].sweet / sweetSum : 0,
+            spice: spiceSum > 0 ? rawFlavors[letter].spice / spiceSum : 0,
+            salt: saltSum > 0 ? rawFlavors[letter].salt / saltSum : 0,
+          };
+          flavors[letter] = simplify(flavors[letter]);
+          flavors[letter] = normalize(flavors[letter]);
+          console.log(flavors[letter]);
+        } else {
+          flavors[letter] = {
+            sweet: 0,
+            spice: 0,
+            salt: 0,
+          }
+        }
+      }
+    }
+
+    const inputs = {
+      word: document.getElementById("word-input"),
+      sweet: document.getElementById("sweet-input"),
+      spice: document.getElementById("spice-input"),
+      salt: document.getElementById("salt-input"),
+    };
+    function addWord() {
+      if (inputs.word.value.trim() == "") return;
+
+      words[inputs.word.value] = {
+        sweet: Number(inputs.sweet.value),
+        spice: Number(inputs.spice.value),
+        salt: Number(inputs.salt.value),
+      }
+
+      inputs.word.value = "";
+      inputs.sweet.value = 0;
+      inputs.spice.value = 0;
+      inputs.salt.value = 0;
+
+      update();
+    }
+
+    updateFlavorTable();
+    updateWordsList();
+
+    function copy() {
+      navigator.clipboard.writeText(JSON.stringify(words));
+    }
+
+    function copyLetters() {
+      navigator.clipboard.writeText(JSON.stringify(flavors));
+    }
+
+    async function read() {
+      const text = await navigator.clipboard.readText()
+        .then(text => {
+          set(text);
+        })
+        .catch(error => {
+          console.error('Failed to read clipboard contents: ', err);
+        });
+    }
+
+    function update() {
+      updateFlavorValues();
+      updateFlavorTable();
+      updateWordsList();
+    }
+
+    function set(string) {
+      words = JSON.parse(string);
+      update();
+    }
+
+    set('{"hamburger":{"sweet":0,"spice":0.5,"salt":0.5},"burger":{"sweet":0,"spice":0.5,"salt":0.5},"cheeseburger":{"sweet":0,"spice":0.4,"salt":0.6},"sandwich":{"sweet":0.1,"spice":0.6,"salt":0.3},"salisbury steak":{"sweet":0.3,"spice":0.2,"salt":0.5},"slider":{"sweet":0.1,"spice":0.5,"salt":0.4},"big mac":{"sweet":0.3,"spice":0.2,"salt":0.5},"hot dog":{"sweet":0.2,"spice":0.2,"salt":0.6},"feta":{"sweet":0,"spice":0.5,"salt":0.5},"pepper jack":{"sweet":0,"spice":0.4,"salt":0.6},"pepper":{"sweet":0,"spice":1,"salt":0},"zucchini":{"sweet":0.5,"spice":0,"salt":0.5},"pickle":{"sweet":0.5,"spice":0,"salt":0.5},"chili":{"sweet":0,"spice":1,"salt":0},"onion":{"sweet":0.2,"spice":0.8,"salt":0},"garlic":{"sweet":0,"spice":1,"salt":0},"vegetable":{"sweet":0,"spice":1,"salt":0},"veggie":{"sweet":0,"spice":1,"salt":0},"pineapple":{"sweet":0.8,"spice":0.2,"salt":0},"tomato":{"sweet":0.2,"spice":0.8,"salt":0},"parsley":{"sweet":0,"spice":1,"salt":0},"jalapeno":{"sweet":0,"spice":1,"salt":0},"beetroot":{"sweet":0,"spice":1,"salt":0},"celery":{"sweet":0,"spice":0.1,"salt":0},"cabbage":{"sweet":0,"spice":0,"salt":0},"lettuce":{"sweet":0,"spice":0,"salt":0},"potato":{"sweet":0,"spice":0,"salt":0.5},"lentil":{"sweet":0,"spice":0.5,"salt":0.3},"paprika":{"sweet":0,"spice":1,"salt":0},"olive":{"sweet":0,"spice":0.7,"salt":0.3},"bun":{"sweet":0.5,"spice":0,"salt":0},"squid":{"sweet":0.3,"spice":0.2,"salt":0.5},"shrimp":{"sweet":0,"spice":0,"salt":1},"anchovies":{"sweet":0,"spice":0,"salt":1},"mushroom":{"sweet":0,"spice":0.7,"salt":0.3},"egg":{"sweet":0.3,"spice":0,"salt":0.7},"patty":{"sweet":0.4,"spice":0.3,"salt":0.3},"extract":{"sweet":0.5,"spice":0.5,"salt":0},"swiss":{"sweet":0,"spice":0.5,"salt":0.5}}');
+  </script>
+</html>

@@ -85,7 +85,7 @@ const game = {
 
     game.guys[Math.random() * 5 | 0].appreciatesText = true;
 
-    // game.guys[Math.random() * 5 | 0].createRequest();
+    game.guys[Math.random() * 5 | 0].createRequest();
   },
 
   beginDay: function() {
@@ -108,7 +108,23 @@ const game = {
     game.generateGuys();
 
     new MarketAlert();
-    new Headline("SMALL BURGERS...", "... ARE IN!");
+
+    var headlines1 = [
+      "NEWS_SMALL_BURGER",
+      "NEWS_BIG_BURGER",
+      "NEWS_SALTY_BURGER",
+      "NEWS_SPICY_BURGER",
+      "NEWS_SWEET_BURGER"
+    ];
+    var headlines2 = [
+      "NEWS_TRENDING",
+      "NEWS_FALLOFF"
+    ];
+
+    new Headline(
+      localized("UI", headlines1[Math.random() * headlines1.length | 0]),
+      localized("UI", headlines2[Math.random() * headlines2.length | 0])
+    );
     new Prices();
 
     sfx("begin_day");
@@ -254,6 +270,8 @@ const game = {
 
       playerdata.prices[char].push(todaysPrice);
     }
+
+    updateResearchBlock();
   },
 
   load: function() {

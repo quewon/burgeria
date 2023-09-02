@@ -17,6 +17,10 @@
   --block-bg-filter: none;
   --borders: var(--lines);
   --block-border-radius: 0;
+
+  --bodyfont: 'Times', 'Times New Roman', serif;
+  --newsfont: 'Times', 'Times New Roman', serif;
+  --monospace: monospace;
 }
 
 html.grabbing, html.grabbing * {
@@ -24,6 +28,10 @@ html.grabbing, html.grabbing * {
   user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
+}
+
+html {
+  font-family: var(--bodyfont);
 }
 
 body {
@@ -37,11 +45,13 @@ body {
   background-image: radial-gradient(var(--burgeria-bg) 1px, transparent 0);
   background-size: 20px 20px;
 
+  /* font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale; */
+
   color: var(--lines);
 
   animation: burgeria-bg 2s linear infinite;
-
-  /* font-family: serif; */
 
   word-break: keep-all;
 }
@@ -96,10 +106,10 @@ h1, h2 {
 }
 
 h1 {
-  font-family: serif;
+  font-family: var(--bodyfont);
   font-size: 3.25em;
   font-weight: bold;
-  transform: scaleY(1.7);
+  scale: 1 1.7;
   /* line-height: 1.3em; */
   white-space: nowrap;
 }
@@ -135,7 +145,11 @@ h2 {
 
 .news {
   background: var(--newsgray);
+  font-family: var(--newsfont);
 }
+/* .news h1 {
+  font-family: var(--bodyfont) !important;
+} */
 
 #navbar {
   border-color: var(--burgeria);
@@ -294,6 +308,7 @@ button {
   cursor: pointer;
   color: inherit;
   min-height: 1.5rem;
+  height: fit-content;
 
   padding: 0;
   padding-left: .7ch;
@@ -693,7 +708,7 @@ p {
   /* height: 1rem; */
   position: relative;
   vertical-align: top;
-  font-family: serif;
+  font-family: var(--bodyfont);
 }
 .burgerpoints::after {
   content: "✸";
@@ -870,7 +885,7 @@ th {
   background: var(--newsgray);
 }
 .bankbook th, .bankbook td {
-  font-family: monospace;
+  font-family: var(--monospace);
   white-space: nowrap;
   text-align: center;
 }
@@ -879,7 +894,7 @@ th {
 }
 .bankbook td:nth-child(n+3):not(:empty)::before {
   content: "✸";
-  font-family: serif;
+  font-family: var(--bodyfont);
 }
 
 span[name="title"] {
@@ -1249,4 +1264,17 @@ div.has-request div[name='text']::after, div.awaiting-request div[name='text']::
   min-height: 1rem;
   text-align: center;
   display: inline-block;
+}
+
+#loading {
+  position: absolute;
+  /* bottom: 1rem;
+  left: 1rem; */
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  border: 1px solid var(--burgeria);
+  padding: 1rem;
+  font-family: var(--monospace);
+  background: var(--bg);
 }

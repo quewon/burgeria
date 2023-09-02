@@ -4,9 +4,9 @@ class Guy {
 
     const arch = ARCHETYPES[Math.random() * ARCHETYPES.length | 0];
 
-    this.name = arch.name;
+    this.complexity = arch.complexity;
 
-    this.generateDesiredMenu(arch.complexity);
+    this.name = arch.name;
 
     this.createElement(arch);
 
@@ -95,12 +95,12 @@ class Guy {
       switch (this.request.compensation.type) {
         case "gift":
           dialogue = "thanks, here's something thing i found";
-          tempMessage("<i>An item has been added to your <button onclick='setScene(`kitchen`)'>→ stock</button>.</i>");
+          tempMessage(localized("UI", "F_ADDED_ITEM"));
           break;
 
         case "piece":
           dialogue = "thanks. this is for you";
-          tempMessage("<i>A piece has been added to your <button onclick='setScene(`kitchen`)'>→ library</button>.</i>");
+          tempMessage(localized("UI", "F_ADDED_PIECE"));
           break;
 
         default:
@@ -160,7 +160,7 @@ class Guy {
       this.addPause(10);
     }
 
-    tempMessage("<i>A request has been added to your <button onclick='setScene(`workshop`)'>→ workshop</button>.</i>");
+    tempMessage(localized("UI", "F_ADDED_REQUEST"));
   }
 
   createRequestDialogue() {
@@ -349,6 +349,8 @@ class Guy {
   }
 
   enterStore() {
+    this.generateDesiredMenu(this.complexity);
+
     this.element.onclick = null;
     this.element.style.position = "unset";
 

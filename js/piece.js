@@ -1,3 +1,14 @@
+function createWorkshopPiece() {
+  const piece = new WorkshopPiece();
+  piece.addToWorkshop();
+  sfx('click');
+}
+
+function deleteWorkshopPiece() {
+  playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop();
+  sfx('click');
+}
+
 function calculatePieceCost(text) {
   var cost = 0;
   for (let char of text) {
@@ -12,13 +23,11 @@ function calculatePieceCost(text) {
 function randomLine(text) {
   var lines = text.match(/\(?[^\.\?\!]+[\.!\?]\)?/g);
 
-  console.log(lines);
-
   for (let i=lines.length-1; i>=0; i--) {
     const line = lines[i];
 
     var containsAnyLetter = false;
-    for (let letter in playerdata.letters) {
+    for (let letter in LETTERS) {
       if (line.includes(letter)) {
         containsAnyLetter = true;
         break;
@@ -185,7 +194,7 @@ class LibraryPiece {
       let char = this.text[randomindex];
       this.text = this.text.slice(0, randomindex) + " " + this.text.slice(randomindex + 1);
       if ("abcdefghijklmnopqrstuvwxyz".includes(char)) {
-        if (!(char in playerdata.letters)) {
+        if (!(char in LETTERS)) {
           playerdata.letters[char] = 0;
         }
         playerdata.letters[char]++;
@@ -210,7 +219,7 @@ class WorkshopPiece {
     this.inputManager = new InputManager(ui.workshop.textarea, text, function() {
       this.piece.text = this.history[this.historyIndex].text;
       const title = this.piece.text.split("\n")[0];
-      this.piece.title = title == "" ? "Empty note" : title;
+      this.piece.title = title;
       this.piece.updateUI();
       updateRequestPieceList();
     });
@@ -221,7 +230,8 @@ class WorkshopPiece {
   createRequestListItem() {
     const li = document.createElement("li");
 
-    const button = document.createElement("button"); button.textContent = this.title;
+    const button = document.createElement("button");
+    button.textContent = this.title;
 
     button.dataset.index = this.index;
     button.onclick = function() {
@@ -243,14 +253,15 @@ class WorkshopPiece {
     workshop.selectionEnd = state.selectionEnd;
     workshop.value = state.text;
 
-    const lib = ui.workshop.library;
-    if (
-      playerdata.workshopIndex != -1 && playerdata.workshopIndex < lib.children.length &&
-      playerdata.workshop[playerdata.workshopIndex] == this
-    )
-      lib.children[playerdata.workshopIndex].textContent = this.title;
+    var title = this.title;
+    if (title == "") {
+      const empty = localized("UI", "WS_EMPTY_NOTE");
+      title = empty == "" ? "Empty note" : empty;
+    }
 
-    if (this.requestListButton) this.requestListButton.textContent = this.title;
+    const lib = ui.workshop.library;
+    if (this.element) this.element.textContent = title;
+    if (this.requestListButton) this.requestListButton.textContent = title;
   }
 
   wordsCount() {
@@ -355,6 +366,7 @@ class WorkshopPiece {
     this.buttonSelect();
 
     this.createRequestListItem();
+    this.updateUI();
   }
 
   removeFromWorkshop() {
@@ -421,7 +433,7 @@ class FacadePiece {
   constructor(text, origin) {
     this.text = text || "";
     this.index = playerdata.facade.length;
-    this.origin = origin || "workshop";
+    this.origin = origin || "workshop"; // this looks stupid but origin is not originScene, because origin could be library (which is not a scene)
     this.originScene = this.origin == "workshop" ? "workshop" : "kitchen";
     playerdata.facade.push(this);
 
@@ -491,7 +503,8 @@ class FacadePiece {
         break;
     }
 
-    tempMessage("<i>This piece has been returned to the <button onclick='setScene(`"+this.originScene+"`)'>→ "+this.origin+"</button>.</i>");
+    const message = localized("UI", "F_PIECE_RETURNED").replace("[origin scene]", "<button onclick='setScene(`"+this.originScene+"`)'>→ "+localized("UI", "NAV_"+this.origin.toUpperCase())+"</button>");
+    tempMessage(message);
 
     updateFacadeList();
   }

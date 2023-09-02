@@ -37,7 +37,7 @@ function init_default_playerdata() {
   for (let char of abc) {
     playerdata.prices[char] = [];
 
-    const price = Math.max(.01, Math.random() * .1);
+    const price = Math.max(.01, Math.random() * .5);
     playerdata.prices[char].push(price);
     game.tomorrowsPrices[char] = price;
   }
@@ -56,20 +56,14 @@ function init_default_playerdata() {
   piece2.addToWorkshop();
 
   new Ingredient({
-    name: "top bun",
-    geometry: "bun",
-    color: 0xFFE4B5
+    name: "top bun"
   });
   new Ingredient({
     name: "bottom bun",
-    geometry: "bun",
-    rx: 1,
-    color: 0xFFE4B5
+    rx: 1
   });
   new Ingredient({
-    name: "patty",
-    geometry: "patty",
-    color: 0x8b4513
+    name: "patty"
   });
   // new Ingredient({
   //   name: "ketchup",
@@ -82,9 +76,7 @@ function init_default_playerdata() {
   //   color: 0x3CB371
   // });
   new Ingredient({
-    name: "onion",
-    geometry: "onion",
-    color: 0xffffe0,
+    name: "onion"
   });
   // new Ingredient({
   //   name: "cheese",
@@ -108,14 +100,11 @@ function init_default_playerdata() {
   // });
 
   new Ingredient({
-    name: "fries",
-    geometry: "fries",
-    color: 0xFFA500
+    name: "fries"
   });
   new Ingredient({
     name: "coke",
-    geometry: "can",
-    color: 0xff0000
+    geometry: "can"
   });
 
   for (let name of ["top bun", "bottom bun", "patty", "fries", "coke"]) {

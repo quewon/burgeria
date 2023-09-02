@@ -93,6 +93,7 @@ var ui = {
     researchNavigation: document.getElementById("research-nav"),
     researchIndex: document.getElementById("research-index"),
     ingredientsTotal: document.getElementById("research-ingredients-total"),
+    researchLettersList: document.getElementById("research-letters-block"),
 
     bookshelf: document.getElementById("bookshelf"),
   },
@@ -262,7 +263,23 @@ function createSpiderChart(element, normalizedAxes) {
   i=0;
   for (let axis in normalizedAxes) {
     const label = document.createElementNS('http://www.w3.org/2000/svg', "text");
-    label.textContent = axis;
+    switch (axis) {
+      case "value":
+        label.textContent = localized("UI", "K_RND_VALUE");
+        break;
+      case "size":
+        label.textContent = localized("UI", "K_RND_SIZE");
+        break;
+      case "sweet":
+        label.textContent = localized("UI", "FLAVOR_SWEET");
+        break;
+      case "spice":
+        label.textContent = localized("UI", "FLAVOR_SPICE");
+        break;
+      case "salt":
+        label.textContent = localized("UI", "FLAVOR_SALT");
+        break;
+    }
     label.setAttributeNS(null, "x", labelPoints[i][0]);
     label.setAttributeNS(null, "y", labelPoints[i][1]);
 
@@ -312,6 +329,7 @@ function divContainingTemplate(templateName) {
   let template = ui.templates[templateName];
   let clone = template.content.cloneNode(true);
   div.appendChild(clone);
+  localizeElement(div);
   return div;
 }
 
@@ -382,7 +400,7 @@ function updateResearchBlock() {
   if (chart.lastElementChild) {
     chart.lastElementChild.remove();
   }
-  createSpiderChart(chart, currentIngredient.stats);
+  createSpiderChart(chart, currentIngredient.generateStats());
 
   while (table.children.length > 1) {
     table.lastElementChild.remove();
@@ -405,9 +423,9 @@ function updateResearchBlock() {
 }
 
 function selectBook(el, index) {
-  el.classList.toggle("selected");
+  if (el) el.classList.toggle("selected");
 
-  if (el.classList.contains("selected")) {
+  if (el && el.classList.contains("selected")) {
     const books = document.querySelectorAll("[type='book']");
     for (let book of books) {
       book.classList.remove("selected");
@@ -550,13 +568,13 @@ function updateDayUI() {
     }
 
     counter.textContent = playerdata.day;
-    dtb.textContent = "open store";
+    dtb.textContent = localized("UI", "SF_STORE_OPEN");
     timer.style.height = "100%";
-    state.textContent = "CLOSED";
+    state.innerHTML = localized("UI", "SF_STORE_DESC_CLOSED");
   } else {
-    dtb.textContent = "close store early";
+    dtb.textContent = localized("UI", "SF_EARLY_CLOSE");
     di.textContent = "☼";
-    state.textContent = "OPEN";
+    state.innerHTML = localized("UI", "SF_STORE_DESC_OPEN");
     timer.style.height = "0%";
     timer.classList.add("transition");
     timer.onanimationend = function() {
@@ -588,7 +606,18 @@ function updateRecipes() {
   for (let name in categories) {
     const category = categories[name];
     let label = document.createElement("b");
-    label.textContent = category[0].category.toUpperCase();
+
+    switch (category[0].category) {
+      case "singles":
+        label.textContent = localized("UI", "SF_MENU_SINGLES_TITLE");
+        label.classList.add("local-sf-menu-singles-title");
+        break;
+      case "sets":
+        label.textContent = localized("UI", "SF_MENU_SETS_TITLE");
+        label.classList.add("local-sf-menu-sets-title");
+        break;
+    }
+
     let ul = document.createElement("ul");
     for (let recipe of category) {
       recipe.domIndex = i;
@@ -626,7 +655,7 @@ function updateGuysList() {
   }
 
   if (guysListed == 0) {
-    list.innerHTML = "<div class='block'><i>Nobody to serve.</i></div>";
+    list.innerHTML = "<div class='block'><i>"+localized("UI", "SF_TRAY_DESC_NOBODY")+"</i></div>";
   }
 }
 
@@ -711,7 +740,7 @@ function updateList(listElement, listObject) {
 
   if (!inventoryOccupied) {
     let span = document.createElement("i");
-    span.textContent = "It's empty...";
+    span.textContent = localized("UI", "GENERIC_EMPTY");
     listElement.appendChild(span);
     return false;
   }
@@ -723,14 +752,6 @@ function updateList(listElement, listObject) {
   return true;
 }
 
-function addEmptyLabel(element) {
-  if (!market.lastElementChild) {
-    let span = document.createElement("i");
-    span.textContent = "It's empty...";
-    market.appendChild(span);
-  }
-}
-
 function updateBankbook() {
   const table = ui.kitchen.bankbook;
   const bankbook = playerdata.bankbook;
@@ -740,7 +761,13 @@ function updateBankbook() {
     table.lastElementChild.remove();
   }
 
-  let keys = ["day", "description", "withdrawals", "deposits", "balance"];
+  let keys = [
+    localized("UI", "K_BANKBOOK_DAY"),
+    localized("UI", "K_BANKBOOK_DESC"),
+    localized("UI", "K_BANKBOOK_WITHDRAWALS"),
+    localized("UI", "K_BANKBOOK_DEPOSITS"),
+    localized("UI", "K_BANKBOOK_BALANCE")
+  ];
   let keysElement = document.createElement("tr");
   for (let key of keys) {
     let th = document.createElement("th");
@@ -851,4 +878,15 @@ function toggleDropdown(button) {
   // }
 
   button.classList.toggle("activated");
+}
+
+function toggleFacadeGuys(button) {
+  button.parentNode.parentNode.classList.toggle('hide-guys');
+  if (button.parentNode.parentNode.classList.contains("hide-guys")) {
+    button.textContent = localized("UI", "F_SHOW_GUYS");
+    button.className = "local-f-show-guys";
+  } else {
+    button.textContent = localized("UI", "F_HIDE_GUYS");
+    button.className = "local-f-hide-guys";
+  }
 }

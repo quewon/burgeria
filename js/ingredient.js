@@ -1,11 +1,20 @@
+function createNewIngredient() {
+  new Ingredient({ name: "" });
+  game.researchIndex = Object.keys(playerdata.ingredients).length - 1;
+  updateResearchBlock();
+  ui.kitchen.researchLettersList.classList.remove("gone");
+}
 
+function deleteIngredient() {
+  
+}
 
 class Ingredient {
   constructor(p) {
-    this.name = p.name;
+    this.name = p.name || "";
 
-    this.stats = this.generateStats();
     this.makeup = this.getMakeup();
+    this.size = this.getSize();
 
     this.createMeshRules(p.geometry, p.color, p.rx);
 
@@ -24,26 +33,72 @@ class Ingredient {
     this.button = button;
 
     playerdata.ingredients[this.name] = this;
+    updateResearchBlock();
+  }
+
+  getSize() {
+    var size = 0;
+    for (let letter in this.makeup) {
+      if (letter == 'misc') continue;
+      size += this.makeup[letter];
+    }
+    return size;
   }
 
   generateStats() {
+    // sums
+    var sweet = 0;
+    var spice = 0;
+    var salt = 0;
+    var value = 0;
+
+    // value is the average of all the letters
+    var letters = 0;
+    for (let letter in this.makeup) {
+      if (letter == 'misc') continue;
+      for (let i=0; i<this.makeup[letter].count; i++) {
+        const prices = playerdata.prices[letter];
+        value += prices[prices.length - 1];
+
+        sweet += LETTERS[letter].sweet;
+        spice += LETTERS[letter].spice;
+        salt += LETTERS[letter].salt;
+
+        letters++;
+      }
+    }
+    value /= letters || 1;
+    sweet /= letters || 1;
+    spice /= letters || 1;
+    salt /= letters || 1;
+
+    // size is compared to every other ingredient?
+    var longestName = "";
+    for (let ing in playerdata.ingredients) {
+      if (ing.length > longestName.length) {
+        longestName = ing;
+      }
+    }
+    var size = this.name.length / longestName.length;
+
     return {
-      sweet: Math.random(),
-      spice: Math.random(),
-      salt: Math.random(),
-      size: Math.random(),
-      value: Math.random(),
+      sweet: sweet,
+      spice: spice,
+      salt: salt,
+      size: size,
+      value: value,
     }
   }
 
   getMakeup() {
     var makeup = {};
     for (let char of this.name) {
-      if (char in playerdata.letters) {
-        if (!(char in makeup)) {
-          makeup[char] = { count: 0, percentage: 0 }
+      let letter = char.toLowerCase();
+      if (letter in LETTERS) {
+        if (!(letter in makeup)) {
+          makeup[letter] = { count: 0, percentage: 0 }
         }
-        makeup[char].count++;
+        makeup[letter].count++;
       } else {
         if (!('misc' in makeup)) {
           makeup.misc = { count: 0, percentage: 0 }
@@ -60,6 +115,25 @@ class Ingredient {
   }
 
   createMeshRules(geoname, color, rx) {
+    if (!geoname) {
+      geoname = Object.keys(_geobank)[0];
+      for (let geo in _geobank) {
+        if (this.name.includes(geo)) {
+          geoname = geo;
+          break;
+        }
+      }
+    }
+
+    if (!color) {
+      for (let name in _colorbank) {
+        if (this.name.includes(name) || geoname.includes(name)) {
+          color = _colorbank[name];
+          break;
+        }
+      }
+    }
+
     let def = new Geometry(geoname || "bun", rx || 0);
     color = color || 0xff0000;
     this.mesh = {

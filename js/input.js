@@ -57,7 +57,7 @@ class InputManager {
   }
 
   useLetter(letter) {
-    if (!(letter in playerdata.letters)) return;
+    if (!(letter in LETTERS)) return;
 
     let count = playerdata.letters[letter];
     if (count > 0) {
@@ -70,7 +70,7 @@ class InputManager {
   }
 
   unuseLetter(letter) {
-    if (!(letter in playerdata.letters)) return;
+    if (!(letter in LETTERS)) return;
 
     playerdata.letters[letter]++;
     updateLettersLists();
@@ -119,7 +119,7 @@ class InputManager {
     let charsDeleted = "";
     for (let char of deleted) {
       const letter = char.toLowerCase();
-      if (letter in playerdata.letters) {
+      if (letter in LETTERS) {
         this.unuseLetter(letter);
         charsDeleted += letter;
       }
@@ -135,7 +135,7 @@ class InputManager {
     if (added) {
       for (let char of added) {
         const letter = char.toLowerCase();
-        if (letter in playerdata.letters) {
+        if (letter in LETTERS) {
           const result = this.useLetter(letter);
           if (result) {
             addable += char;
@@ -274,17 +274,6 @@ function init_workshop() {
     const button = ui.workshop.library.children[playerdata.workshopIndex];
     button.classList.add("focused");
   });
-}
-
-function createWorkshopPiece() {
-  const piece = new WorkshopPiece();
-  piece.addToWorkshop();
-  sfx('click');
-}
-
-function deleteWorkshopPiece() {
-  playerdata.workshop[playerdata.workshopIndex].removeFromWorkshop();
-  sfx('click');
 }
 
 function updateLettersLists() {

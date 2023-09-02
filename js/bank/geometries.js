@@ -1,3 +1,11 @@
+var _colorbank = {
+  "bun": 0xFFE4B5,
+  "patty": 0x8b4513,
+  "onion": 0xffffe0,
+  "fries": 0xFFA500,
+  "can": 0xff0000,
+};
+
 var _geobank = {
   "bun": {
     geometry: new THREE.CylinderGeometry(1, 1.1, .4),

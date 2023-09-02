@@ -218,8 +218,8 @@ class Request {
         this.piece = null;
       }
 
-      this.statusElement.textContent = "UNWRITTEN";
-      this.pieceSelectButton.textContent = "SELECT PIECE";
+      this.statusElement.textContent = localized("UI", "REQUEST_STATUS_UNWRITTEN");
+      this.pieceSelectButton.textContent = localized("UI", "REQUEST_ATTACH_BUTTON");
       this.pieceSelectButton.parentNode.removeAttribute("title");
       ui.workshop.requestPieceBlock.classList.add("gone");
 
@@ -239,7 +239,7 @@ class Request {
 
     this.pieceSelectButton.parentNode.setAttribute("title", "detach piece");
 
-    this.statusElement.textContent = "UNDELIVERED";
+    this.statusElement.textContent = localized("UI", "REQUEST_STATUS_UNDELIVERED");
 
     this.pieceSelectButton.textContent = piece.title;
     piece.inputManager.burn();
@@ -320,7 +320,7 @@ class Request {
         bankPoints(points, "COMMISSION");
       }
 
-      this.statusElement.textContent = "DELIVERED";
+      this.statusElement.textContent = localized("UI", "REQUEST_STATUS_DELIVERED");
       this.fulfilled = true;
       this.pieceSelectButton.parentNode.setAttribute("disabled", true);
       this.pieceSelectButton.parentNode.removeAttribute("title");

@@ -16,15 +16,16 @@ class Tray {
     this.element = divContainingTemplate("tray");
     this.element.classList.add("slide-up");
 
+    this.element.querySelector(".local-tt-sf-tray-x").title = localized("UI", "TT_SF_TRAY_X");
+
     let cons = this.element.querySelectorAll(".collection");
     for (let con of cons) {
-      let sidename = con.getAttribute("placeholder");
+      let sidename = con.dataset.side;
       this.collections[sidename] = [];
       let col = new Collection(this, con, sidename);
       col.capacity = Number(con.dataset.capacity);
       con.dataset.containerValue = 2;
       con.dataset.index = this.index;
-      con.dataset.side = col.side;
       con.addEventListener("mouseenter", function(e) {
         let item = _dragdrop.itemInHand;
         if (!item) return;
