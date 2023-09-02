@@ -89,6 +89,14 @@ function set_language(lang) {
   }
 }
 
+function toggle_language(button) {
+  if (LANGUAGES.currentLanguage == "eng") {
+    set_language("kor");
+  } else {
+    set_language("eng");
+  }
+}
+
 function localizeElement(element) {
   if (LANGUAGES.currentLanguage == undefined) return;
 

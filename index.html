@@ -25,6 +25,7 @@
       <!-- <button onclick="game.save()">save file</button> -->
       <button onclick="toggleVolume(); sfx('click');" title="change volume" class="local-tt-volume"><i><span class="local-volume">volume</span>:</i> <span class="monospace" id="volume-icon"></span>%</button>
       <button class="local-tt-theme" onclick="toggleTheme(); sfx('click');"><span id="theme-name">☼</span></button>
+      <button class="local-tt-translate" onclick="toggle_language();">🌐</button>
     </div>
 
     <div id="facade-piece-container" class="disabled">
@@ -564,6 +565,8 @@
       </div><br> -->
 
       <div class="margintop" style="text-align: center;">
+        <button id="language-button" onclick="toggle_language();">🌐 <span class="local-about-translate">한국어로 바꾸기</span></button>
+        <br><br>
         <button class="local-popup-close" onclick="this.parentNode.parentNode.close(); ui.dialogs['help-burgeria-canvas'].deactivate();" autofocus>close</button>
       </div>
     </dialog>

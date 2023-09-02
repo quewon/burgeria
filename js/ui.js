@@ -43,6 +43,7 @@ var ui = {
   currentScene: "storefront",
   themeName: document.getElementById("theme-name"),
   volumeIcon: document.getElementById("volume-icon"),
+  languageButton: document.getElementById("language-button"),
   "storefront": {
     sceneButton: document.getElementById("storefront-scene-button"),
     body: document.getElementById("scene-storefront-body"),
