@@ -67,7 +67,7 @@ class PieceAlert {
     cost = cost || calculatePieceCost(text);
     this.text = text;
     this.cost = cost;
-    this.title = text.split("\n")[0];
+    this.title = text.split("\n")[0].substring(0, 32);
     this.index = game.market.length;
 
     game.market.push(this);

@@ -288,6 +288,7 @@ h2 {
   gap: var(--gap);
   padding: 0;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 .tray .container {
   padding: var(--padding);
@@ -788,6 +789,7 @@ p {
   padding: 3px;
   /* min-height: 1rem; */
   text-align: justify;
+  word-break: break-word;
 }
 .guy div[name="text"] * {
   display: inline;

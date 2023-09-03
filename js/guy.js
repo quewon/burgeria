@@ -33,6 +33,25 @@ class Guy {
     this.hangAround();
   }
 
+  updateLanguage() {
+    if (this.hasRequest) {
+      for (let rule of this.request.rules) {
+        rule.updateLanguage();
+      }
+    }
+
+    if (this.enteredStore) {
+      this.clearDialogue();
+      if (this.request && !this.request.fulfilled && this.request.piece) {
+        this.createAwaitRequestDialogue();
+      } else if (!this.hasRequest || this.request.accepted) {
+        this.createOrderDialogue();
+      } else {
+        this.createRequestDialogue();
+      }
+    }
+  }
+
   createRequest() {
     this.hasRequest = true;
     this.element.classList.add("has-request");
@@ -94,17 +113,17 @@ class Guy {
 
       switch (this.request.compensation.type) {
         case "gift":
-          dialogue = "thanks, here's something thing i found";
+          dialogue = localized("DIALOGUE", "REQUEST_FULFILLED_GIFT");
           tempMessage(localized("UI", "F_ADDED_ITEM"));
           break;
 
         case "piece":
-          dialogue = "thanks. this is for you";
+          dialogue = localized("DIALOGUE", "REQUEST_FULFILLED_PIECE");
           tempMessage(localized("UI", "F_ADDED_PIECE"));
           break;
 
         default:
-          dialogue = "thank you";
+          dialogue = localized("DIALOGUE", "REQUEST_FULFILLED");
           break;
       }
 
@@ -112,7 +131,7 @@ class Guy {
       this.element.classList.remove("awaiting-request");
       this.fulfillRequestButton.classList.add("gone");
     } else {
-      this.addString(this.styleText("sorry, this isn't what i wanted", true, null));
+      this.addString(this.styleText(localized("DIALOGUE", "REQUEST_WRONG"), true, null));
     }
 
     if (this.enteredStore) {
@@ -131,13 +150,12 @@ class Guy {
 
     // rejection dialogue
 
+    this.clearDialogue();
+    this.addString(this.styleText(localized("DIALOGUE", "REQUEST_REMOVED"), true, null));
+
     if (this.enteredStore) {
-      this.clearDialogue();
-      this.addString(this.styleText("aw man", true, null));
       this.createOrderDialogue(true);
     } else {
-      this.clearDialogue();
-      this.addString(this.styleText("aw man", true, null));
       this.addPause(10);
     }
   }
@@ -150,13 +168,11 @@ class Guy {
 
     // accepted dialogue
 
+    this.clearDialogue();
+    this.addString(this.styleText(localized("DIALOGUE", "REQUEST_ACCEPTED"), true, null));
     if (this.enteredStore) {
-      this.clearDialogue();
-      this.addString(this.styleText("thank you", true, null));
       this.createOrderDialogue(true);
     } else {
-      this.clearDialogue();
-      this.addString(this.styleText("thank you", true, null));
       this.addPause(10);
     }
 
@@ -164,7 +180,7 @@ class Guy {
   }
 
   createRequestDialogue() {
-    this.addString(this.styleText("i have a request for you", true, null));
+    this.addString(this.styleText(localized("DIALOGUE", "REQUEST"), true, null));
     this.addPause(15);
   }
 
@@ -244,7 +260,7 @@ class Guy {
 
   createAwaitRequestDialogue() {
     var dialogue = this.randomLine([
-      "have you fulfilled my request"
+      localized("DIALOGUE", "REQUEST_WAITING")
     ]);
 
     this.addString(this.styleText(dialogue, true, null));
@@ -288,20 +304,32 @@ class Guy {
 
         dialogue = this.randomLine([
           "", "",
-          "hello", "hi", "hallo", "morning", "good morning",
-          "open the store", "when does the store open",
-          "hungry", "i'm hungry", "so hungry",
-          "bored", "kinda bored", "i'm bored",
-          "boo",
-          "Burgeria"
+          localized("DIALOGUE", "WAIT_1"),
+          localized("DIALOGUE", "WAIT_2"),
+          localized("DIALOGUE", "WAIT_3"),
+          localized("DIALOGUE", "WAIT_4"),
+          localized("DIALOGUE", "WAIT_5"),
+          localized("DIALOGUE", "WAIT_6"),
+          localized("DIALOGUE", "WAIT_7"),
+          localized("DIALOGUE", "WAIT_8"),
+          localized("DIALOGUE", "WAIT_9"),
+          localized("DIALOGUE", "WAIT_10"),
+          localized("DIALOGUE", "WAIT_11"),
+          localized("DIALOGUE", "WAIT_12"),
+          localized("DIALOGUE", "WAIT_13"),
+          localized("DIALOGUE", "WAIT_14"),
+          localized("DIALOGUE", "WAIT_15"),
         ]);
       } else {
         // overtime
 
         dialogue = this.randomLine([
           "", "",
-          "zzz", "sleepy",
-          "i've been waiting for so long", "how much longer", "what's the hold up"
+          localized("DIALOGUE", "OVERTIME_1"),
+          localized("DIALOGUE", "OVERTIME_2"),
+          localized("DIALOGUE", "OVERTIME_3"),
+          localized("DIALOGUE", "OVERTIME_4"),
+          localized("DIALOGUE", "OVERTIME_5"),
         ]);
       }
     } else {
@@ -309,9 +337,13 @@ class Guy {
 
       dialogue = this.randomLine([
         "", "",
-        "wonder what i'll get", "what's on the menu", "wait for me",
-        "hungry", "i'm hungry", "so hungry",
-        "time to eat"
+        localized("DIALOGUE", "STORE_OPEN_1"),
+        localized("DIALOGUE", "STORE_OPEN_2"),
+        localized("DIALOGUE", "STORE_OPEN_3"),
+        localized("DIALOGUE", "STORE_OPEN_4"),
+        localized("DIALOGUE", "STORE_OPEN_5"),
+        localized("DIALOGUE", "STORE_OPEN_6"),
+        localized("DIALOGUE", "STORE_OPEN_7"),
       ]);
     }
 
@@ -326,7 +358,13 @@ class Guy {
 
   createLeavingDialogue() {
     var dialogue = this.randomLine([
-      "goodbye", "bye bye", "bye", "farewell", "see ya", "see you", "aw man"
+      localized("DIALOGUE", "LEAVE_1"),
+      localized("DIALOGUE", "LEAVE_2"),
+      localized("DIALOGUE", "LEAVE_3"),
+      localized("DIALOGUE", "LEAVE_4"),
+      localized("DIALOGUE", "LEAVE_5"),
+      localized("DIALOGUE", "LEAVE_6"),
+      localized("DIALOGUE", "LEAVE_7"),
     ]);
 
     this.addString(this.styleText(dialogue, true, null));
@@ -435,7 +473,7 @@ class Guy {
       "!", "!",
       "...",
       "!!!",
-      "?", "?!"
+      // "?", "?!"
     ];
     return line+punctuation[punctuation.length * Math.random() | 0];
   }
@@ -460,41 +498,63 @@ class Guy {
 
     const greeting = this.randomLine([
       "", "",
-      "hello", "hello", "hello",
-      "hi", "hi", "hi",
-      "um",
-      "hmm", "hmm",
-      "ey",
-      "greetings",
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_1"),
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_1"),
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_1"),
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_2"),
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_2"),
+      localized("DIALOGUE", "ORDER_OPENER_COMMON_2"),
+      localized("DIALOGUE", "ORDER_OPENER_3"),
+      localized("DIALOGUE", "ORDER_OPENER_3"),
+      localized("DIALOGUE", "ORDER_OPENER_UNCOMMON_4"),
+      localized("DIALOGUE", "ORDER_OPENER_UNCOMMON_5"),
+      localized("DIALOGUE", "ORDER_OPENER_UNCOMMON_6"),
     ]);
     const request = this.randomLine([
-      "i would like the",
-      "can i have the",
-      "give me the",
-      "gotta go for the",
-      "i'll have the",
-      "i'm craving the",
-      "make me the",
-      "i want the"
+      localized("DIALOGUE", "ORDER_REQUEST_1"),
+      localized("DIALOGUE", "ORDER_REQUEST_2"),
+      localized("DIALOGUE", "ORDER_REQUEST_3"),
+      localized("DIALOGUE", "ORDER_REQUEST_4"),
+      localized("DIALOGUE", "ORDER_REQUEST_5"),
+      localized("DIALOGUE", "ORDER_REQUEST_6"),
+      localized("DIALOGUE", "ORDER_REQUEST_7"),
+      localized("DIALOGUE", "ORDER_REQUEST_8"),
     ], true);
     const signoff = this.randomLine([
       "", "", "",
-      "thank you", "thank you", "thank you :)",
-      "thanks", "thanks", "thanks :)",
-      "i love Burgeria", "i hate burgeria", "i am indifferent to Burgeria",
-      "make it tasty",
-      "can't wait",
-      "eh",
-      "yeah",
-      "yes",
-      "please and thank you",
-      ":)", ":D"
+      localized("DIALOGUE", "ORDER_SIGNOFF_COMMON_1"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_COMMON_1"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_COMMON_2"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_COMMON_2"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_3"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_4"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_5"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_6"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_7"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_8"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_9"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_10"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_11"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_12"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_13"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_14"),
+      localized("DIALOGUE", "ORDER_SIGNOFF_15"),
     ]);
 
     if (!skipGreeting) this.addString(greeting);
-    this.addString(request);
-    this.addString(menu.name, "order");
+
+    var splitRequest = request.split(/\[|\]/g);
+    for (let section of splitRequest) {
+      if (section == "menu") {
+        this.addString(menu.name, "order");
+      } else {
+        this.addString(section);
+      }
+    }
     this.addString(this.randomPunctuateLine(""));
+
+    const and = localized("DIALOGUE", "ORDER_CONCAT");
+    const but = localized("DIALOGUE", "REPLACE_CONCAT");
 
     if (menu.deviations.length > 0) {
       const deviations = menu.deviations;
@@ -503,27 +563,40 @@ class Guy {
         switch (deviation.type) {
           case "remove":
             if (i>0) {
-              this.addString("and", true);
+              this.addString(and, true);
             }
 
-            this.addString(this.styleText("without any "+deviation.item, true, i>0), "em");
+            // without any [item]
+            this.addString(this.styleText(
+              localized("DIALOGUE", "ORDER_REMOVE").replace("[item]", deviation.item),
+              true, i>0), "em");
             this.addString(".");
             break;
           case "replace":
             if (i==0) {
-              this.addString(this.styleText("but", true));
+              this.addString(this.styleText(but, true));
             } else {
-              this.addString(this.styleText("and", true));
+              this.addString(this.styleText(and, true));
             }
 
-            var question = Math.random() < .5 ? true : false;
-            if (question) {
-              this.addString(this.styleText("can i have", true, true));
-            } else {
-              this.addString(this.randomLine(["give me", "i want"], true, true));
+            var replaceDialogue = this.randomLine([
+              "", "", "",
+              localized("DIALOGUE", "ORDER_REPLACE_1"),
+              localized("DIALOGUE", "ORDER_REPLACE_2"),
+              localized("DIALOGUE", "ORDER_REPLACE_3"),
+            ]);
+            replaceDialogue = this.styleText(replaceDialogue, true, true);
+            replaceDialogue = replaceDialogue.split(/<em>|<\/em>/g);
+
+            for (let section of replaceDialogue) {
+              if (section == "") continue;
+              if (section.includes("[to]")) {
+                this.addString(section.replace("[to]", deviation.to).replace("[from]", deviation.from), "em");
+              } else {
+                this.addString(section);
+              }
             }
-            this.addString(deviation.to+" instead of "+deviation.from, "em");
-            this.addString(question ? "?" : ".");
+            // this.addString(question ? "?" : ".");
             break;
         }
       }
@@ -625,11 +698,11 @@ class Guy {
   reject() {
     if (this.words.length > 0) {
       const dialogue = this.randomLine([
-        "wait i wasn't done talking",
-        "what",
-        "wait what",
-        "oh ok",
-        "ah excuse me"
+        localized("DIALOGUE", "REJECT_INTERRUPT_1"),
+        localized("DIALOGUE", "REJECT_INTERRUPT_2"),
+        localized("DIALOGUE", "REJECT_INTERRUPT_3"),
+        localized("DIALOGUE", "REJECT_INTERRUPT_4"),
+        localized("DIALOGUE", "REJECT_INTERRUPT_5")
       ]);
       this.words = [];
       this.addString(dialogue);
@@ -682,26 +755,46 @@ class Guy {
       "categories_in_wrong_order",
     ];
     const dialogue = {
-      "tray_has_nothing": "this tray has nothing on it!",
-      "categories_missing": "i didn't get my [item]...",
-      "categories_in_wrong_order": "[item] was in the wrong order.",
-      "categories_swapped": "the [a] and the [b] got mixed up.",
-      "categories_mixed_up": "my [should_be] was in the wrong spot!",
-      "unwanted_categories": "haha, free [item]!",
-      "unwanted_items": "why was there [item] in my [category]?",
-      "items_missing": "my [category] was missing [item]...",
-      "categories_overfilled": "there was too much stuff in my [item].",
-      "items_misplaced": "this [item] was in the wrong spot.",
+      "tray_has_nothing": localized("DIALOGUE", "FEEDBACK_TRAY_HAS_NOTHING"),
+      "categories_missing": localized("DIALOGUE", "FEEDBACK_CATEGORIES_MISSING"),
+      "categories_in_wrong_order": localized("DIALOGUE", "FEEDBACK_CATEGORIES_IN_WRONG_ORDER"),
+      "categories_swapped": localized("DIALOGUE", "FEEDBACK_CATEGORIES_SWAPPED"),
+      "categories_mixed_up": localized("DIALOGUE", "FEEDBACK_CATEGORIES_MIXED_UP"),
+      "unwanted_categories": localized("DIALOGUE", "FEEDBACK_UNWANTED_CATEGORIES"),
+      "unwanted_items": localized("DIALOGUE", "FEEDBACK_UNWANTED_ITEMS"),
+      "items_missing": localized("DIALOGUE", "FEEDBACK_ITEMS_MISSING"),
+      "categories_overfilled": localized("DIALOGUE", "FEEDBACK_CATEGORIES_OVERFILLED"),
+      "items_misplaced": localized("DIALOGUE", "FEEDBACK_ITEMS_MISPLACED"),
     };
+
+    const localizeCategory = function(string) {
+      switch (string) {
+        case "burger":
+          return localized("UI", "PLACEHOLDER_BURGER");
+          break;
+        case "drink":
+          return localized("UI", "PLACEHOLDER_DRINK");
+          break;
+        case "side":
+          return localized("UI", "PLACEHOLDER_SIDE");
+          break;
+      }
+    }
+
     for (let i=priority.length-1; i>=0; i--) {
       let f = feedback[priority[i]];
       f = f.constructor === Array ? f[0] : f;
+
+      var isCategories = priority[i].includes("categor");
+
       if (f) {
         text = dialogue[priority[i]];
         if (typeof f === "string") {
+          if (isCategories) f = localizeCategory(f);
           text = text.replace("[item]", f);
         } else {
           for (let property in f) {
+            if (isCategories) f = localizeCategory(f);
             text = text.replace("["+property+"]", f[property]);
           }
         }

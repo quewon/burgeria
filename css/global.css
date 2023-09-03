@@ -4,7 +4,6 @@
 
 .monospace {
   font-family: var(--monospace);
-  text-transform: uppercase;
 }
 
 .strikethrough {

@@ -165,6 +165,8 @@ class InputManager {
       }
     }
 
+    output = output.replace(/[^\x00-\x7F]/g, "");
+
     element.value = output;
 
     if (output != prevtext) {

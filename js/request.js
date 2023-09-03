@@ -7,21 +7,25 @@ class RequestRule {
     //<li>must be <em>30 characters or longer</em>.</li>
 
     this.element = document.createElement("div");
+    this.updateLanguage();
+  }
+
+  updateLanguage() {
     switch (this.type) {
       case "startString":
-        this.element.innerHTML = "must begin with <span class='monospace'><em>"+this.condition+"</em></span>.";
+        this.element.innerHTML = localized("UI", "REQUEST_RULE_STARTSTRING").replace("X", "<em class='monospace'>"+this.condition+"</em>");
         break;
 
       case "endString":
-        this.element.innerHTML = "must end with <span class='monospace'><em>"+this.condition+"</em></span>.";
+        this.element.innerHTML = localized("UI", "REQUEST_RULE_ENDSTRING").replace("X", "<em class='monospace'>"+this.condition+"</em>");
         break;
 
       case "contain":
-        this.element.innerHTML = "must contain <span class='monospace'><em>"+this.condition+"</em></span>.";
+        this.element.innerHTML = localized("UI", "REQUEST_RULE_CONTAIN").replace("X", "<em class='monospace'>"+this.condition+"</em>");
         break;
 
       case "minLetterCount":
-        this.element.innerHTML = "must be "+p.condition+" letters or longer.";
+        this.element.innerHTML = localized("UI", "REQUEST_RULE_MINLETTERCOUNT").replace("X", "<em class='monospace'>"+this.condition+"</em>");
         break;
     }
   }
@@ -98,7 +102,7 @@ class Request {
   previewForAcceptance() {
     const dialog = ui.dialogs["preview-request"];
 
-    dialog.querySelector("[name='dialogue']").textContent = "i have a request for you.";
+    dialog.querySelector("[name='dialogue']").textContent = localized("DIALOGUE", "REQUEST");
 
     if (!this.element) {
       this.createElement();
@@ -161,19 +165,19 @@ class Request {
     const comp = this.element.querySelector("[name='compensation']");
     switch (this.compensation.type) {
       case "pointsPerLetter":
-        comp.innerHTML = "<span class='burgerpoints' title='BurgerPoints'></span>"+this.compensation.condition+" PER LETTER";
+        comp.innerHTML = localized("UI", "REQUEST_COMPENSATION_MULT").replace("X", "<span class='burgerpoints'></span>"+this.compensation.condition);
         break;
 
       case "points":
-        comp.innerHTML = "<span class='burgerpoints' title='BurgerPoints'></span>"+this.compensation.condition;
+        comp.innerHTML = "<span class='burgerpoints'></span>"+this.compensation.condition;
         break;
 
       case "gift":
-        comp.textContent = "A GIFT";
+        comp.textContent = localized("UI", "REQUEST_COMPENSATION_GIFT");
         break;
 
       case "piece":
-        comp.textContent = "A PIECE";
+        comp.textContent = localized("UI", "REQUEST_COMPENSATION_PIECE");
         break;
     }
   }

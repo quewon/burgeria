@@ -20,7 +20,7 @@ var REQUESTS = [
         "love,", "from,", "sincerely,"
       ]);
 
-      guy.request.title = "A LETTER FOR "+person;
+      guy.request.title = "A LETTER FOR "+person.toUpperCase();
       guy.request.addRule({ type: "startString", condition: to+" "+person });
       guy.request.addRule({ type: "contain", condition: message });
       guy.request.addRule({ type: "endString", condition: signoff+" "+guy.name });
@@ -102,7 +102,7 @@ var REQUESTS = [
         "love", "goodbyes", "burger", "heroes", "good", "me", "you", "home"
       ]);
 
-      const title = "A "+song+" ABOUT "+subject;
+      const title = "A "+song.toUpperCase()+" ABOUT "+subject.toUpperCase();
 
       // const contain = randomFromArray([
       //   "", "", "",

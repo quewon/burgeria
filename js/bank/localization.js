@@ -87,6 +87,14 @@ function set_language(lang) {
   for (let recipe of playerdata.recipes) {
     localizeElement(recipe.tray.element);
   }
+  for (let request of playerdata.requests) {
+    for (let rule of request.rules) {
+      rule.updateLanguage();
+    }
+  }
+  for (let guy of game.guys) {
+    guy.updateLanguage();
+  }
 }
 
 function toggle_language(button) {

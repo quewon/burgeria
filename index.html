@@ -519,7 +519,7 @@
       <div class="block dashed slide-down">
         <button class="local-tt-close top right front" onclick="this.parentNode.parentNode.remove();">x</button>
         <div class="marginbelow">
-          <i>Someone left a note on a napkin...</i>
+          <i class="local-guy-feedback">Someone left a note on a napkin...</i>
         </div>
         <span name="text"></span>
       </div>
@@ -595,7 +595,7 @@
         <div class="grow">!</div>
         <button class="local-tt-close" onclick="this.parentNode.parentNode.close();">x</button>
       </div>
-      Not enough points!
+      <span class="local-error-not-enough-points">Not enough points!</span>
       <div class="margintop" style="text-align: center;">
         <button class="local-popup-close" onclick="this.parentNode.parentNode.close();" autofocus>close</button>
       </div>
@@ -751,8 +751,11 @@
     function checkLoaded() {
       if (LANGUAGES.UI && WWW.length != 0) {
         document.getElementById("loading").classList.add("gone");
+        set_language("kor");
+        
         ui.dialogs['help-burgeria'].showModal();
         ui.dialogs['help-burgeria-canvas'].activate();
+        game.generateGuys();
       }
     }
 
@@ -791,7 +794,6 @@
       // storefront
       init_3d();
       init_dragdrop();
-      game.generateGuys();
 
       //
 
@@ -881,9 +883,6 @@
 
       load_languages(function() {
         console.log("loaded languages.");
-
-        set_language("eng");
-
         checkLoaded();
       });
     }
