@@ -71,6 +71,11 @@ function load_data(onload) {
   .then((data) => {
     WWW = SheetArrayToObjects(data.values);
     if (onload) onload();
+  })
+  .catch((error) => {
+    document.getElementById("loading").textContent = "CANNOT CONNECT TO SERVER - PLEASE CHECK YOUR NETWORK CONNECTION!";
+
+    console.log(error);
   });
 
   function SheetArrayToObjects(array) {

@@ -355,10 +355,14 @@ function updateVolumeUI() {
 function navigateRND(value) {
   game.researchIndex += value;
 
+  ui.kitchen.researchLettersBlock.classList.add("gone");
+
   updateResearchBlock();
 }
 
 function updateResearchBlock() {
+  console.trace();
+
   const block = ui.kitchen.researchBlock;
 
   const nav = ui.kitchen.researchNavigation;
@@ -390,7 +394,7 @@ function updateResearchBlock() {
     table.classList.add("gone");
     return;
   } else {
-    table.classList.add("remove");
+    table.classList.remove("gone");
   }
 
   const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
@@ -446,6 +450,7 @@ function selectBook(el, index) {
     playerdata.libraryIndex = index;
     updateLibrary();
     ui.kitchen.libraryBlock.classList.remove("gone");
+    ui.kitchen.lettersContainer.classList.add("gone");
   } else {
     ui.kitchen.libraryBlock.classList.add("gone");
   }
@@ -756,10 +761,6 @@ function updateList(listElement, listObject) {
     span.classList.add("local-generic-empty");
     listElement.appendChild(span);
     return false;
-  }
-
-  if (ui.currentScene == "kitchen" && listElement == ui.kitchen.lettersList) {
-    ui.kitchen.lettersContainer.classList.remove("gone");
   }
 
   return true;

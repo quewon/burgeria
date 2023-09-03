@@ -253,7 +253,7 @@
 
             <div class="block dashed attached-above gone" id="research-letters-block">
               <b class="local-letters-container-title">INK</b>
-              <ul id="research-letters-list"></ul>
+              <ul id="research-letters-list" class="flexbox"></ul>
             </div>
           </div>
         </div>
@@ -782,10 +782,11 @@
       updatePoints();
       updateRecipes();
       updateBookshelf();
-      new InputManager(ui.kitchen.researchBlock.querySelector("[name='input']"), "", function() {
+      ui.researchInputManager = new InputManager(ui.kitchen.researchBlock.querySelector("[name='input']"), "", function() {
         const ingredients = Object.keys(playerdata.ingredients);
         const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
-        currentIngredient.visualizeName(this.element.value);
+        if (!currentIngredient) return;
+        if (!currentIngredient.nameIsSet) currentIngredient.visualizeName(this.element.value);
       });
 
       playerdata.recipes[0].previewRecipe();

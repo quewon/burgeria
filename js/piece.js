@@ -67,7 +67,11 @@ class PieceAlert {
     cost = cost || calculatePieceCost(text);
     this.text = text;
     this.cost = cost;
-    this.title = text.split("\n")[0].substring(0, 32);
+
+    const firstLine = text.split("\n")[0];
+
+    this.title = firstLine.substring(0, 32);
+    if (this.title != firstLine) this.title += "...";
     this.index = game.market.length;
 
     game.market.push(this);
@@ -181,6 +185,7 @@ class LibraryPiece {
     if (!this.disintegrating) {
       this.disintegrating = true;
       this.sfxId = sfx("disintegrate");
+      ui.kitchen.lettersContainer.classList.remove("gone");
     }
   }
 

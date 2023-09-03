@@ -1,5 +1,6 @@
 function createNewIngredient() {
   const currentIngredient = new Ingredient({ name: "" });
+  currentIngredient.nameIsSet = false;
   game.researchIndex = Object.keys(playerdata.ingredients).length - 1;
   updateResearchBlock();
   ui.kitchen.researchLettersBlock.classList.remove("gone");
@@ -24,11 +25,13 @@ function finalizeNewIngredientName() {
   const input = ui.kitchen.researchBlock.querySelector("[name='input']");
   input.classList.add("gone");
   name.classList.remove("gone");
+  ui.kitchen.researchLettersBlock.classList.add("gone");
 
   var ingredients = Object.keys(playerdata.ingredients);
   const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
   currentIngredient.finalizeName(input.value);
 
+  ui.researchInputManager.burn();
   input.value = "";
 }
 
@@ -50,6 +53,7 @@ function deleteIngredient() {
 class Ingredient {
   constructor(p) {
     this.name = p.name || "";
+    this.nameIsSet = true;
 
     this.makeup = this.getMakeup();
     this.size = this.getSize();
@@ -91,26 +95,39 @@ class Ingredient {
     const previousName = this.name;
 
     this.name = string;
+    this.makeup = this.getMakeup();
+    this.size = this.getSize();
 
     if (playerdata.ingredients[this.name]) {
       playerdata.ingredients[this.name].delete();
       playerdata.ingredients[this.name] = this;
-      game.researchIndex--;
+      game.researchIndex = Object.keys(playerdata.ingredients).indexOf(this.name);
     } else {
       playerdata.ingredients[this.name] = this;
     }
-    if (previousName != this.name) delete playerdata.ingredients[previousName];
-    updateBankbook();
+    if (this.name == "") {
+      this.delete();
+      if (game.researchIndex > 0) game.researchIndex--;
+    } else {
+      this.button.textContent = this.name;
+      this.button.dataset.ingredientName = this.name;
+    }
+    if (previousName != this.name) {
+      delete playerdata.ingredients[previousName];
+    }
 
-    this.button.textContent = this.name;
-    this.button.dataset.ingredientName = this.name;
+    const ing = playerdata.ingredients[Object.keys(playerdata.ingredients)[game.researchIndex]];
+
+    this.nameIsSet = true;
+
+    updateResearchBlock();
   }
 
   getSize() {
     var size = 0;
     for (let letter in this.makeup) {
       if (letter == 'misc') continue;
-      size += this.makeup[letter];
+      size += this.makeup[letter].count;
     }
     return size;
   }
@@ -252,6 +269,15 @@ class Ingredient {
   }
 
   delete() {
+    if (this.name.length > 0) {
+      ui.kitchen.researchLettersBlock.classList.remove("gone");
+    }
+    for (let char of this.name) {
+      const letter = char.toLowerCase();
+      if (letter in LETTERS) {
+        ui.researchInputManager.unuseLetter(letter);
+      }
+    }
     this.button.remove();
     delete playerdata.ingredients[this.name];
   }
