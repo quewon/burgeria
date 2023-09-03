@@ -10,12 +10,12 @@
   font-style: normal;
 }
 
-/* @font-face {
+@font-face {
     font-family: 'EF_jejudoldam';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_jejudoldam.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-} */
+}
 
 @font-face {
     font-family: '-KITA-Regular';
@@ -43,6 +43,7 @@ h1:lang(kor) {
   font-size: 4rem;
   scale: 1 1;
   margin-top: -.1em;
+  /* margin-top: -1.5rem; */
   margin-bottom: -.15em;
   font-weight: normal;
 }

@@ -1,12 +1,50 @@
 function createNewIngredient() {
-  new Ingredient({ name: "" });
+  const currentIngredient = new Ingredient({ name: "" });
   game.researchIndex = Object.keys(playerdata.ingredients).length - 1;
   updateResearchBlock();
-  ui.kitchen.researchLettersList.classList.remove("gone");
+  ui.kitchen.researchLettersBlock.classList.remove("gone");
+
+  const name = ui.kitchen.researchBlock.querySelector("[name='name']");
+  const input = ui.kitchen.researchBlock.querySelector("[name='input']");
+  input.classList.remove("gone");
+  name.classList.add("gone");
+  input.focus();
+  input.onkeydown = function(e) {
+    if (e.key == "Enter" || e.key == "Escape") {
+      this.blur();
+    }
+  }
+  // input.oninput = function() {
+  //   this.value = currentIngredient.visualizeName(this.value);
+  // };
+}
+
+function finalizeNewIngredientName() {
+  const name = ui.kitchen.researchBlock.querySelector("[name='name']");
+  const input = ui.kitchen.researchBlock.querySelector("[name='input']");
+  input.classList.add("gone");
+  name.classList.remove("gone");
+
+  var ingredients = Object.keys(playerdata.ingredients);
+  const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
+  currentIngredient.finalizeName(input.value);
+
+  input.value = "";
 }
 
 function deleteIngredient() {
-  
+  var ingredients = Object.keys(playerdata.ingredients);
+  if (ingredients.length == 0) return;
+
+  const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
+  currentIngredient.delete();
+  ingredients = Object.keys(playerdata.ingredients);
+
+  if (game.researchIndex >= ingredients.length && game.researchIndex > 0) {
+    game.researchIndex--;
+  }
+
+  updateResearchBlock();
 }
 
 class Ingredient {
@@ -23,17 +61,49 @@ class Ingredient {
     ui.kitchen.ingredientButtons.appendChild(button);
     button.dataset.ingredientName = this.name;
     button.onclick = function(e) {
-      let success = playerdata.ingredients[this.dataset.ingredientName].create();
+      let success = this.create();
       if (success) {
         sfx("click");
       } else {
         sfx("error");
       }
-    };
+    }.bind(this);
     this.button = button;
 
     playerdata.ingredients[this.name] = this;
     updateResearchBlock();
+  }
+
+  visualizeName(string) {
+    const previousName = this.name;
+
+    this.name = string;
+    this.makeup = this.getMakeup();
+    this.size = this.getSize();
+    updateResearchBlock();
+
+    this.name = previousName;
+
+    return string;
+  }
+
+  finalizeName(string) {
+    const previousName = this.name;
+
+    this.name = string;
+
+    if (playerdata.ingredients[this.name]) {
+      playerdata.ingredients[this.name].delete();
+      playerdata.ingredients[this.name] = this;
+      game.researchIndex--;
+    } else {
+      playerdata.ingredients[this.name] = this;
+    }
+    if (previousName != this.name) delete playerdata.ingredients[previousName];
+    updateBankbook();
+
+    this.button.textContent = this.name;
+    this.button.dataset.ingredientName = this.name;
   }
 
   getSize() {
@@ -179,5 +249,10 @@ class Ingredient {
     new Item(this.name, playerdata.inventory);
 
     updateList(ui.kitchen.inventoryList, playerdata.inventory.list);
+  }
+
+  delete() {
+    this.button.remove();
+    delete playerdata.ingredients[this.name];
   }
 }

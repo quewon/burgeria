@@ -94,7 +94,8 @@ var ui = {
     researchNavigation: document.getElementById("research-nav"),
     researchIndex: document.getElementById("research-index"),
     ingredientsTotal: document.getElementById("research-ingredients-total"),
-    researchLettersList: document.getElementById("research-letters-block"),
+    researchLettersBlock: document.getElementById("research-letters-block"),
+    researchLettersList: document.getElementById("research-letters-list"),
 
     bookshelf: document.getElementById("bookshelf"),
   },
@@ -371,11 +372,29 @@ function updateResearchBlock() {
   const table = block.querySelector("[name='table']");
 
   const ingredients = Object.keys(playerdata.ingredients);
-  const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
 
   while (name.lastElementChild) {
     name.lastElementChild.remove();
   }
+  if (chart.lastElementChild) {
+    chart.lastElementChild.remove();
+  }
+  while (table.children.length > 1) {
+    table.lastElementChild.remove();
+  }
+  navIndex.textContent = game.researchIndex + 1;
+  navTotal.textContent = ingredients.length;
+
+  if (ingredients.length == 0) {
+    navIndex.textContent = 0;
+    table.classList.add("gone");
+    return;
+  } else {
+    table.classList.add("remove");
+  }
+
+  const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
+
   for (let char of currentIngredient.name) {
     const td = document.createElement("td");
     td.style.border = "1px solid var(--borders)";
@@ -395,17 +414,9 @@ function updateResearchBlock() {
       nav2.removeAttribute("disabled");
     }
   }
-  navIndex.textContent = game.researchIndex + 1;
-  navTotal.textContent = ingredients.length;
 
-  if (chart.lastElementChild) {
-    chart.lastElementChild.remove();
-  }
   createSpiderChart(chart, currentIngredient.generateStats());
 
-  while (table.children.length > 1) {
-    table.lastElementChild.remove();
-  }
   for (let char in currentIngredient.makeup) {
     const count = currentIngredient.makeup[char].count;
     const percentage = Math.round(currentIngredient.makeup[char].percentage * 100) / 100;
@@ -742,6 +753,7 @@ function updateList(listElement, listObject) {
   if (!inventoryOccupied) {
     let span = document.createElement("i");
     span.textContent = localized("UI", "GENERIC_EMPTY");
+    span.classList.add("local-generic-empty");
     listElement.appendChild(span);
     return false;
   }

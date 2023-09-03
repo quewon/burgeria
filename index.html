@@ -229,14 +229,9 @@
               <div class="block transparent" style="text-align: center">
                 <table style="width: auto; margin: auto">
                   <tr name="name">
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">b</td>
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">o</td>
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">t</td>
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">t</td>
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">o</td>
-                    <td style="border: 1px solid var(--borders); width: 1rem; height: 1rem;">m</td>
                   </tr>
                 </table>
+                <input class="gone" type="text" name="input" value="" onblur="finalizeNewIngredientName()">
               </div>
               <div class="flexbox gap">
                 <div name="chart">
@@ -252,11 +247,11 @@
               </div>
               <div class="flexbox">
                 <div class="grow"></div>
-                <button class="local-k-rnd-del">delete</button>
+                <button class="local-k-rnd-del" onclick="deleteIngredient()">delete</button>
               </div>
             </div>
 
-            <div class="block dashed attached-above" id="research-letters-block">
+            <div class="block dashed attached-above gone" id="research-letters-block">
               <b class="local-letters-container-title">INK</b>
               <ul id="research-letters-list"></ul>
             </div>
@@ -436,7 +431,7 @@
       <div class="flexbox">
         <button style="border: 1px solid var(--borders)" name="close" class="local-tt-sf-tray-x top right">x</button>
         <div class="tray block has-buttonbar">
-          <span class="local-sf-tray-label label">tray</span>
+          <!-- <span class="local-sf-tray-label label">tray</span> -->
           <main>
             <div class="container">
               <div class="local-placeholder-burger collection empty" data-capacity="-1" data-side="burger">
@@ -751,8 +746,8 @@
     function checkLoaded() {
       if (LANGUAGES.UI && WWW.length != 0) {
         document.getElementById("loading").classList.add("gone");
-        set_language("kor");
-        
+        set_language("eng");
+
         ui.dialogs['help-burgeria'].showModal();
         ui.dialogs['help-burgeria-canvas'].activate();
         game.generateGuys();
@@ -785,9 +780,13 @@
       // kitchen
       updateLibrary();
       updatePoints();
-      // updateBankbook();
       updateRecipes();
       updateBookshelf();
+      new InputManager(ui.kitchen.researchBlock.querySelector("[name='input']"), "", function() {
+        const ingredients = Object.keys(playerdata.ingredients);
+        const currentIngredient = playerdata.ingredients[ingredients[game.researchIndex]];
+        currentIngredient.visualizeName(this.element.value);
+      });
 
       playerdata.recipes[0].previewRecipe();
 

@@ -31,8 +31,8 @@ class InputManager {
 
     this.element.dataset.index = this.index;
     this.element.oninput = function() {
-      _inputs[this.dataset.index].input();
-    };
+      this.input();
+    }.bind(this);
   }
 
   newState(text, selectionStart, selectionEnd, added, deleted) {
@@ -282,4 +282,5 @@ function updateLettersLists() {
   updateList(ui.kitchen.lettersList, playerdata.letters);
   updateList(ui.workshop.lettersList, playerdata.letters);
   updateList(ui.storefront.lettersList, playerdata.letters);
+  updateList(ui.kitchen.researchLettersList, playerdata.letters);
 }
