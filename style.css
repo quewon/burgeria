@@ -1,0 +1,315 @@
+/* sonhdon */
+/* https://sonhdon.gumroad.com/ */
+@font-face {
+    font-family: 'Whimsy';
+    src: url('res/font/Whimsy-Regular.ttf');
+}
+
+:root {
+    --black: #181b1c;
+    --red: #eb3d2a;
+}
+
+body, html {
+    margin: 0;
+    overflow: hidden;
+}
+
+html, body, body * {
+    cursor: none;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+*::selection {
+    background: var(--red);
+    color: white;
+}
+.focused *::selection {
+    background: var(--black);
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    font-style: italic;
+    user-select: none;
+    -webkit-user-select: none;
+}
+button:active {
+    font-style: normal;
+}
+
+textarea {
+    outline: none;
+    border: none;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    resize: none;
+    display: block;
+    max-height: 60vh;
+
+    font-family: serif;
+    font-size: 1rem;
+    color: inherit;
+    background: transparent;
+}
+.textarea-test {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    visibility: hidden;
+    font-family: serif;
+    font-size: 1rem;
+    padding: 1rem;
+    white-space: pre-wrap;
+}
+.window:has(textarea.rejected) .inventory-button {
+    background: white;
+    color: var(--black);
+    border-color: white;
+}
+.window.focused:has(textarea.rejected) .inventory-button {
+    color: var(--red);
+}
+textarea.rejected {
+    animation: stall 100ms linear;
+}
+@keyframes stall {
+    0% { }
+    100% { }
+}
+
+.noselect {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#mouse {
+    position: absolute;
+    background: url("res/svg/cursor/normal.svg");
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    filter: 
+        drop-shadow(-1px -1px 3px rgb(255 255 255 / 0.2))
+        drop-shadow( 1px -1px 3px rgb(255 255 255 / 0.2))
+        drop-shadow(-1px  1px 3px rgb(255 255 255 / 0.2))
+        drop-shadow( 1px  1px 3px rgb(255 255 255 / 0.2));
+    z-index: 10;
+}
+#mouse.text {
+    background: url("res/svg/cursor/text.svg") !important;
+    translate: 0 0 !important;
+}
+#mouse.down {
+    background: url("res/svg/cursor/down.svg");
+    translate: calc(-50% + 1px) calc(-50% + 1px);
+}
+
+/* window */
+
+.window {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--black);
+    max-width: 50vw;
+    background: white;
+    color: var(--black);
+    z-index: 1;
+
+    border-radius: 2px;
+}
+
+.window.ghost {
+    border-color: var(--red);
+    background: transparent;
+}
+.window.ghost * {
+    visibility: hidden;
+}
+
+.window > .header .title {
+    font-family: 'Whimsy';
+    font-size: 2rem;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    background: var(--black);
+    color: white;
+    border-bottom: 1px solid white;
+    font-family: monospace;
+}
+.toolbar > * {
+    border-top: 1px solid var(--black);
+    border-bottom: 1px solid var(--black);
+}
+.toolbar > button {
+    padding-right: 1rem;
+    padding-left: 1rem;
+    border-left: 1px solid white;
+}
+.toolbar > button:hover {
+    background: white;
+    color: var(--black);
+    border-color: white;
+}
+.toolbar > div {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+.window.focused {
+    border-color: var(--red);
+    color: var(--red);
+}
+.window.focused .toolbar {
+    background: var(--red);
+}
+.window.focused .toolbar > * {
+    border-top: 1px solid var(--red);
+    border-bottom: 1px solid var(--red);
+}
+.window.focused .toolbar > button:hover {
+    color: var(--red);
+    border-color: white;
+}
+
+/* file */
+
+.icon svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    stroke: var(--black);
+    fill: var(--black);
+}
+
+.file {
+    position: absolute;
+    width: 3rem;
+    color: var(--black);
+    padding: .5rem;
+    translate: -50% -50%;
+    z-index: 0;
+    font-family: monospace;
+    border-radius: 2px;
+}
+.file > .icon {
+    font-family: 'Whimsy';
+    font-size: 2.5rem;
+    text-align: center;
+
+    width: inherit;
+    aspect-ratio: 1;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    box-sizing: border-box;
+}
+.file > .name {
+    min-width: 3rem;
+    width: fit-content;
+    position: absolute;
+    left: 50%;
+    top: 4rem;
+    translate: -50% 0;
+    text-align: center;
+}
+
+.file.focused {
+    color: var(--red);
+}
+.file.focused > .icon svg {
+    stroke: var(--red);
+    fill: var(--red);
+}
+.file.focused > .icon {
+    border-color: var(--red);
+}
+
+.file.selected .icon {
+    border: 1px dotted var(--black);
+}
+.file.focused.selected .icon {
+    border-color: var(--red);
+}
+
+.ghost {
+    opacity: .8;
+    z-index: 3;
+}
+
+.file.ghost {
+    color: var(--red);
+    border: none;
+    pointer-events: none;
+}
+.file.ghost > .icon {
+    border-color: var(--red);
+}
+.file.ghost > .icon svg {
+    stroke: var(--red);
+    fill: var(--red);
+}
+
+th, td {
+    padding: 1rem;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.window.focused th, .window.focused td, .window.focused tr {
+    border-color: var(--red);
+}
+
+table.inventory {
+    font-family: monospace;
+    width: 100%;
+    border-collapse: collapse;
+}
+table.inventory th {
+    font-weight: normal;
+    font-family: serif;
+}
+table.inventory td {
+    border-left: 1px solid var(--black);
+}
+table.inventory tr > *:first-child {
+    border: none;
+    text-align: right;
+    width: 0;
+}
+table.inventory tr {
+    border-bottom: 1px solid var(--black);
+}
+table.inventory tr:last-child {
+    border: none;
+}
