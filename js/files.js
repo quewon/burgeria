@@ -45,9 +45,9 @@ class TextFile extends File {
 
             this.data = this.data.substring(0, i) + this.data.substring(i+1);
             this.window.body.value = this.data;
-            this.window.fitText();
             this.window.updateCharCount();
             this.window.updateTitle();
+            this.window.fitText();
 
             this.disintegrateSpeed /= 1.03;
 
@@ -64,9 +64,9 @@ class TextEditorWindow extends BurgeriaWindow {
         this.fitTestElement.className = "textarea-test";
 
         this.inputManager = new InputManager(this.body, this.file.data, function() {
-            this.fitText();
             this.updateCharCount();
             this.updateTitle();
+            this.fitText();
             this.file.data = this.body.value;
         }.bind(this));
         

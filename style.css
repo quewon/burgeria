@@ -56,17 +56,10 @@ button:active {
 }
 
 textarea {
-    outline: none;
-    border: none;
     width: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
     resize: none;
     display: block;
-    max-height: 60vh;
 
-    font-family: serif;
-    font-size: 1rem;
     color: inherit;
     background: transparent;
 }
@@ -76,10 +69,17 @@ textarea {
     left: 0;
     pointer-events: none;
     visibility: hidden;
+}
+textarea, .textarea-test {
+    outline: none;
+    border: none;
+    max-height: 60vh;
     font-family: serif;
     font-size: 1rem;
     padding: 1rem;
     white-space: pre-wrap;
+    box-sizing: border-box;
+    word-break: break-all;
 }
 .window:has(textarea.rejected) .inventory-button {
     background: white;
