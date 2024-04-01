@@ -1,11 +1,11 @@
 var _sounds = {
-    type: [
-      new Howl({ src: "res/sound/click/1.wav", volume: .7 }),
-      new Howl({ src: "res/sound/click/2.wav", volume: .7 }),
-      new Howl({ src: "res/sound/click/3.wav", volume: .7 })
-    ],
+    // type: [
+    //   new Howl({ src: "res/sound/click/1.wav", volume: .7 }),
+    //   new Howl({ src: "res/sound/click/2.wav", volume: .7 }),
+    //   new Howl({ src: "res/sound/click/3.wav", volume: .7 })
+    // ],
     error: new Howl({ src: "res/sound/click/error.mp3" }),
-    disintegrate: new Howl({ src: "res/sound/dust.wav", loop: true }),
+    disintegrate: new Howl({ src: "res/sound/dust.wav" }),
     chime: [
       new Howl({ src: "res/sound/chime/1.wav" }),
       new Howl({ src: "res/sound/chime/2.wav" }),
@@ -31,28 +31,22 @@ var _sounds = {
     ],
     grab: new Howl({ src: "res/sound/wetgrab.wav" }),
     drop: new Howl({ src: "res/sound/wetdrop.wav" }),
-  };
+};
   
-  function sfx_random(name, id) {
-    // let sound = _sounds.talk[name][_sounds.talk[name].length * Math.random() | 0];
-    let sound = _sounds[name][_sounds[name].length * Math.random() | 0];
-  
-    if (id) sound.stop(id);
-    return sound.play();
-  }
-  
-  function sfx(name, fadetime) {
-    if (name == "click") return;
-  
+function sfx(name, fadetime) {
     let sound = _sounds[name];
     if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
     const id = sound.play();
     if (fadetime) sound.fade(0, 1, fadetime);
+
+    if (name == "disintegrate") {
+      sound.loop(true, id);
+    }
   
     return id;
-  }
+}
   
-  function sfx_stop(name, fadetime, id) {
+function sfx_stop(name, fadetime, id) {
     let sound = _sounds[name];
     if (sound.constructor === Array) sound = sound[sound.length * Math.random() | 0];
     if (fadetime) {
@@ -61,5 +55,8 @@ var _sounds = {
     } else {
       sound.stop(id);
     }
-  }
-  
+
+    if (name == "disintegrate") {
+      sound.loop(false, id);
+    }
+}

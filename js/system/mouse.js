@@ -3,17 +3,33 @@ var mouse = {
     down: false,
     selectionElement: document.getElementById("mouse-selection"),
     selecting: false,
-    on_window: false
+    on_window: false,
+    dropdown: document.querySelector(".dropdown")
 };
 mouse.selectionElement.remove();
 
 mouse.ondown = function(e) {
     mouse.down = true;
-    mouse.element.classList.add("down");
-
     var on_window = elementInClass(e.target, "window");
-    if (!on_window) {
-        mouse.selectionStart = new Vector2(e.pageX, e.pageY);
+    var on_dropdown = elementInClass(e.target, "dropdown");
+
+    if (e.button == 0) {
+        mouse.element.classList.add("down");
+
+        if (!on_window && !on_dropdown) {
+            mouse.selectionStart = new Vector2(e.pageX, e.pageY);
+        }
+
+        if (!on_dropdown) {
+            mouse.dropdown.classList.add("gone");
+        }
+    } else if (e.button == 2) {
+        if (!on_window) {
+            var dropdown = mouse.dropdown;
+            dropdown.classList.remove("gone");
+            dropdown.style.left = e.pageX+"px";
+            dropdown.style.top = e.pageY+"px";
+        }
     }
 }
 mouse.onup = function(e) {
@@ -23,6 +39,11 @@ mouse.onup = function(e) {
     mouse.selectionStart = null;
     mouse.selecting = false;
     document.body.className = "";
+
+    if (mouse.clearDropdownOnUp) {
+        mouse.dropdown.classList.add("gone");
+        mouse.clearDropdownOnUp = false;
+    }
 }
 mouse.onmove = function(e) {
     let x = e.pageX;
@@ -84,6 +105,15 @@ mouse.onmove = function(e) {
                 file.unselect(e);
             }
         }
+    }
+
+    if (!mouse.dropdown.classList.contains("gone") && mouse.down) {
+        var downPoint = new Vector2(
+            parseFloat(mouse.dropdown.style.left), 
+            parseFloat(mouse.dropdown.style.top)
+        );
+        if (downPoint.distanceTo(new Vector2(e.pageX, e.pageY)) > 5)
+            mouse.clearDropdownOnUp = true;
     }
 }
 

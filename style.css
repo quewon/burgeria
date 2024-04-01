@@ -353,3 +353,24 @@ svg {
     stroke: var(--red);
     fill: var(--red);
 }
+
+.dropdown {
+    border: 1px solid var(--black);
+    position: absolute;
+    translate: 3px 0;
+    padding: .5rem;
+    background: white;
+}
+.dropdown button {
+    
+}
+.dropdown button:hover,
+.dropdown button:active {
+    font-style: normal;
+    background: var(--red);
+    color: white;
+}
+
+.gone {
+    display: none;
+}

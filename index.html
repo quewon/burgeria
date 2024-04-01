@@ -14,6 +14,10 @@
 
         </div>
 
+        <div class="dropdown gone">
+            <button onmouseup="new TextFile(event.pageX, event.pageY); this.parentElement.classList.add('gone')">+ new text file</button>
+        </div>
+
         <div id="mouse"></div>
         <div id="mouse-selection"></div>
 
@@ -68,7 +72,7 @@
         </div>
     </template>
 
-    <script src="js/lib/howler.core.js"></script>
+    <script src="js/lib/howler.core.min.js"></script>
     <script src="js/lib/util.js"></script>
 
     <script src="js/system/sound.js"></script>

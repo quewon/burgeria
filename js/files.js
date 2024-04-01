@@ -31,8 +31,8 @@ class TextFile extends File {
 
     disintegrateTick() {
         if (this.data.trim().length == 0) {
-            this.delete();
             sfx_stop("disintegrate", null, this.sfxId);
+            this.delete();
         } else {
             // container.appendChild(this.window.element);
 

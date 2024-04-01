@@ -27,10 +27,12 @@ class File {
 
         this.element.onmousedown = this.mousedown.bind(this);
         this.element.onmouseup = function(e) {
-            if (this.readyToOpenWindow) {
-                this.openWindow(e);
-                mouse.onup(e);
-                e.stopPropagation();
+            if (e.button == 0) {
+                if (this.readyToOpenWindow) {
+                    this.openWindow(e);
+                    mouse.onup(e);
+                    e.stopPropagation();
+                }
             }
         }.bind(this);
 
@@ -48,20 +50,22 @@ class File {
     }
 
     mousedown(e) {
-        this.select(e);
-        mouse.ondown(e);
-        e.stopPropagation();
+        if (e.button == 0) {
+            this.select(e);
+            mouse.ondown(e);
+            e.stopPropagation();
 
-        if (this.canDoubleClick) {
-            this.readyToOpenWindow = true;
-            return;
-        }
+            if (this.canDoubleClick) {
+                this.readyToOpenWindow = true;
+                return;
+            }
 
-        if (!mouse.selecting) {
-            this.canDoubleClick = true;
-            setTimeout(function() {
-                this.canDoubleClick = false;
-            }.bind(this), 500);
+            if (!mouse.selecting) {
+                this.canDoubleClick = true;
+                setTimeout(function() {
+                    this.canDoubleClick = false;
+                }.bind(this), 500);
+            }
         }
     }
 
@@ -148,6 +152,7 @@ class File {
             for (let file of selectedFiles) {
                 file.element.classList.remove("dragging");
     
+                if (!file.ghost) file.createGhost();
                 file.element.style.left = file.ghost.style.left;
                 file.element.style.top = file.ghost.style.top;
                 file.removeGhost();
@@ -214,15 +219,19 @@ class BurgeriaWindow {
             this.classList.remove("hovered");
         };
         this.element.onmousedown = function(e) {
-            if (!(e.target instanceof HTMLButtonElement)) {
-                this.focus();
+            if (e.button == 0) {
+                if (!(e.target instanceof HTMLButtonElement)) {
+                    this.focus();
+                }
             }
         }.bind(this);
 
         var header = this.element.querySelector(".header");
         header.onmousedown = function(e) {
-            if (!(e.target instanceof HTMLButtonElement)) {
-                this.drag(e);   
+            if (e.button == 0) {
+                if (!(e.target instanceof HTMLButtonElement)) {
+                    this.drag(e);   
+                }
             }
         }.bind(this);
 
@@ -340,10 +349,10 @@ class BurgeriaWindow {
 }
 
 document.addEventListener("mousedown", function(e) {
+    mouse.ondown(e);
+    
     var on_file = elementInClass(e.target, "file");
     if (on_file) return;
-
-    mouse.ondown(e);
 
     if (selectedFiles.length > 0) {
         let unselect = !focusedWindow || !focusedWindow.element.classList.contains("hovered");
@@ -393,6 +402,9 @@ document.addEventListener("mousemove", function(e) {
             newPosition.x = clamp(newPosition.x, 0, window.innerWidth - file.element.clientWidth);
             newPosition.y = clamp(newPosition.y, 0, window.innerHeight - file.element.clientHeight);
 
+            if (!file.ghost) {
+                file.createGhost();
+            }
             file.ghost.style.left = newPosition.x + "px";
             file.ghost.style.top = newPosition.y + "px";
 
