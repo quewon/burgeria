@@ -1,5 +1,9 @@
 const abc = "abcdefghijklmnopqrstuvwxyz";
 
+function aabb(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return x1 <= x2 + w2 && x1 + w1 >= x2 && y1 <= y2 + h2 && y1 + h1 >= y2;
+}
+
 function letterCount(text) {
   let letters = 0;
   for (let char of text) {
@@ -9,6 +13,21 @@ function letterCount(text) {
     }
   }
   return letters;
+}
+
+function elementInClass(el, className) {
+  if (el) {
+    let parent = el;
+    while (parent != document.documentElement) {
+        if (parent.classList.contains(className)) {
+            return true;
+        } else {
+            parent = parent.parentElement;
+        }
+    }
+  }
+
+  return false;
 }
 
 function createElementFromTemplate(id) {

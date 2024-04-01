@@ -1,6 +1,9 @@
 const container = document.getElementById("container");
 
-var selectedFile = null;
+var files = [];
+var selectedFiles = [];
+var draggingFiles = false;
+var draggingFile = null;
 var draggingWindow = null;
 var focusedWindow = null;
 
@@ -10,6 +13,8 @@ class File {
         this.createElement(x, y);
         this.setName();
         this.createWindow();
+
+        files.push(this);
     }
 
     setIcon(html) {
@@ -52,23 +57,35 @@ class File {
             return;
         }
 
-        this.canDoubleClick = true;
-        setTimeout(function() {
-            this.canDoubleClick = false;
-        }.bind(this), 500);
+        if (!mouse.selecting) {
+            this.canDoubleClick = true;
+            setTimeout(function() {
+                this.canDoubleClick = false;
+            }.bind(this), 500);
+        }
     }
 
     unselect() {
+        if (selectedFiles.indexOf(this) == -1) return;
+
         this.unfocus();
         this.element.classList.remove("selected");
-        selectedFile = null;
+        selectedFiles.splice(selectedFiles.indexOf(this), 1);
         this.readyToOpenWindow = false;
     }
 
     select(e) {
-        if (selectedFile) selectedFile.unselect();
+        if (!mouse.selecting && selectedFiles.indexOf(this) == -1) {
+            for (let i=selectedFiles.length-1; i>=0; i--) {
+                let file = selectedFiles[0];
+                file.unselect();
+            }
+        }
+
         this.element.classList.add("selected");
-        selectedFile = this;
+        if (selectedFiles.indexOf(this) == -1) {
+            selectedFiles.push(this);
+        }
         this.drag(e);
         this.focus();
     }
@@ -82,30 +99,63 @@ class File {
     }
 
     drag(e) {
+        if (mouse.selecting) return;
+
         container.appendChild(this.element);
         this.offset = new Vector2(
             (parseFloat(this.element.style.left) || 0) - e.pageX,
             (parseFloat(this.element.style.top) || 0) - e.pageY
         );
-        this.dragging = true;
-        this.element.classList.add("dragging");
+        draggingFiles = true;
+        draggingFile = this;
 
-        this.ghost = this.element.cloneNode(true);
-        this.ghost.classList.add("ghost");
-        container.appendChild(this.ghost);
+        for (let file of selectedFiles) {
+            file.dragging = true;
+            file.element.classList.add("dragging");
+
+            file.ghost = file.element.cloneNode(true);
+            file.ghost.classList.add("ghost");
+            container.appendChild(file.ghost);
+        }
     }
 
     drop() {
-        this.dragging = false;
-        this.element.classList.remove("dragging");
+        if (mouse.selecting) return;
+        
+        if (draggingFiles) {
+            for (let file of selectedFiles) {
+                file.dragging = false;
+                file.element.classList.remove("dragging");
+    
+                file.element.style.left = file.ghost.style.left;
+                file.element.style.top = file.ghost.style.top;
+                file.ghost.remove();
+            }
+        }
 
-        this.element.style.left = this.ghost.style.left;
-        this.element.style.top = this.ghost.style.top;
-        this.ghost.remove();
+        draggingFiles = false;
+        draggingFile = null;
     }
 
     openWindow(e) {
-        this.drop();
+        let d = new Vector2(
+            e.pageX - parseFloat(this.element.style.left),
+            e.pageY - parseFloat(this.element.style.top)
+        );
+
+        for (let file of selectedFiles) {
+            file.drop();
+
+            if (file == this) {
+                
+            } else {
+                file.window.open({
+                    pageX: parseFloat(file.element.style.left) + d.x,
+                    pageY: parseFloat(file.element.style.top) + d.y,
+                });
+            }
+        }
+
         this.window.open(e);
     }
 
@@ -159,6 +209,8 @@ class BurgeriaWindow {
         );
         this.element.classList.add("dragging");
 
+        e.stopPropagation();
+
         this.ghost = this.element.cloneNode(true);
         this.ghost.classList.add("ghost");
         container.appendChild(this.ghost);
@@ -178,13 +230,17 @@ class BurgeriaWindow {
     }
 
     unfocus() {
-        if (selectedFile) selectedFile.focus();
+        if (selectedFiles.length > 0) {
+            for (let file of selectedFiles) file.focus();
+        }
         this.element.classList.remove("focused");
         focusedWindow = null;
     }
 
     focus() {
-        if (selectedFile) selectedFile.unfocus();
+        if (selectedFiles.length > 0) {
+            for (let file of selectedFiles) file.unfocus();
+        }
         if (focusedWindow) {
             focusedWindow.element.classList.remove("focused");
         }
@@ -224,11 +280,20 @@ class BurgeriaWindow {
     update() { }
 }
 
-document.addEventListener("mousedown", function() {
-    if (selectedFile) {
-        selectedFile.unfocus();
-        if (!focusedWindow || !focusedWindow.element.classList.contains("hovered")) {
-            selectedFile.unselect();
+document.addEventListener("mousedown", function(e) {
+    var on_file = elementInClass(e.target, "file");
+    if (on_file) return;
+
+    if (selectedFiles.length > 0) {
+        let unselect = !focusedWindow || !focusedWindow.element.classList.contains("hovered");
+
+        for (let i=selectedFiles.length-1; i>=0; i--) {
+            let file = selectedFiles[i];
+            if (unselect) {
+                file.unselect();
+            } else {
+                file.unfocus();
+            }
         }
     }
 });
@@ -245,25 +310,33 @@ document.addEventListener("mousemove", function(e) {
         draggingWindow.ghost.style.top = y+"px";
     }
 
-    if (selectedFile && selectedFile.dragging) {
-        let rect = selectedFile.element.getBoundingClientRect();
-        let x = e.pageX + selectedFile.offset.x;
-        let y = e.pageY + selectedFile.offset.y;
+    if (draggingFile) {
+        let x = e.pageX + draggingFile.offset.x;
+        let y = e.pageY + draggingFile.offset.y;
+        let movement = new Vector2(
+            x - parseFloat(draggingFile.element.style.left),
+            y - parseFloat(draggingFile.element.style.top),
+        );
 
-        x = clamp(x, 0, window.innerWidth - rect.width);
-        y = clamp(y, 0, window.innerHeight - rect.height);
-
-        selectedFile.ghost.style.left = x + "px";
-        selectedFile.ghost.style.top = y + "px";
-
-        if (selectedFile.readyToOpenWindow) {
+        for (let file of selectedFiles) {
             var originalPosition = new Vector2(
-                parseFloat(selectedFile.element.style.left),
-                parseFloat(selectedFile.element.style.top),
+                parseFloat(file.element.style.left),
+                parseFloat(file.element.style.top),
             );
-            var newPosition = new Vector2(x, y);
-            if (originalPosition.distanceTo(newPosition) > .5) {
-                selectedFile.readyToOpenWindow = false;
+            var newPosition = new Vector2(
+                originalPosition.x + movement.x,
+                originalPosition.y + movement.y
+            );
+            newPosition.x = clamp(newPosition.x, 0, window.innerWidth - file.element.clientWidth);
+            newPosition.y = clamp(newPosition.y, 0, window.innerHeight - file.element.clientHeight);
+
+            file.ghost.style.left = newPosition.x + "px";
+            file.ghost.style.top = newPosition.y + "px";
+
+            if (file.readyToOpenWindow) {
+                if (originalPosition.distanceTo(newPosition) > .5) {
+                    file.readyToOpenWindow = false;
+                }
             }
         }
     }
@@ -278,8 +351,11 @@ function onmouseup(e) {
         draggingWindow.drop();
     }
 
-    if (selectedFile) {
-        selectedFile.drop();
+    if (selectedFiles.length > 0) {
+        for (let i=selectedFiles.length-1; i>=0; i--) {
+            let file = selectedFiles[i];
+            file.drop();
+        }
     }
 }
 document.addEventListener("mouseup", onmouseup);
