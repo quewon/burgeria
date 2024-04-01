@@ -29,7 +29,7 @@
     <template id="editor-template">
         <div class="window">
             <div class="header toolbar">
-                <div class="title noselect"></div>
+                <div class="title noselect">txt</div>
                 <button class="close-button">x</button>
             </div>
             <div class="body">
@@ -55,6 +55,15 @@
                         <td>0</td>
                     </tr>
                 </table>
+                <div class="file-drop-prompt">
+                    <svg width="33" height="40" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="2.79071" width="30" height="37.2093" stroke="none"/>
+                        <rect x="0.5" y="0.5" width="29" height="36.2093" fill="white"/>
+                        <path d="M11 5.58142H25M4 5.58142H9M23 22.3256H25M4 22.3256H21M4 16.7442H12M14 16.7442H25M19 11.1628H25M4 11.1628H17" fill="none"/>
+                    </svg>
+                    <br>
+                    distill txt
+                </div>
             </div>
         </div>
     </template>
@@ -63,16 +72,16 @@
     <script src="js/lib/util.js"></script>
 
     <script src="js/system/sound.js"></script>
-    <script src="js/system/mouse.js"></script>
     <script src="js/system/file.js"></script>
     <script src="js/system/input.js"></script>
+    <script src="js/system/mouse.js"></script>
 
     <script src="js/files.js"></script>
 
     <script src="js/game.js"></script>
     <script>
         INVENTORY_FILE = new InventoryFile(100, 200);
-        new TextFile(100, 100, "hello :)");
+        new TextFile(100, 100, "manual\n\n- letters are a limited resource\n- put text files into inventory program to distill them");
         new TextFile(200, 100, "credits:\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
     </script>
 

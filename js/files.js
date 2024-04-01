@@ -3,6 +3,7 @@ var INVENTORY_FILE;
 class TextFile extends File {
     constructor(x, y, text) {
         super(x, y, text);
+        this.type = "text";
     }
     
     createWindow() {
@@ -12,6 +13,46 @@ class TextFile extends File {
     setName(name) {
         this.name = name || "untitled";
         this.element.querySelector(".name").textContent = this.name;
+    }
+
+    disintegrate(e) {
+        if (this.sfxId) return;
+        
+        this.cancelDrop();
+
+        this.window.body.disabled = "true";
+        // this.openWindow(e);
+        this.sfxId = sfx("disintegrate");
+
+        this.disintegrateSpeed = 100;
+
+        setTimeout(this.disintegrateTick.bind(this), this.disintegrateSpeed);
+    }
+
+    disintegrateTick() {
+        if (this.data.trim().length == 0) {
+            this.delete();
+            sfx_stop("disintegrate", null, this.sfxId);
+        } else {
+            // container.appendChild(this.window.element);
+
+            var i = this.data.length * Math.random() | 0;
+            let char = this.data[i].toLowerCase();
+            if (abc.includes(char)) {
+                player.inventory[char]++;
+                updateLettersLists();
+            }
+
+            this.data = this.data.substring(0, i) + this.data.substring(i+1);
+            this.window.body.value = this.data;
+            this.window.fitText();
+            this.window.updateCharCount();
+            this.window.updateTitle();
+
+            this.disintegrateSpeed /= 1.03;
+
+            setTimeout(this.disintegrateTick.bind(this), this.disintegrateSpeed);
+        }
     }
 }
 
@@ -26,6 +67,7 @@ class TextEditorWindow extends BurgeriaWindow {
             this.fitText();
             this.updateCharCount();
             this.updateTitle();
+            this.file.data = this.body.value;
         }.bind(this));
         
         container.appendChild(this.element);
@@ -50,6 +92,13 @@ class TextEditorWindow extends BurgeriaWindow {
             let rect = this.element.getBoundingClientRect();
             INVENTORY_FILE.window.setPosition(rect.left + rect.width + 5, rect.top);
         }.bind(this);
+
+        this.body.addEventListener("focus", function() {
+            this.body.scrollTop = this.savedScrollTop;
+        }.bind(this));
+        this.body.addEventListener("scroll", function() {
+            this.savedScrollTop = this.body.scrollTop;
+        }.bind(this));
     }
     
     fitText() {
@@ -93,25 +142,43 @@ class TextEditorWindow extends BurgeriaWindow {
         this.file.setName(title);
     }
 
-    onfocus() {
-        setTimeout(function() {
-            if (document.activeElement != this.body)
-                focusOnContenteditable(this.body);
-        }.bind(this), 1);
+    onclose() {
+        this.savedScrollTop = 0;
+    }
+
+    delete() {
+        this.close();
+        this.inputManager.delete();
     }
 }
 
-class InventoryFile extends File {
+class InventoryFile extends Program {
     constructor(x, y) {
         super(x, y);
         this.setName("inventory");
-        this.setIcon(
-            `<svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 23.1363L9.86364 14.9545H31V26.5454L22.1364 34.7273H1V23.1363Z" fill="white" stroke="none"/>
-            <path d="M1 23.1363L9.86364 14.9545H31M1 23.1363H22.1364M1 23.1363V34.7273H22.1364M22.1364 23.1363L31 14.9545M22.1364 23.1363V34.7273M31 14.9545V26.5454L22.1364 34.7273" fill="white"/>
-            <text class="noselect" style="font-family: 'serif'; font-size: 20px" x="15" y="10" stroke="none">a</text>
-            </svg>`
-        );
+
+        this.element.addEventListener("mouseenter", function() {
+            if (draggingFile) {
+                for (let file of selectedFiles) {
+                    if (file.type != "text") {
+                        return;
+                    }
+                }
+                this.element.classList.add("dropzone");
+            }
+        }.bind(this));
+        this.element.addEventListener("mouseleave", function() {
+            this.element.classList.remove("dropzone");
+        }.bind(this));
+        this.element.addEventListener("mouseup", function(e) {
+            if (this.element.classList.contains("dropzone")) {
+                this.element.classList.remove("dropzone");
+                for (let i=selectedFiles.length-1; i>=0; i--) {
+                    selectedFiles[i].disintegrate(e);
+                }
+                this.window.open(e);
+            }
+        }.bind(this));
     };
 
     createWindow() {
@@ -122,12 +189,38 @@ class InventoryFile extends File {
 class InventoryWindow extends BurgeriaWindow {
     constructor(file) {
         super(file);
+
+        this.update();
     }
 
     createElement() {
         this.element = createElementFromTemplate("inventory-template");
         container.appendChild(this.element);
         this.table = this.element.querySelector("table");
+
+        this.fileDropPrompt = this.element.querySelector(".file-drop-prompt");
+        var body = this.element.querySelector(".body");
+        body.addEventListener("mouseenter", function() {
+            if (draggingFile) {
+                for (let file of selectedFiles) {
+                    if (file.type != "text") {
+                        return;
+                    }
+                }
+                this.fileDropPrompt.classList.add("visible");
+            }
+        }.bind(this));
+        body.addEventListener("mouseleave", function() {
+            this.fileDropPrompt.classList.remove("visible");
+        }.bind(this));
+        body.addEventListener("mouseup", function(e) {
+            if (this.fileDropPrompt.classList.contains("visible")) {
+                this.fileDropPrompt.classList.remove("visible");
+                for (let i=selectedFiles.length-1; i>=0; i--) {
+                    selectedFiles[i].disintegrate(e);
+                }
+            }
+        }.bind(this));
     }
 
     update() {
@@ -172,17 +265,19 @@ class InventoryWindow extends BurgeriaWindow {
         tr.appendChild(td);
         this.table.appendChild(tr);
 
-        let prominentChar = prominentChars[0];
+        let prominentChar = "";
         let prominentCharY = 10;
+        if (prominentChars.length > 0) {
+            prominentChar = prominentChars[prominentChars.length * Math.random() | 0];
 
-        // gets cut off
-        if ("idjlkfbht".includes(prominentChar)) {
-            prominentCharY = 13;
-        }
-
-        // could be higher
-        if ("qpgy".includes(prominentChar)) {
-            prominentCharY = 9;
+            // gets cut off
+            if ("idjlkfbht".includes(prominentChar)) {
+                prominentCharY = 13;
+            }
+            // could be higher
+            if ("qpgy".includes(prominentChar)) {
+                prominentCharY = 9;
+            }
         }
 
         this.file.setIcon(
@@ -192,5 +287,9 @@ class InventoryWindow extends BurgeriaWindow {
             <text class="noselect" style="font-family: 'serif'; font-size: 20px" x="15" y="`+prominentCharY+`" stroke="none">`+prominentChar+`</text>
             </svg>`
         );
+
+        if (this.ghost) {
+            this.updateGhost();
+        }
     }
 }

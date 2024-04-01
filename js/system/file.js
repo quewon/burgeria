@@ -2,7 +2,6 @@ const container = document.getElementById("container");
 
 var files = [];
 var selectedFiles = [];
-var draggingFiles = false;
 var draggingFile = null;
 var draggingWindow = null;
 var focusedWindow = null;
@@ -10,6 +9,7 @@ var focusedWindow = null;
 class File {
     constructor(x, y, data) {
         this.data = data || "";
+
         this.createElement(x, y);
         this.setName();
         this.createWindow();
@@ -98,6 +98,20 @@ class File {
         this.element.classList.remove("focused");
     }
 
+    createGhost() {
+        if (this.ghost) this.removeGhost();
+        this.ghost = this.element.cloneNode(true);
+        this.ghost.classList.add("ghost");
+        container.appendChild(this.ghost);
+    }
+
+    removeGhost() {
+        if (this.ghost) {
+            this.ghost.remove();
+            this.ghost = null;
+        }
+    }
+
     drag(e) {
         if (mouse.selecting) return;
 
@@ -106,38 +120,45 @@ class File {
             (parseFloat(this.element.style.left) || 0) - e.pageX,
             (parseFloat(this.element.style.top) || 0) - e.pageY
         );
-        draggingFiles = true;
         draggingFile = this;
 
         for (let file of selectedFiles) {
-            file.dragging = true;
             file.element.classList.add("dragging");
 
-            file.ghost = file.element.cloneNode(true);
-            file.ghost.classList.add("ghost");
-            container.appendChild(file.ghost);
+            file.createGhost();
+        }
+    }
+
+    cancelDrop() {
+        if (mouse.selecting) return;
+
+        if (draggingFile) {
+            for (let file of selectedFiles) {
+                file.element.classList.remove("dragging");
+                file.removeGhost();
+            }
+            if (draggingFile == this) draggingFile = null;
         }
     }
 
     drop() {
         if (mouse.selecting) return;
         
-        if (draggingFiles) {
+        if (draggingFile) {
             for (let file of selectedFiles) {
-                file.dragging = false;
                 file.element.classList.remove("dragging");
     
                 file.element.style.left = file.ghost.style.left;
                 file.element.style.top = file.ghost.style.top;
-                file.ghost.remove();
+                file.removeGhost();
             }
+            if (draggingFile == this) draggingFile = null;
         }
-
-        draggingFiles = false;
-        draggingFile = null;
     }
 
     openWindow(e) {
+        this.readyToOpenWindow = false;
+
         let d = new Vector2(
             e.pageX - parseFloat(this.element.style.left),
             e.pageY - parseFloat(this.element.style.top)
@@ -160,7 +181,23 @@ class File {
     }
 
     createWindow() {
-        this.window = new TextEditorWindow(this);
+        this.window = new BurgeriaWindow(this);
+    }
+
+    delete() {
+        if (this == draggingFile) draggingFile = null;
+        this.removeGhost();
+        this.unselect();
+        this.element.remove();
+        this.window.delete();
+        files.splice(files.indexOf(this), 1);
+    }
+}
+
+class Program extends File {
+    constructor(x, y) {
+        super(x, y);
+        this.type = "program";
     }
 }
 
@@ -200,6 +237,28 @@ class BurgeriaWindow {
         container.appendChild(this.element);
     }
 
+    createGhost() {
+        if (this.ghost) this.removeGhost();
+        this.ghost = this.element.cloneNode(true);
+        this.ghost.classList.add("ghost");
+        container.appendChild(this.ghost);
+    }
+
+    updateGhost() {
+        if (this.ghost) {
+            var rect = this.element.getBoundingClientRect();
+            this.ghost.style.width = rect.width+"px";
+            this.ghost.style.height = rect.height+"px";
+        }
+    }
+
+    removeGhost() {
+        if (this.ghost) {
+            this.ghost.remove();
+            this.ghost = null;
+        }
+    }
+
     drag(e) {
         if (draggingWindow) draggingWindow.drop();
         draggingWindow = this;
@@ -211,20 +270,16 @@ class BurgeriaWindow {
 
         e.stopPropagation();
 
-        this.ghost = this.element.cloneNode(true);
-        this.ghost.classList.add("ghost");
-        container.appendChild(this.ghost);
+        this.createGhost();
     }
 
     drop() {
         this.element.classList.remove("dragging");
         this.offset = null;
-        draggingWindow = null;
-
+        if (draggingWindow == this) draggingWindow = null;
         if (this.ghost) {
             this.setPosition(parseFloat(this.ghost.style.left), parseFloat(this.ghost.style.top));
-            this.ghost.remove();
-            this.ghost = null;
+            this.removeGhost();
             this.focus();
         }
     }
@@ -234,7 +289,7 @@ class BurgeriaWindow {
             for (let file of selectedFiles) file.focus();
         }
         this.element.classList.remove("focused");
-        focusedWindow = null;
+        if (focusedWindow == this) focusedWindow = null;
     }
 
     focus() {
@@ -247,9 +302,7 @@ class BurgeriaWindow {
         focusedWindow = this;
         this.element.classList.add("focused");
         container.appendChild(this.element);
-        this.onfocus();
     }
-    onfocus() { }
 
     open(e) {
         if (!this.position) {
@@ -261,11 +314,13 @@ class BurgeriaWindow {
     }
 
     close() {
+        this.onclose();
         this.element.remove();
         this.unfocus();
         this.drop();
         this.element.onmouseleave();
     }
+    onclose() { }
 
     setPosition(x, y) {
         let rect = this.element.getBoundingClientRect();
@@ -278,11 +333,17 @@ class BurgeriaWindow {
     }
 
     update() { }
+
+    delete() {
+        this.close();
+    }
 }
 
 document.addEventListener("mousedown", function(e) {
     var on_file = elementInClass(e.target, "file");
     if (on_file) return;
+
+    mouse.ondown(e);
 
     if (selectedFiles.length > 0) {
         let unselect = !focusedWindow || !focusedWindow.element.classList.contains("hovered");
@@ -299,6 +360,8 @@ document.addEventListener("mousedown", function(e) {
 });
 
 document.addEventListener("mousemove", function(e) {
+    mouse.onmove(e);
+
     if (draggingWindow) {
         let rect = draggingWindow.ghost.getBoundingClientRect();
         let x = e.pageX + draggingWindow.offset.x;
@@ -339,10 +402,17 @@ document.addEventListener("mousemove", function(e) {
                 }
             }
         }
+
+        var w = getParentWithClass(e.target, "window");
+        if (w) {
+            container.appendChild(w);
+        }
     }
 });
 
 function onmouseup(e) {
+    mouse.onup(e);
+
     if (focusedWindow && !focusedWindow.element.classList.contains("hovered")) {
         focusedWindow.unfocus();
     }
@@ -352,11 +422,18 @@ function onmouseup(e) {
     }
 
     if (selectedFiles.length > 0) {
+        var on_window = elementInClass(e.target, "window");
         for (let i=selectedFiles.length-1; i>=0; i--) {
             let file = selectedFiles[i];
-            file.drop();
+            if (on_window) {
+                file.cancelDrop();
+            } else {
+                file.drop();
+            }
         }
     }
+
+    draggingFile = null;
 }
 document.addEventListener("mouseup", onmouseup);
 window.addEventListener("blur", onmouseup);

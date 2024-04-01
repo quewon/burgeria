@@ -2,7 +2,8 @@ var mouse = {
     element: document.getElementById("mouse"),
     down: false,
     selectionElement: document.getElementById("mouse-selection"),
-    selecting: false
+    selecting: false,
+    on_window: false
 };
 mouse.selectionElement.remove();
 
@@ -21,6 +22,7 @@ mouse.onup = function(e) {
     mouse.selectionElement.remove();
     mouse.selectionStart = null;
     mouse.selecting = false;
+    document.body.className = "";
 }
 mouse.onmove = function(e) {
     let x = e.pageX;
@@ -29,17 +31,22 @@ mouse.onmove = function(e) {
     mouse.element.style.left = x+"px";
     mouse.element.style.top = y+"px";
 
-    var on_button = e.target && e.target instanceof HTMLButtonElement;
-    var noselect = on_button || e.target && e.target.classList.contains("noselect");
-    var on_text = isPointOverText(x, y) || (e.target && e.target instanceof HTMLTextAreaElement);
-
-    if (!noselect && on_text) {
-        mouse.element.classList.add("text");
+    if (draggingFile) {
+        mouse.element.className = "down";
+        document.body.className = "dragging";
     } else {
-        mouse.element.classList.remove("text");
+        var on_button = e.target && e.target instanceof HTMLButtonElement;
+        var noselect = on_button || e.target && e.target.classList.contains("noselect");
+        var on_text = isPointOverText(x, y) || (e.target && e.target instanceof HTMLTextAreaElement);
+
+        if (!noselect && on_text) {
+            mouse.element.classList.add("text");
+        } else {
+            mouse.element.classList.remove("text");
+        }
     }
 
-    if (mouse.down && !draggingFiles && mouse.selectionStart) {
+    if (mouse.down && !draggingFile && mouse.selectionStart) {
         if (!mouse.selecting) {
             document.body.appendChild(mouse.selectionElement);
             mouse.selecting = true;
@@ -80,10 +87,8 @@ mouse.onmove = function(e) {
     }
 }
 
-document.addEventListener("mousedown", mouse.ondown);
-document.addEventListener("mouseup", mouse.onup);
+document.oncontextmenu = function(e) { e.preventDefault() };
 window.addEventListener("blur", mouse.onup);
-document.addEventListener("mousemove", mouse.onmove);
 
 //https://stackoverflow.com/a/76328261
 function isPointOverText(x, y) {

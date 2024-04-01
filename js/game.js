@@ -5,7 +5,7 @@ var player = {
 }
 
 for (let char of abc) {
-    player.inventory[char] = 1;
+    player.inventory[char] = 0;
     player.prices = [0.5];
     player.tomorrowsPrices = 0.5;
 }

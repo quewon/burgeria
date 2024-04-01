@@ -17,8 +17,8 @@ body, html {
 
 html, body, body * {
     cursor: none;
-    user-select: text;
-    -webkit-user-select: text;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 canvas {
@@ -38,6 +38,9 @@ canvas {
     background: var(--black);
 }
 
+body.dragging button {
+    pointer-events: none;
+}
 button {
     font-family: inherit;
     font-size: inherit;
@@ -47,8 +50,6 @@ button {
     border: none;
     background: transparent;
     font-style: italic;
-    user-select: none;
-    -webkit-user-select: none;
 }
 button:active {
     font-style: normal;
@@ -130,7 +131,7 @@ textarea.rejected {
 }
 #mouse-selection {
     position: absolute;
-    border: 1px dashed var(--red);
+    border: 1px dotted var(--red);
     mix-blend-mode: screen;
     z-index: 9;
 }
@@ -150,6 +151,40 @@ textarea.rejected {
     z-index: 1;
 
     border-radius: 2px;
+}
+
+.window .body {
+    position: relative;
+}
+.window .body, .window .body * {
+    user-select: text;
+    -webkit-user-select: text;
+}
+.body:has(.file-drop-prompt.visible) {
+    min-height: 10rem;
+}
+.body .file-drop-prompt {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+        
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    background: white;
+    font-family: monospace;
+    opacity: .9;
+    pointer-events: none;
+
+    display: flex;
+    visibility: hidden;
+}
+.body .file-drop-prompt.visible {
+    visibility: visible;
 }
 
 .window.ghost {
@@ -216,8 +251,6 @@ textarea.rejected {
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    stroke: var(--black);
-    fill: var(--black);
 }
 
 .file {
@@ -242,7 +275,7 @@ textarea.rejected {
     box-sizing: border-box;
 }
 .file > .name {
-    width: fit-content;
+    width: 100px;
     position: absolute;
     left: 50%;
     top: calc(1rem + 50px);
@@ -253,24 +286,16 @@ textarea.rejected {
 .file.focused {
     color: var(--red);
 }
-.file.focused > .icon svg {
-    stroke: var(--red);
-    fill: var(--red);
-}
 .file.focused > .icon {
     border-color: var(--red);
 }
 
+.file.dropzone .icon,
 .file.selected .icon {
     border: 1px dotted var(--black);
 }
 .file.focused.selected .icon {
     border-color: var(--red);
-}
-
-.ghost {
-    opacity: .8;
-    z-index: 3;
 }
 
 .file.ghost {
@@ -280,10 +305,6 @@ textarea.rejected {
 }
 .file.ghost > .icon {
     border-color: var(--red);
-}
-.file.ghost > .icon svg {
-    stroke: var(--red);
-    fill: var(--red);
 }
 
 th, td {
@@ -317,4 +338,18 @@ table.inventory tr {
 }
 table.inventory tr:last-child {
     border: none;
+}
+
+svg {
+    stroke: var(--black);
+    fill: var(--black);
+}
+.ghost {
+    opacity: .8;
+    z-index: 3;
+}
+.focused svg,
+.ghost svg {
+    stroke: var(--red);
+    fill: var(--red);
 }

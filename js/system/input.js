@@ -260,11 +260,20 @@ class InputManager {
 
   delete() {
     this.clear();
-
     spliceIndexedObject(_inputs, this.index, function(manager) {
       manager.element.dataset.index = manager.index;
     });
   }
+}
+
+function spliceIndexedObject(array, objectIndex, objectFunction) {
+  for (let i=objectIndex; i<array.length; i++) {
+    if (i==objectIndex) continue;
+    array[i].index--;
+    if (objectFunction) objectFunction(array[i]);
+  }
+
+  array.splice(objectIndex, 1);
 }
 
 function updateLettersLists() {
