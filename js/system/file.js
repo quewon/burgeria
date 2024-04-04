@@ -323,6 +323,10 @@ class BurgeriaWindow {
     }
 
     focus() {
+        if (!this.element.classList.contains("focused")) {
+            this.element.classList.add("focusing");
+        }
+
         if (selectedFiles.length > 0) {
             for (let file of selectedFiles) file.unfocus();
         }
@@ -332,15 +336,10 @@ class BurgeriaWindow {
         focusedWindow = this;
 
         this.element.classList.add("focused");
-        this.element.classList.add("focusing");
         container.appendChild(this.element);
     }
 
     open(e) {
-        if (!this.position) {
-            this.setPosition(e.pageX, e.pageY);
-        }
-
         if (!container.contains(this.element)) {
             this.element.classList.add("loading");
         }
@@ -348,19 +347,30 @@ class BurgeriaWindow {
         container.appendChild(this.element);
         this.focus();
         this.update();
+
+        if (!this.position) {
+            this.setPosition(e.pageX, e.pageY);
+        }
     }
 
     close() {
         this.onclose();
-        this.element.remove();
         this.unfocus();
         this.drop();
         this.element.onmouseleave();
+        this.element.remove();
     }
     onclose() { }
 
     setPosition(x, y) {
         let rect = this.element.getBoundingClientRect();
+        // if (!container.contains(this.element)) {
+        //     container.appendChild(this.element);
+        //     rect = this.element.getBoundingClientRect();
+        //     this.element.remove();
+        // } else {
+        //     rect = this.element.getBoundingClientRect();
+        // }
         x = clamp(x || 0, 0, window.innerWidth - rect.width);
         y = clamp(y || 0, 0, window.innerHeight - rect.height);
         this.element.style.left = x+"px";
@@ -427,8 +437,8 @@ document.addEventListener("mousemove", function(e) {
                 originalPosition.x + movement.x,
                 originalPosition.y + movement.y
             );
-            newPosition.x = clamp(newPosition.x, 0, window.innerWidth - file.element.clientWidth);
-            newPosition.y = clamp(newPosition.y, 0, window.innerHeight - file.element.clientHeight);
+            newPosition.x = clamp(newPosition.x, file.element.clientWidth/2, window.innerWidth - file.element.clientWidth/2);
+            newPosition.y = clamp(newPosition.y, file.element.clientHeight/2, window.innerHeight - file.element.clientHeight/2);
 
             if (!file.ghost) {
                 file.createGhost();

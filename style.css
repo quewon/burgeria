@@ -13,6 +13,9 @@
 :root {
     --black: #1e2020;
     --red: #eb3d2a;
+
+    --sun-body: rgb(255 156 38);
+    --sun-ray: rgb(255 217 0);
 }
 
 body, html {
@@ -88,7 +91,7 @@ textarea, .textarea-test {
     padding: 1rem;
     white-space: pre-wrap;
     box-sizing: border-box;
-    word-break: break-all;
+    word-break: break-word;
 }
 .window:has(textarea.rejected) .inventory-button {
     background: white;
@@ -307,6 +310,26 @@ textarea.rejected {
     border-color: white;
 }
 
+.window.focused .cooker-background {
+    --dot-color: var(--sun-ray);
+}
+.cooker-background {
+    --dot-color: lightgray;
+    --dot-size: 1px;
+    --bg-size: 15px;
+    --bg-pos: calc(var(--bg-size) / 2);
+    background-image: 
+        radial-gradient(circle at center, var(--dot-color) var(--dot-size), transparent 0);
+        /* radial-gradient(circle at center, var(--dot-color) var(--dot-size), transparent 0); */
+    /* background-position: 0 0, var(--bg-pos) var(--bg-pos); */
+    background-size: var(--bg-size) var(--bg-size);
+    background-repeat: round;
+}
+.cooker-background .file-slot,
+.cooker-background textarea {
+    background: white;
+}
+
 /* file */
 
 .icon svg {
@@ -489,10 +512,10 @@ svg {
     height: 50vh;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: rgb(255 156 38);
+    background: var(--sun-body);
     box-shadow: 
-        0 0 35vw 5vw rgb(255 217 0),
-        0 0 25vw 5vw rgb(255 217 0) inset;
+        0 0 35vw 5vw var(--sun-ray),
+        0 0 25vw 5vw var(--sun-ray) inset;
 
     display: flex;
     /* align-items: center; */

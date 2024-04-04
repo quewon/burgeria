@@ -1,5 +1,5 @@
 var INVENTORY_FILE;
-var STOREFRONT_FILE;
+var WORLD_FILE;
 
 class TextFile extends File {
     constructor(x, y, text) {
@@ -310,25 +310,25 @@ class InventoryWindow extends BurgeriaWindow {
     }
 }
 
-class StorefrontFile extends Program {
+class WorldViewerFile extends Program {
     constructor(x, y) {
         super(x, y);
-        this.setName("window");
+        this.setName("field");
         this.setIcon("<img src='res/window.jpeg' draggable='false'>")
     }
 
     createWindow() {
-        this.window = new StorefrontWindow(this);
+        this.window = new WorldWindow(this);
     }
 }
 
-class StorefrontWindow extends BurgeriaWindow {
+class WorldWindow extends BurgeriaWindow {
     constructor(file) {
         super(file);
     }
 
     createElement() {
-        this.element = createElementFromTemplate("storefront-template");
+        this.element = createElementFromTemplate("world-viewer-template");
         container.appendChild(this.element);
 
         this.guysContainer = this.element.querySelector(".guys-container");
@@ -339,6 +339,15 @@ class BurgerMakerFile extends Program {
     constructor(x, y) {
         super(x, y);
         this.setName("burgeria");
+        this.setIcon(`<svg width="36" height="40" viewBox="0 0 36 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.7 8.09794C11.7 8.98019 12.3201 9.87267 13.5257 10.5724C14.7185 11.2647 16.3995 11.7089 18.2833 11.7089C20.1672 11.7089 21.8482 11.2647 23.041 10.5724C24.2466 9.87267 24.8667 8.98019 24.8667 8.09794L24.8667 8.09778C24.8668 8.09543 24.8678 8.07201 24.8239 8.01947C24.7738 7.95944 24.6789 7.88001 24.5172 7.79117C24.1924 7.61273 23.694 7.44771 23.0487 7.3098C21.7667 7.03587 20.0337 6.89514 18.2833 6.89514C16.533 6.89514 14.8 7.03587 13.518 7.3098C12.8727 7.44771 12.3743 7.61273 12.0495 7.79117C11.8878 7.88001 11.7929 7.95944 11.7428 8.01947C11.6989 8.07201 11.6999 8.09543 11.7 8.09778C11.7 8.09785 11.7 8.09791 11.7 8.09794Z" fill="white"/>
+        <rect x="11.2" y="5.34863" width="14.1667" height="2.90686" rx="1" fill="white"/>
+        <path d="M23.95 4.81082C23.95 3.35741 12.6167 3.35744 12.6167 4.81082C12.6167 6.2642 18.2833 8.4444 18.2833 8.4444C18.2833 8.4444 23.95 6.26424 23.95 4.81082Z" fill="white"/>
+        <path d="M11.7 4.11092C11.7 3.22867 12.3201 2.3362 13.5257 1.63651C14.7185 0.944206 16.3995 0.5 18.2833 0.5C20.1672 0.5 21.8482 0.944206 23.041 1.63651C24.2466 2.3362 24.8667 3.22867 24.8667 4.11092L24.8667 4.11108C24.8668 4.11343 24.8678 4.13685 24.8239 4.1894C24.7738 4.24942 24.6789 4.32886 24.5172 4.4177C24.1924 4.59613 23.694 4.76115 23.0487 4.89906C21.7667 5.17299 20.0337 5.31373 18.2833 5.31373C16.533 5.31373 14.8 5.17299 13.518 4.89906C12.8727 4.76115 12.3743 4.59613 12.0495 4.4177C11.8878 4.32886 11.7929 4.24942 11.7428 4.1894C11.6989 4.13685 11.6999 4.11343 11.7 4.11108C11.7 4.11101 11.7 4.11096 11.7 4.11092Z" fill="white"/>
+        <rect x="4.89999" y="12.1274" width="26.2" height="26.9059" fill="white"/>
+        <path d="M18 21.1742V11.6274M18 21.1742C18 21.1742 18 25.5804 13.75 25.5804C9.5 25.5804 9.5 21.1742 9.5 21.1742M18 21.1742C18 21.1742 18 25.5804 22.25 25.5804C26.5 25.5804 26.5 21.1742 26.5 21.1742M18 11.6274H10.6333M18 11.6274H25.3667M9.5 21.1742C9.5 21.1742 9.5 25.5804 5.25 25.5804C1 25.5804 1 21.1742 1 21.1742L4.4 11.6274H10.6333M9.5 21.1742L10.6333 11.6274M26.5 21.1742C26.5 21.1742 26.5 25.5804 30.75 25.5804C35 25.5804 35 21.1742 35 21.1742L31.6 11.6274H25.3667M26.5 21.1742L25.3667 11.6274" fill="white"/>
+        <path d="M17.4667 29.5686H18.5333C20.4663 29.5686 22.0333 31.1356 22.0333 33.0686V39.0333H13.9667V33.0686C13.9667 31.1356 15.5337 29.5686 17.4667 29.5686Z" fill="white"/>
+        </svg>`);
     }
 
     createWindow() {

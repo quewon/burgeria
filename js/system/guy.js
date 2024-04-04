@@ -27,7 +27,7 @@ class Guy {
         this.element.textContent = face;
         this.element.className = "guy noselect";
 
-        let win = STOREFRONT_FILE.window;
+        let win = WORLD_FILE.window;
         win.guysContainer.appendChild(this.element);
 
         this.setPosition(x, y);

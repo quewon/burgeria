@@ -79,7 +79,7 @@
         </div>
     </template>
 
-    <template id="storefront-template">
+    <template id="world-viewer-template">
         <div class="window">
             <div class="header toolbar">
                 <div class="title noselect"></div>
@@ -114,8 +114,8 @@
                     <div class="toolbar">
                         <div>transmute letters into food</div>
                     </div>
-                    <div class="body">
-                        <textarea class="text-slot" placeholder="top bun&#10;patty&#10;bottom bun"></textarea>
+                    <div class="body cooker-background">
+                        <textarea class="text-slot" placeholder="small beef burger with fries"></textarea>
                         <div>
                             |<br>
                             V
@@ -140,13 +140,13 @@
 
     <script src="js/game.js"></script>
     <script>
-        INVENTORY_FILE = new InventoryFile(100, 200);
-        new TextFile(100, 100, "manual\n\n- letters are a limited resource\n- put text files into inventory program to distill them");
-        new TextFile(200, 100, "credits\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
-        STOREFRONT_FILE = new StorefrontFile(window.innerWidth/2, window.innerHeight/2);
-        STOREFRONT_FILE.window.open({ pageX: window.innerWidth/2 - 50, pageY: window.innerHeight/4 });
+        INVENTORY_FILE = new InventoryFile(100, 100);
+        new TextFile(200, 100, "handoff\n\n- your letters are limited\n- click on the 'letters' file, or the button in this window to view your stock\n- drag text files into the letters window/file to distill them");
+        new TextFile(window.innerWidth - 100, window.innerHeight - 100, "credits\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
+        WORLD_FILE = new WorldViewerFile(window.innerWidth/2, window.innerHeight/2);
+        WORLD_FILE.window.open({ pageX: window.innerWidth/2 - 50, pageY: window.innerHeight/4 });
 
-        BURGERIA_FILE = new BurgerMakerFile(200, 200);
+        BURGERIA_FILE = new BurgerMakerFile(100, 200);
 
         new Guy();
     </script>
