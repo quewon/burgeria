@@ -5,7 +5,7 @@ var _sounds = {
     //   new Howl({ src: "res/sound/click/3.wav", volume: .7 })
     // ],
     error: new Howl({ src: "res/sound/click/error.mp3" }),
-    disintegrate: new Howl({ src: "res/sound/dust.wav" }),
+    distill: new Howl({ src: "res/sound/dust.wav" }),
     chime: [
       new Howl({ src: "res/sound/chime/1.wav" }),
       new Howl({ src: "res/sound/chime/2.wav" }),
@@ -39,7 +39,7 @@ function sfx(name, fadetime) {
     const id = sound.play();
     if (fadetime) sound.fade(0, 1, fadetime);
 
-    if (name == "disintegrate") {
+    if (name == "distill") {
       sound.loop(true, id);
     }
   
@@ -56,7 +56,7 @@ function sfx_stop(name, fadetime, id) {
       sound.stop(id);
     }
 
-    if (name == "disintegrate") {
+    if (name == "distill") {
       sound.loop(false, id);
     }
 }

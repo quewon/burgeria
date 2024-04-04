@@ -9,13 +9,20 @@
     </head>
 
     <body>
-        
+
+        <div class="sun">(:</div>
+
         <div id="container">
 
         </div>
 
         <div class="dropdown gone">
-            <button onmouseup="new TextFile(event.pageX, event.pageY); this.parentElement.classList.add('gone')">+ new text file</button>
+            <div class="text-files gone">
+                <button onmouseup="for (let i=selectedFiles.length-1; i>=0; i--) { selectedFiles[i].distill(event) }; INVENTORY_FILE.window.open(event); this.parentElement.parentElement.classList.add('gone')">- distill txt file(s)</button>
+            </div>
+            <div class="global">
+                <button onmouseup="new TextFile(event.pageX, event.pageY); this.parentElement.parentElement.classList.add('gone')">+ new text file</button>
+            </div>
         </div>
 
         <div id="mouse"></div>
@@ -39,7 +46,7 @@
             <div class="body">
                 <div class="toolbar">
                     <div><span class="char-counter">000</span> chars</div>
-                    <button class="inventory-button">inventory</button>
+                    <button class="inventory-button">letters</button>
                 </div>
                 <textarea></textarea>
             </div>
@@ -49,7 +56,7 @@
     <template id="inventory-template">
         <div class="window">
             <div class="header toolbar">
-                <div class="title noselect">inv</div>
+                <div class="title noselect">letters</div>
                 <button class="close-button">x</button>
             </div>
             <div class="body">
@@ -72,6 +79,54 @@
         </div>
     </template>
 
+    <template id="storefront-template">
+        <div class="window">
+            <div class="header toolbar">
+                <div class="title noselect"></div>
+                <button class="close-button">x</button>
+            </div>
+            <div class="body">
+                <div style="width: min(50vw, 50vh); aspect-ratio: 1; background: url('res/window.jpeg'); background-size: contain"></div>
+                <div class="guys-container"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="burger-maker-template">
+        <div class="window">
+            <div class="header toolbar">
+                <div class="title noselect">burgeria</div>
+                <button class="close-button">x</button>
+            </div>
+            <div class="body" style="display: flex;">
+                <div class="vertical-section">
+                    <div class="toolbar">
+                        <div><b>menu</b></div>
+                    </div>
+                    <div class="body">
+                        <div>no items on menu</div>
+                    </div>
+                </div>
+                <div class="vertical-section">
+                    <div class="toolbar">
+                        <div><b>cooker</b></div>
+                    </div>
+                    <div class="toolbar">
+                        <div>transmute letters into food</div>
+                    </div>
+                    <div class="body">
+                        <textarea class="text-slot" placeholder="top bun&#10;patty&#10;bottom bun"></textarea>
+                        <div>
+                            |<br>
+                            V
+                        </div>
+                        <div class="file-slot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <script src="js/lib/howler.core.min.js"></script>
     <script src="js/lib/util.js"></script>
 
@@ -79,6 +134,7 @@
     <script src="js/system/file.js"></script>
     <script src="js/system/input.js"></script>
     <script src="js/system/mouse.js"></script>
+    <script src="js/system/guy.js"></script>
 
     <script src="js/files.js"></script>
 
@@ -86,7 +142,13 @@
     <script>
         INVENTORY_FILE = new InventoryFile(100, 200);
         new TextFile(100, 100, "manual\n\n- letters are a limited resource\n- put text files into inventory program to distill them");
-        new TextFile(200, 100, "credits:\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
+        new TextFile(200, 100, "credits\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
+        STOREFRONT_FILE = new StorefrontFile(window.innerWidth/2, window.innerHeight/2);
+        STOREFRONT_FILE.window.open({ pageX: window.innerWidth/2 - 50, pageY: window.innerHeight/4 });
+
+        BURGERIA_FILE = new BurgerMakerFile(200, 200);
+
+        new Guy();
     </script>
 
 </html>

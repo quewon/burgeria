@@ -66,6 +66,8 @@ class File {
                     this.canDoubleClick = false;
                 }.bind(this), 500);
             }
+        } else {
+            this.select(e, { noDrag: true });
         }
     }
 
@@ -78,7 +80,9 @@ class File {
         this.readyToOpenWindow = false;
     }
 
-    select(e) {
+    select(e, p) {
+        p = p || {};
+
         if (!mouse.selecting && selectedFiles.indexOf(this) == -1) {
             for (let i=selectedFiles.length-1; i>=0; i--) {
                 let file = selectedFiles[0];
@@ -90,7 +94,7 @@ class File {
         if (selectedFiles.indexOf(this) == -1) {
             selectedFiles.push(this);
         }
-        this.drag(e);
+        if (!p.noDrag) this.drag(e);
         this.focus();
     }
 
@@ -236,7 +240,24 @@ class BurgeriaWindow {
         }.bind(this);
 
         var x = this.element.querySelector(".close-button");
-        x.onclick = this.close.bind(this);
+        x.onclick = function() {
+            this.element.classList.add("closing");
+        }.bind(this);
+
+        this.element.onanimationend = function(e) {
+            switch (e.animationName) {
+                case "load-window":
+                    this.element.classList.remove("loading");
+                    break;
+                case "stall":
+                    this.element.classList.remove("focusing");
+                    break;
+                case "close-window":
+                    this.element.classList.remove("closing");
+                    this.close();
+                    break;
+            }
+        }.bind(this);
 
         this.element.remove();
     }
@@ -305,11 +326,13 @@ class BurgeriaWindow {
         if (selectedFiles.length > 0) {
             for (let file of selectedFiles) file.unfocus();
         }
-        if (focusedWindow) {
+        if (focusedWindow && focusedWindow != this) {
             focusedWindow.element.classList.remove("focused");
         }
         focusedWindow = this;
+
         this.element.classList.add("focused");
+        this.element.classList.add("focusing");
         container.appendChild(this.element);
     }
 
@@ -317,6 +340,11 @@ class BurgeriaWindow {
         if (!this.position) {
             this.setPosition(e.pageX, e.pageY);
         }
+
+        if (!container.contains(this.element)) {
+            this.element.classList.add("loading");
+        }
+
         container.appendChild(this.element);
         this.focus();
         this.update();

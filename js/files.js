@@ -1,4 +1,5 @@
 var INVENTORY_FILE;
+var STOREFRONT_FILE;
 
 class TextFile extends File {
     constructor(x, y, text) {
@@ -15,23 +16,22 @@ class TextFile extends File {
         this.element.querySelector(".name").textContent = this.name;
     }
 
-    disintegrate(e) {
+    distill(e) {
         if (this.sfxId) return;
         
         this.cancelDrop();
 
         this.window.body.disabled = "true";
         // this.openWindow(e);
-        this.sfxId = sfx("disintegrate");
+        this.sfxId = sfx("distill");
 
-        this.disintegrateSpeed = 100;
-
-        setTimeout(this.disintegrateTick.bind(this), this.disintegrateSpeed);
+        this.distillSpeed = 100;
+        setTimeout(this.distillTick.bind(this), this.distillSpeed);
     }
 
-    disintegrateTick() {
+    distillTick() {
         if (this.data.trim().length == 0) {
-            sfx_stop("disintegrate", null, this.sfxId);
+            sfx_stop("distill", null, this.sfxId);
             this.delete();
         } else {
             // container.appendChild(this.window.element);
@@ -49,9 +49,9 @@ class TextFile extends File {
             this.window.updateTitle();
             this.window.fitText();
 
-            this.disintegrateSpeed /= 1.03;
+            this.distillSpeed /= 1.03;
 
-            setTimeout(this.disintegrateTick.bind(this), this.disintegrateSpeed);
+            setTimeout(this.distillTick.bind(this), this.distillSpeed);
         }
     }
 }
@@ -102,6 +102,8 @@ class TextEditorWindow extends BurgeriaWindow {
     }
     
     fitText() {
+        this.body.offsetWidth;
+
         var div = this.fitTestElement;
         div.className = "textarea-test";
         div.style.width = this.body.clientWidth+"px";
@@ -123,20 +125,30 @@ class TextEditorWindow extends BurgeriaWindow {
             linesPath = "";
         }
 
-        this.file.setIcon(
-            `<svg width="33" height="40" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="2.79071" width="30" height="37.2093" stroke="none"/>
-            <rect x="0.5" y="0.5" width="29" height="36.2093" fill="white"/>
-            <path d="`+linesPath+`" fill="none"/>
-            </svg>`
-        );
+        if (this.file.sfxId && linesPath != "") {
+            this.file.setIcon(
+                `<svg width="38" height="43" viewBox="0 0 38 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="5.79071" width="30" height="37.2093" stroke="none"/>
+                <rect x="5.5" y="3.5" width="29" height="36.2093" fill="white"/>
+                <path d="M7 0.581421H21M0 0.581421H5M19 17.3256H21M0 17.3256H17M0 11.7442H8M10 11.7442H21M15 6.16282H21M0 6.16282H13" fill="none"/>
+                </svg>`
+            );
+        } else {
+            this.file.setIcon(
+                `<svg width="33" height="40" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="2.79071" width="30" height="37.2093" stroke="none"/>
+                <rect x="0.5" y="0.5" width="29" height="36.2093" fill="white"/>
+                <path d="`+linesPath+`" fill="none"/>
+                </svg>`
+            );
+        }
     }
 
     updateTitle() {
-        let title = this.body.value.trim().toLowerCase();
-        title = title.split("\n")[0];
-        title = title.replace(/[^a-z ]/g, "").replace(/ +/, " ");
-        title = title.substring(0, 10);
+        let title = this.body.value;
+        title = title.replace(/[^A-Za-z\n ]/g, "").replace(/ +/, " ");
+        title = title.trim().split("\n")[0];
+        title = title.substring(0, 20);
         if (title == "") title = "untitled";
         this.title.textContent = title;
         this.file.setName(title);
@@ -144,6 +156,10 @@ class TextEditorWindow extends BurgeriaWindow {
 
     onclose() {
         this.savedScrollTop = 0;
+    }
+
+    update() {
+        this.fitText();
     }
 
     delete() {
@@ -155,7 +171,7 @@ class TextEditorWindow extends BurgeriaWindow {
 class InventoryFile extends Program {
     constructor(x, y) {
         super(x, y);
-        this.setName("inventory");
+        this.setName("letters");
 
         this.element.addEventListener("mouseenter", function() {
             if (draggingFile) {
@@ -174,7 +190,7 @@ class InventoryFile extends Program {
             if (this.element.classList.contains("dropzone")) {
                 this.element.classList.remove("dropzone");
                 for (let i=selectedFiles.length-1; i>=0; i--) {
-                    selectedFiles[i].disintegrate(e);
+                    selectedFiles[i].distill(e);
                 }
                 this.window.open(e);
             }
@@ -217,7 +233,7 @@ class InventoryWindow extends BurgeriaWindow {
             if (this.fileDropPrompt.classList.contains("visible")) {
                 this.fileDropPrompt.classList.remove("visible");
                 for (let i=selectedFiles.length-1; i>=0; i--) {
-                    selectedFiles[i].disintegrate(e);
+                    selectedFiles[i].distill(e);
                 }
             }
         }.bind(this));
@@ -291,5 +307,52 @@ class InventoryWindow extends BurgeriaWindow {
         if (this.ghost) {
             this.updateGhost();
         }
+    }
+}
+
+class StorefrontFile extends Program {
+    constructor(x, y) {
+        super(x, y);
+        this.setName("window");
+        this.setIcon("<img src='res/window.jpeg' draggable='false'>")
+    }
+
+    createWindow() {
+        this.window = new StorefrontWindow(this);
+    }
+}
+
+class StorefrontWindow extends BurgeriaWindow {
+    constructor(file) {
+        super(file);
+    }
+
+    createElement() {
+        this.element = createElementFromTemplate("storefront-template");
+        container.appendChild(this.element);
+
+        this.guysContainer = this.element.querySelector(".guys-container");
+    }
+}
+
+class BurgerMakerFile extends Program {
+    constructor(x, y) {
+        super(x, y);
+        this.setName("burgeria");
+    }
+
+    createWindow() {
+        this.window = new BurgerMakerWindow(this);
+    }
+}
+
+class BurgerMakerWindow extends BurgeriaWindow {
+    constructor(file) {
+        super(file);
+    }
+
+    createElement() {
+        this.element = createElementFromTemplate("burger-maker-template");
+        container.appendChild(this.element);
     }
 }

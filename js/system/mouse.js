@@ -7,6 +7,7 @@ var mouse = {
     dropdown: document.querySelector(".dropdown")
 };
 mouse.selectionElement.remove();
+mouse.dropdown.onmousedown = function(e) { e.stopPropagation() };
 
 mouse.ondown = function(e) {
     mouse.down = true;
@@ -29,6 +30,23 @@ mouse.ondown = function(e) {
             dropdown.classList.remove("gone");
             dropdown.style.left = e.pageX+"px";
             dropdown.style.top = e.pageY+"px";
+        }
+
+        dropdown.querySelector(".text-files").classList.add("gone");
+        if (selectedFiles.length > 0) {
+            var text_files_selected = true;
+            for (let file of selectedFiles) {
+                if (file.type != "text") {
+                    text_files_selected = false;
+                    break;
+                }
+            }
+            if (text_files_selected) {
+                var on_file = elementInClass(e.target, "file");
+                if (on_file) {
+                    dropdown.querySelector(".text-files").classList.remove("gone");
+                }
+            }
         }
     }
 }

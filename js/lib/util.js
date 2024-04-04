@@ -17,7 +17,7 @@ function letterCount(text) {
 
 function getParentWithClass(el, className) {
   let parent = el;
-  while (!parent || !('classList' in parent)) {
+  while (parent && 'classList' in parent) {
     if (parent.classList.contains(className)) {
         return parent;
     } else {
@@ -29,7 +29,7 @@ function getParentWithClass(el, className) {
 
 function elementInClass(el, className) {
   let parent = el;
-  while (!parent || !('classList' in parent)) {
+  while (parent && 'classList' in parent) {
     if (parent.classList.contains(className)) {
         return true;
     } else {
