@@ -523,7 +523,7 @@ export default class Word {
             while (top.above)
                 top = top.above;
             top.update_group_element();
-        } else {
+        } else if (this.group_element) {
             this.group_element.remove();
             this.group_element = null;
         }
@@ -566,8 +566,9 @@ export default class Word {
             } else {
                 this.set_position(this.x, insert_after.y + Word.char_height);
                 if (insert_after.below) {
-                    insert_after.below.set_position(insert_after.below.x, this.y + Word.char_height);
-                    this.attach_below(insert_after.below);
+                    let bottom = this.bottom();
+                    insert_after.below.set_position(insert_after.below.x, bottom.y + Word.char_height);
+                    bottom.attach_below(insert_after.below);
                 }
                 this.attach_above(insert_after);
             }

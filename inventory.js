@@ -16,7 +16,8 @@ for (let letter of "abcdefghijklmnopqrstuvwxyz") {
 inventory_add(abc);
 
 function inventory_add(text) {
-    for (const letter of text) {
+    for (const char of text) {
+        const letter = char.toLowerCase();
         if (letter in inventory) {
             inventory[letter]++;
             setTimeout(() => {
