@@ -96,8 +96,8 @@ async function init() {
                 e.preventDefault();
 
                 var selected = [];
-                var x = 0;
-                var y = 0;
+                var x = Infinity;
+                var y = Infinity;
                 for (let word of words) {
                     if (word.grabbed) {
                         selected.push({
