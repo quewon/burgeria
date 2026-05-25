@@ -37,9 +37,8 @@ async function init() {
             }
             return;
         }
-        if (e.ctrlKey || e.metaKey) {
-            return;
-        }
+        if (e.ctrlKey || e.metaKey) return;
+        if (kitchen_zone.classList.contains("hidden")) return;
 
         const input = document.createElement("input");
         new InputManager(input, "");
