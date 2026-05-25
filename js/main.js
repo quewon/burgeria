@@ -183,7 +183,6 @@ async function init() {
                         x = input_x;
                     }
                 }
-                console.log(x, y);
                 set_input_position(x, y);
             }
             input.blur();
