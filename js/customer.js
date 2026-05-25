@@ -41,7 +41,8 @@ export default class Customer {
             word.remove();
             this.grow();
             this.element.classList.add("served");
-            this.element.textContent = ":D";
+            this.face = ":D";
+            this.element.textContent = this.face;
             this.state = "served";
             if (recipe_check.message) {
                 this.say(recipe_check.message + " +" + recipe_check.score);
@@ -110,7 +111,14 @@ export default class Customer {
         const width = Word.char_width * text.length;
         const height = Word.char_height;
         Word.spawn_string(this.x - width/2, this.y - height * 2, text, undefined, () => {
-            sfx("talk")
+            sfx("talk");
+            if (this.face != ":D") {
+                this.element.textContent = ":O";
+                setTimeout(() => {
+                    if (this.element.textContent == ":O")
+                        this.element.textContent = this.face;
+                }, 100);
+            }
         });
 
         switch (this.state) {

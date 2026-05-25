@@ -193,7 +193,7 @@ async function init() {
     })
 
     Word.spawn_string(5, Word.char_height * 1, "eat words by dragging them off", 0);
-    Word.spawn_string(5, Word.char_height * 2, "type anywhere to make words", 0);
+    Word.spawn_string(5, Word.char_height * 2, "click and type to make words", 0);
     Word.spawn_string(5 + Word.char_width * 8, Word.char_height * 4, "to build burgers", 0);
 
     words.push(new Word(5, Word.char_height * 3, "stack"))
@@ -212,6 +212,7 @@ function create_word_at_input() {
         );
         words.push(word);
         // word.interact(word.get_active_word_interaction_point());
+        sfx("type");
     }
     input_manager.burn();
 }

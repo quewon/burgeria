@@ -86,7 +86,7 @@ body.might-eat .word.grab {
     aspect-ratio: 1;
     padding: 0;
     position: absolute;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) rotate(90deg);
     animation: flash-customer 500ms;
     background: white;
     z-index: 1;
