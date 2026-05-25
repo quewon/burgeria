@@ -114,6 +114,64 @@ export default class Word {
         if (this.group_element) this.update_group_element();
     }
 
+    get_active_word_interaction_point() {
+        const interaction_points = this.get_interaction_points();
+        const active_points = interaction_points.filter(point => {
+            if (point.type != "customer") {
+                let word = point.type == "above" ? this.bottom() : this;
+                return aabb(
+                    word.x, word.width, word.y, word.height, 
+                    point.x, point.width, point.y, point.height
+                );
+            }
+        })
+        const active_sorted = active_points.sort((a, b) => {
+            let a_word = a.type == "above" ? this.bottom() : this;
+            let a_overlap = {
+                min: {
+                    x: Math.max(a_word.x, a.x),
+                    y: Math.max(a_word.y, a.y)
+                },
+                max: {
+                    x: Math.min(a_word.x + a_word.width, a.x + a.width),
+                    y: Math.min(a_word.y + a_word.height, a.y + a.height)
+                }
+            }
+            if (a_overlap.max.x < a_overlap.min.x || a_overlap.max.y < a_overlap.min.y)
+                return 1;
+            let a_intersect_area = 
+                (a_overlap.max.x - a_overlap.min.x) * 
+                (a_overlap.max.y - a_overlap.min.y);
+            let a_area = a.width * a.height;
+            let a_coverage = a_intersect_area / a_area;
+
+            let b_word = b.type == "above" ? this.bottom() : this;
+            let b_overlap = {
+                min: {
+                    x: Math.max(b_word.x, b.x),
+                    y: Math.max(b_word.y, b.y)
+                },
+                max: {
+                    x: Math.min(b_word.x + b_word.width, b.x + b.width),
+                    y: Math.min(b_word.y + b_word.height, b.y + b.height)
+                }
+            }
+            if (b_overlap.max.x < b_overlap.min.x || b_overlap.max.y < b_overlap.min.y)
+                return -1;
+            let b_intersect_area = 
+                (b_overlap.max.x - b_overlap.min.x) * 
+                (b_overlap.max.y - b_overlap.min.y);
+            let b_area = b.width * b.height;
+            let b_coverage = b_intersect_area / b_area;
+
+            return b_coverage - a_coverage;
+        })
+        if (active_sorted.length > 0) {
+            return active_sorted[0];
+        }
+        return null;
+    }
+
     spawn_element() {
         var element = document.createElement("div");
         element.textContent = this.text;
@@ -166,7 +224,7 @@ export default class Word {
         const interaction_field = document.createElement("div");
         interaction_field.className = "interaction-point";
 
-        var active_interaction_point;
+        this.active_interaction_point = null;
         
         const ondrag = e => {
             let mouse_delta = {
@@ -207,8 +265,9 @@ export default class Word {
                         let word_that_might_attach = null;
                         for (let word of words) {
                             if (word.grabbed) {
-                                if (word.get_active_interaction_point()?.word == unattached_word) {
+                                if (word.active_interaction_point?.word == unattached_word) {
                                     word_that_might_attach = word;
+                                    break;
                                 }
                             }
                         }
@@ -224,8 +283,7 @@ export default class Word {
                 y: e.pageY - Word.textzone.y,
             }
             
-            active_interaction_point = null;
-            const active_points = interaction_points.filter(point => {
+            const active_customer_points = interaction_points.filter(point => {
                 if (point.type == "customer") {
                     return (point_in_circle(
                         mouse.x, mouse.y,
@@ -233,15 +291,9 @@ export default class Word {
                         point.customer.element.offsetTop,
                         point.customer.element.clientWidth/2
                     ))
-                } else {
-                    let word = point.type == "above" ? this.bottom() : this;
-                    return aabb(
-                        word.x, word.width, word.y, word.height, 
-                        point.x, point.width, point.y, point.height
-                    );
                 }
             })
-            const active_sorted = active_points.sort((a, b) => {
+            const active_customers_sorted = active_customer_points.sort((a, b) => {
                 if (a.type == "customer" && b.type == "customer") {
                     return (
                         distance(
@@ -255,55 +307,18 @@ export default class Word {
                             b.customer.y / 100 * Word.textzone.height
                         )
                     )
-                } else if (a.type == "customer" || b.type == "customer") {
+                } else {
                     if (a.type == "customer") return -1;
                     return 1;
                 }
-                let a_word = a.type == "above" ? this.bottom() : this;
-                let a_overlap = {
-                    min: {
-                        x: Math.max(a_word.x, a.x),
-                        y: Math.max(a_word.y, a.y)
-                    },
-                    max: {
-                        x: Math.min(a_word.x + a_word.width, a.x + a.width),
-                        y: Math.min(a_word.y + a_word.height, a.y + a.height)
-                    }
-                }
-                if (a_overlap.max.x < a_overlap.min.x || a_overlap.max.y < a_overlap.min.y)
-                    return 1;
-                let a_intersect_area = 
-                    (a_overlap.max.x - a_overlap.min.x) * 
-                    (a_overlap.max.y - a_overlap.min.y);
-                let a_area = a.width * a.height;
-                let a_coverage = a_intersect_area / a_area;
-
-                let b_word = b.type == "above" ? this.bottom() : this;
-                let b_overlap = {
-                    min: {
-                        x: Math.max(b_word.x, b.x),
-                        y: Math.max(b_word.y, b.y)
-                    },
-                    max: {
-                        x: Math.min(b_word.x + b_word.width, b.x + b.width),
-                        y: Math.min(b_word.y + b_word.height, b.y + b.height)
-                    }
-                }
-                if (b_overlap.max.x < b_overlap.min.x || b_overlap.max.y < b_overlap.min.y)
-                    return -1;
-                let b_intersect_area = 
-                    (b_overlap.max.x - b_overlap.min.x) * 
-                    (b_overlap.max.y - b_overlap.min.y);
-                let b_area = b.width * b.height;
-                let b_coverage = b_intersect_area / b_area;
-
-                return b_coverage - a_coverage;
             })
-            if (active_sorted.length > 0) {
-                active_interaction_point = active_sorted[0];
+            if (active_customers_sorted.length > 0) {
+                this.active_interaction_point = active_customers_sorted[0];
+            } else {
+                this.active_interaction_point = this.get_active_word_interaction_point();
             }
-            if (active_interaction_point) {
-                const point = active_interaction_point;
+            if (this.active_interaction_point) {
+                const point = this.active_interaction_point;
                 if (point.type == "customer") {
                     interaction_field.remove();
                     point.customer.element.textContent = ":O";
@@ -322,14 +337,14 @@ export default class Word {
                 } else {
                     point.word.element.classList.add("might-attach");
                     const box = this.get_bounding_box();
-                    const p_box = point.word.get_bounding_box();
+                    const p_box = point.word.top().get_bounding_box();
                     const min = {
                         x: Math.min(box.x, p_box.x),
                         y: Math.min(box.y, p_box.y)
                     }
                     const max = {
-                        x: Math.min(box.x + box.width, p_box.x + p_box.width),
-                        y: Math.min(box.y + box.height, p_box.y + p_box.height)
+                        x: Math.max(box.x + box.width, p_box.x + p_box.width),
+                        y: Math.max(box.y + box.height, p_box.y + p_box.height)
                     }
                     interaction_field.style.left = min.x + "%";
                     interaction_field.style.top = min.y + "%";
@@ -365,8 +380,8 @@ export default class Word {
                     return;
                 }
 
-                if (active_interaction_point) {
-                    this.interact(active_interaction_point);
+                if (this.active_interaction_point) {
+                    this.interact(this.active_interaction_point);
                 }
             }
         })
@@ -514,19 +529,6 @@ export default class Word {
             prev_above.detach_below()
         if (this.below) {
             this.spawn_group_element();
-        }
-    }
-
-    get_active_interaction_point() {
-        const points = this.get_interaction_points();
-        for (let point of points) {
-            let word = point.type == "below" ? this : this.bottom()
-            if (aabb(
-                word.x, word.width, word.y, word.height,
-                point.x, point.width, point.y, point.height
-            )) {
-                return point;
-            }
         }
     }
 

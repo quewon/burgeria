@@ -77,8 +77,8 @@ function create_input() {
                 }
                 const word = new Word(x, y, text);
                 words.push(word);
-                const active_point = word.get_active_interaction_point();
-                if (active_point && active_point.type != "customer") {
+                const active_point = word.get_active_word_interaction_point();
+                if (active_point) {
                     word.interact(active_point);
                 }
                 x += (text.length + 1) * Word.char_width;
