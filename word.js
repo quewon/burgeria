@@ -42,67 +42,55 @@ export default class Word {
         this.set_position(x, y);
     }
 
-    push_down_colliding_words() {
-        let x = this.x;
-        let y = this.y;
-        let width = this.width;
-        let height = this.height;
-        if (this.group_element) {
-            x = parseFloat(this.group_element.style.left);
-            y = parseFloat(this.group_element.style.top);
-            width = parseFloat(this.group_element.style.width);
-            height = parseFloat(this.group_element.style.height);
+    get_bounding_box() {
+        let min = { x: this.x, y: this.y };
+        let max = { x: this.x + this.width, y: this.y + this.height };
+        let below = this.below;
+        while (below) {
+            min.x = Math.min(below.x, min.x);
+            min.y = Math.min(below.y, min.y);
+            max.x = Math.max(below.x + below.width, max.x);
+            max.y = Math.max(below.y + below.height, max.y);
+            below = below.below;
         }
+        return { x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y }
+    }
+
+    push_down_colliding_words() {
+        if (this.top() != this) return;
+        const box = this.get_bounding_box();
         for (let word of words) {
-            if (word.layer != this.layer || word.is_attached_to(this) || word.top() != word) continue;
-            let w_x = word.x;
-            let w_y = word.y;
-            let w_width = word.width;
-            let w_height = word.height;
-            if (word.group_element) {
-                w_x = parseFloat(word.group_element.style.left);
-                w_y = parseFloat(word.group_element.style.top);
-                w_width = parseFloat(word.group_element.style.width);
-                w_height = parseFloat(word.group_element.style.height);
-            }
+            if (
+                word.layer != this.layer || 
+                word.is_attached_to(this) || 
+                word.top() != word
+            ) continue;
+            const w_box = word.get_bounding_box();
             if (aabb(
-                x, width, y, height,
-                w_x, w_width, w_y, w_height
+                box.x, box.width, box.y, box.height,
+                w_box.x, w_box.width, w_box.y, w_box.height
             )) {
-                word.set_position(word.x, y + height);
+                word.set_position(word.x, box.y + box.height);
                 word.push_down_colliding_words();
             }
         }
     }
 
     push_up_colliding_words() {
-        let x = this.x;
-        let y = this.y;
-        let width = this.width;
-        let height = this.height;
-        if (this.group_element) {
-            x = parseFloat(this.group_element.style.left);
-            y = parseFloat(this.group_element.style.top);
-            width = parseFloat(this.group_element.style.width);
-            height = parseFloat(this.group_element.style.height);
-        }
+        if (this.top() != this) return;
+        const box = this.get_bounding_box();
         for (let word of words) {
-            if (word.layer != this.layer || word.is_attached_to(this) || word.top() != word) continue;
-            let w_x = word.x;
-            let w_y = word.y;
-            let w_width = word.width;
-            let w_height = word.height;
-            if (word.group_element) {
-                w_x = parseFloat(word.group_element.style.left);
-                w_y = parseFloat(word.group_element.style.top);
-                w_width = parseFloat(word.group_element.style.width);
-                w_height = parseFloat(word.group_element.style.height);
-            }
+            if (
+                word.layer != this.layer || 
+                word.is_attached_to(this) || 
+                word.top() != word
+            ) continue;
+            const w_box = word.get_bounding_box();
             if (aabb(
-                x, width, y, height,
-                w_x, w_width, w_y, w_height
+                box.x, box.width, box.y, box.height,
+                w_box.x, w_box.width, w_box.y, w_box.height
             )) {
-                word.set_position(word.x, y - w_height);
+                word.set_position(word.x, box.y - w_box.height);
                 word.push_up_colliding_words();
             }
         }
@@ -333,16 +321,15 @@ export default class Word {
                     this.layer.appendChild(interaction_field);
                 } else {
                     point.word.element.classList.add("might-attach");
-                    let min = { x: Infinity, y: Infinity }
-                    let max = { x: -Infinity, y: -Infinity }
-                    for (let word of [
-                        ...this.attached_words(), 
-                        ...point.word.attached_words()
-                    ]) {
-                        min.x = Math.min(word.x, min.x);
-                        min.y = Math.min(word.y, min.y);
-                        max.x = Math.max(word.x + word.width, max.x);
-                        max.y = Math.max(word.y + word.height, max.y);
+                    const box = this.get_bounding_box();
+                    const p_box = point.word.get_bounding_box();
+                    const min = {
+                        x: Math.min(box.x, p_box.x),
+                        y: Math.min(box.y, p_box.y)
+                    }
+                    const max = {
+                        x: Math.min(box.x + box.width, p_box.x + p_box.width),
+                        y: Math.min(box.y + box.height, p_box.y + p_box.height)
                     }
                     interaction_field.style.left = min.x + "%";
                     interaction_field.style.top = min.y + "%";
@@ -497,20 +484,11 @@ export default class Word {
     }
 
     update_group_element() {
-        let min = { x: Infinity, y: Infinity }
-        let max = { x: -Infinity, y: -Infinity }
-        let word = this;
-        while (word) {
-            min.x = Math.min(word.x, min.x);
-            min.y = Math.min(word.y, min.y);
-            max.x = Math.max(word.x + word.width, max.x);
-            max.y = Math.max(word.y + word.height, max.y);
-            word = word.below;
-        }
-        this.group_element.style.left = min.x + "%";
-        this.group_element.style.top = min.y + "%";
-        this.group_element.style.width = (max.x - min.x) + "%";
-        this.group_element.style.height = (max.y - min.y) + "%";
+        const { x, y, width, height } = this.get_bounding_box();
+        this.group_element.style.left = x + "%";
+        this.group_element.style.top = y + "%";
+        this.group_element.style.width = width + "%";
+        this.group_element.style.height = height + "%";
     }
 
     detach_below() {
@@ -649,10 +627,7 @@ export default class Word {
                 })
 
                 if (word.group_element) {
-                    let x = parseFloat(word.group_element.style.left);
-                    let y = parseFloat(word.group_element.style.top);
-                    let width = parseFloat(word.group_element.style.width);
-                    let height = parseFloat(word.group_element.style.height);
+                    const { x, y, width, height } = word.get_bounding_box();
                     points.push({
                         type: "insert",
                         word,
@@ -674,16 +649,7 @@ export default class Word {
     }
 
     copy_to_gallery() {
-        let x = this.x;
-        let y = this.y;
-        let width = this.width;
-        let height = this.height;
-        if (this.group_element) {
-            x = parseFloat(this.group_element.style.left);
-            y = parseFloat(this.group_element.style.top);
-            width = parseFloat(this.group_element.style.width);
-            height = parseFloat(this.group_element.style.height);
-        }
+        const { x, y, width, height } = this.get_bounding_box();
 
         const padding = Word.char_width;
         var pos_x = 0;
@@ -694,19 +660,10 @@ export default class Word {
         var gallery_boxes = [];
         for (let word of words) {
             if (word.layer == gallery_zone && word.top() == word) {
-                let x = word.x;
-                let y = word.y;
-                let width = word.width + padding;
-                let height = word.height + padding;
-                if (word.group_element) {
-                    x = parseFloat(word.group_element.style.left);
-                    y = parseFloat(word.group_element.style.top);
-                    width = parseFloat(word.group_element.style.width) + padding;
-                    height = parseFloat(word.group_element.style.height) + padding;
-                }
-                gallery_boxes.push({ x, y, width, height });
-                xs.push(x + width);
-                ys.push(y + height);
+                const w_box = word.get_bounding_box();
+                gallery_boxes.push(w_box);
+                xs.push(w_box.x + w_box.width);
+                ys.push(w_box.y + w_box.height);
             }
         }
         xs = xs.sort((a, b) => a - b);
@@ -783,17 +740,21 @@ export default class Word {
             Word.char_height = char_height / kitchen_zone.clientHeight * 100;
         });
 
-        Word.textzone = {
-            x: main_zone.offsetLeft - main_zone.clientWidth/2,
-            y: main_zone.offsetTop - main_zone.clientHeight/2 + kitchen_zone.offsetTop,
-            width: kitchen_zone.clientWidth,
-            height: kitchen_zone.clientHeight
+        if (!kitchen_zone.classList.contains("hidden")) {
+            Word.textzone = {
+                x: main_zone.offsetLeft - main_zone.clientWidth/2,
+                y: main_zone.offsetTop - main_zone.clientHeight/2 + kitchen_zone.offsetTop,
+                width: kitchen_zone.clientWidth,
+                height: kitchen_zone.clientHeight
+            }
         }
 
         if (words) {
             for (let word of words) {
                 word.width = word.text.length * Word.char_width;
                 word.height = Word.char_height;
+            }
+            for (let word of words) {
                 if (word.group_element)
                     word.update_group_element();
             }
@@ -866,16 +827,7 @@ document.addEventListener("mousedown", e => {
                     !gallery_zone.classList.contains("hidden") && word.layer == kitchen_zone
                 ) continue;
                 if (word.top() != word) continue;
-                let x = word.x;
-                let y = word.y;
-                let width = word.width;
-                let height = word.height;
-                if (word.group_element) {
-                    x = parseFloat(word.group_element.style.left);
-                    y = parseFloat(word.group_element.style.top);
-                    width = parseFloat(word.group_element.style.width);
-                    height = parseFloat(word.group_element.style.height);
-                }
+                let { x, y, width, height } = word.get_bounding_box();
                 if (aabb(
                     min.x, max.x - min.x, min.y, max.y - min.y,
                     x, width, y, height

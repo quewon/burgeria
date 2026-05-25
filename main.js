@@ -17,6 +17,7 @@ async function init() {
         gallery_button.classList.remove("selected");
         kitchen_zone.classList.remove("hidden");
         gallery_zone.classList.add("hidden");
+        Word.onresize();
     }
     gallery_button.onclick = () => {
         kitchen_button.classList.remove("selected");
