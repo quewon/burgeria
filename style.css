@@ -147,6 +147,7 @@ body.might-eat .word.grab {
 #main_zone header button {
     background-color: white;
     border: 1px solid red;
+    color: red;
     border-bottom: none;
 }
 #main_zone header button.selected {
