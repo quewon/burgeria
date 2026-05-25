@@ -52,7 +52,7 @@ async function init() {
         create_word_at_input();
     })
     kitchen_zone.addEventListener("mouseup", e => {
-        if (e.target.closest(".word")) return;
+        if (e.button !== 0 || e.target.closest(".word")) return;
 
         for (let word of words) {
             if (word.grabbed)
@@ -145,10 +145,12 @@ async function init() {
                 for (let i=0; i<text.length; i++) {
                     if (text[i] == " " || text[i] == "\n") continue;
                     const letter = text[i].toLowerCase();
-                    if (letter in inventory && inventory[letter] > 0) continue;
+                    if (letter in inventory && inventory[letter] > 0) {
+                        inventory_remove(text[i]);
+                        continue;
+                    }
                     text = text.substring(0, i) + " " + text.substring(i + 1);
                 }
-                inventory_remove(text);
                 if (text.trim() == "") {
                     sfx("error");
                     document.body.classList.add("letter-rejected");
