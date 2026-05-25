@@ -1,154 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burgeria</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <head>
-        <meta charset="UTF-8">
-        <title>Burgeria</title>
-        <link rel="stylesheet" href="style.css">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-    </head>
+    <div id="eat_zone"></div>
+    <div id="main_zone">
+        <header>
+            <button class="selected" id="kitchen_button">kitchen</button>
+            <button id="gallery_button">burger gallery</button>
+        </header>
+        <div id="kitchen_zone"></div>
+        <div id="gallery_zone" class="hidden"></div>
+    </div>
 
-    <body>
-
-        <div class="sun">(:</div>
-
-        <div id="container">
-
-        </div>
-
-        <div class="dropdown gone">
-            <div class="text-files gone">
-                <button onmouseup="for (let i=selectedFiles.length-1; i>=0; i--) { selectedFiles[i].distill(event) }; INVENTORY_FILE.window.open(event); this.parentElement.parentElement.classList.add('gone')">- distill txt file(s)</button>
-            </div>
-            <div class="global">
-                <button onmouseup="new TextFile(event.pageX, event.pageY); this.parentElement.parentElement.classList.add('gone')">+ new text file</button>
-            </div>
-        </div>
-
-        <div id="mouse"></div>
-        <div id="mouse-selection"></div>
-
-    </body>
-
-    <template id="file-template">
-        <div class="file" draggable="false">
-            <div class="icon noselect"></div>
-            <div class="name noselect"></div>
-        </div>
-    </template>
-
-    <template id="editor-template">
-        <div class="window">
-            <div class="header toolbar">
-                <div class="title noselect">txt</div>
-                <button class="close-button">x</button>
-            </div>
-            <div class="body">
-                <div class="toolbar">
-                    <div><span class="char-counter">000</span> chars</div>
-                    <button class="inventory-button">letters</button>
-                </div>
-                <textarea></textarea>
-            </div>
-        </div>
-    </template>
-
-    <template id="inventory-template">
-        <div class="window">
-            <div class="header toolbar">
-                <div class="title noselect">letters</div>
-                <button class="close-button">x</button>
-            </div>
-            <div class="body">
-                <table class="inventory">
-                    <tr>
-                        <th>a</th>
-                        <td>0</td>
-                    </tr>
-                </table>
-                <div class="file-drop-prompt">
-                    <svg width="33" height="40" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="3" y="2.79071" width="30" height="37.2093" stroke="none"/>
-                        <rect x="0.5" y="0.5" width="29" height="36.2093" fill="white"/>
-                        <path d="M11 5.58142H25M4 5.58142H9M23 22.3256H25M4 22.3256H21M4 16.7442H12M14 16.7442H25M19 11.1628H25M4 11.1628H17" fill="none"/>
-                    </svg>
-                    <br>
-                    distill txt
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="world-viewer-template">
-        <div class="window">
-            <div class="header toolbar">
-                <div class="title noselect"></div>
-                <button class="close-button">x</button>
-            </div>
-            <div class="body">
-                <div style="width: min(50vw, 50vh); aspect-ratio: 1; background: url('res/window.jpeg'); background-size: contain"></div>
-                <div class="guys-container"></div>
-            </div>
-        </div>
-    </template>
-
-    <template id="burger-maker-template">
-        <div class="window">
-            <div class="header toolbar">
-                <div class="title noselect">burgeria</div>
-                <button class="close-button">x</button>
-            </div>
-            <div class="body" style="display: flex;">
-                <div class="vertical-section">
-                    <div class="toolbar">
-                        <div><b>menu</b></div>
-                    </div>
-                    <div class="body">
-                        <div>no items on menu</div>
-                    </div>
-                </div>
-                <div class="vertical-section">
-                    <div class="toolbar">
-                        <div><b>cooker</b></div>
-                    </div>
-                    <div class="toolbar">
-                        <div>transmute letters into food</div>
-                    </div>
-                    <div class="body cooker-background">
-                        <textarea class="text-slot" placeholder="small beef burger with fries"></textarea>
-                        <div>
-                            |<br>
-                            V
-                        </div>
-                        <div class="file-slot"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <script src="js/lib/howler.core.min.js"></script>
-    <script src="js/lib/util.js"></script>
-
-    <script src="js/system/sound.js"></script>
-    <script src="js/system/file.js"></script>
-    <script src="js/system/input.js"></script>
-    <script src="js/system/mouse.js"></script>
-    <script src="js/system/guy.js"></script>
-
-    <script src="js/files.js"></script>
-
-    <script src="js/game.js"></script>
-    <script>
-        INVENTORY_FILE = new InventoryFile(100, 100);
-        new TextFile(200, 100, "handoff\n\n- your letters are limited\n- click on the 'letters' file, or the button in this window to view your stock\n- drag text files into the letters window/file to distill them");
-        new TextFile(window.innerWidth - 100, window.innerHeight - 100, "credits\n\nWhimsy font by sonhdon\nhttps://sonhdon.gumroad.com/");
-        WORLD_FILE = new WorldViewerFile(window.innerWidth/2, window.innerHeight/2);
-        WORLD_FILE.window.open({ pageX: window.innerWidth/2 - 50, pageY: window.innerHeight/4 });
-
-        BURGERIA_FILE = new BurgerMakerFile(100, 200);
-
-        new Guy();
-    </script>
-
+</body>
+<script type="module" src="main.js"></script>
 </html>
