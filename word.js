@@ -752,6 +752,8 @@ export default class Word {
         //     kitchen_zone.classList.remove("hidden");
         //     gallery_zone.classList.add("hidden");
         // }
+
+        gallery_button.classList.remove("hidden");
     }
 
     static async spawn_string(x = 0, y = 0, string = "", delay = 30) {
