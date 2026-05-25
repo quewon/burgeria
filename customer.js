@@ -1,5 +1,5 @@
 import rules from "./rules.js";
-import Word from "./Word.js";
+import Word from "./word.js";
 import { customers } from "./main.js";
 
 export default class Customer {
