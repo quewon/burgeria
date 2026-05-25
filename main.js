@@ -1,6 +1,6 @@
 import rules from "./rules.js";
 import Customer from "./customer.js";
-import Word from "./Word.js";
+import Word from "./word.js";
 import { update_inventory_size } from "./inventory.js";
 import InputManager from "./input.js";
 
