@@ -110,8 +110,8 @@ async function init() {
                     }
                 }
                 for (let selection of selected) {
-                    selection.line_index = Math.floor((selection.y - y) / Word.char_height);
-                    selection.char_index = Math.floor((selection.x - x) / Word.char_width);
+                    selection.line_index = Math.floor((selection.y - y) / (Word.char_height * 0.99));
+                    selection.char_index = Math.floor((selection.x - x) / (Word.char_width * 0.99));
                 }
                 selected.sort((a, b) => {
                     if (a.line_index != b.line_index) {
