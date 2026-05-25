@@ -1,4 +1,5 @@
 import { start_day } from "./main.js";
+import { sfx } from "./sound.js";
 
 var inventory = {};
 
@@ -27,6 +28,7 @@ function inventory_add(text) {
             setTimeout(() => {
                 add_letter_element(letter);
                 update_inventory_size();
+                sfx("burgerpoints");
             }, Math.random() * 100);
         }
     }

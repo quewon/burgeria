@@ -2,7 +2,8 @@ import rules from "./rules.js";
 import Customer from "./customer.js";
 import Word from "./word.js";
 import { inventory, inventory_remove, update_inventory_size } from "./inventory.js";
-import InputManager from "./input.js";
+import InputManager from "./lib/input.js";
+import { sfx } from "./sound.js";
 
 var customers = [];
 var words = [];
@@ -149,6 +150,7 @@ async function init() {
                 }
                 inventory_remove(text);
                 if (text.trim() == "") {
+                    sfx("error");
                     document.body.classList.add("letter-rejected");
                     setTimeout(() => {
                         document.body.classList.remove("letter-rejected");

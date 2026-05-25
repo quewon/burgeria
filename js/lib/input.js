@@ -1,4 +1,5 @@
-import { inventory, inventory_add, inventory_remove } from "./inventory.js";
+import { inventory, inventory_add, inventory_remove } from "../inventory.js";
+import { sfx } from "../sound.js";
 
 const ABC = "abcdefghijklmnopqrstuvwxyz";
 
@@ -165,7 +166,7 @@ export default class InputManager {
             // sfx("type");
         }
         if (letterRejected) {
-            // sfx("error");
+            sfx("error");
         }
     }
 

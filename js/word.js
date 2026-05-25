@@ -1,6 +1,7 @@
 import { words, customers } from "./main.js";
 import { inventory_add } from "./inventory.js";
 import { drag } from "./dragdrop.js";
+import { sfx } from "./sound.js";
 
 function distance(x1, y1, x2, y2) {
     let dx = x2 - x1;
@@ -219,7 +220,10 @@ export default class Word {
             }
         }
 
-        if (this.above) this.detach_above();
+        if (this.above) {
+            sfx("grab");
+            this.detach_above();
+        }
 
         const interaction_field = document.createElement("div");
         interaction_field.className = "interaction-point";
@@ -362,8 +366,9 @@ export default class Word {
             ondrag,
             ondragend: e => {
                 interaction_field.remove();
-                if (!this.grabbed_before_drag)
+                if (!this.grabbed_before_drag) {
                     this.ungrab();
+                }
                 document.body.classList.remove("might-eat");
                 for (let element of document.querySelectorAll(".might-attach"))
                     element.classList.remove("might-attach");
@@ -536,6 +541,7 @@ export default class Word {
         if (!point) return;
         if (point.type == "customer") {
             point.customer.serve(this);
+            sfx("burgerpoints");
         } else if (point.type == "insert") {
             let insert_after = point.word.bottom();
             while (this.y < insert_after?.y) {
@@ -553,6 +559,7 @@ export default class Word {
                 }
                 this.attach_above(insert_after);
             }
+            sfx("drop");
         } else {
             if (point.type == "below") {
                 this.set_position(this.x, point.y);
@@ -567,6 +574,7 @@ export default class Word {
                 this.set_position(this.x, point.y - tiers * Word.char_height);
                 bottom.attach_below(point.word);
             }
+            sfx("drop");
         }
     }
 
@@ -717,12 +725,13 @@ export default class Word {
         gallery_button.classList.remove("hidden");
     }
 
-    static async spawn_string(x = 0, y = 0, string = "", delay = 30) {
+    static async spawn_string(x = 0, y = 0, string = "", delay = 30, onspawn) {
         for (let text of string.split(" ")) {
             const word = new Word(x, y, text);
             word.push_up_colliding_words();
             words.push(word);
             x += (text.length + 1) * Word.char_width;
+            if (onspawn) onspawn();
             await new Promise(resolve => {
                 setTimeout(() => {
                     resolve()

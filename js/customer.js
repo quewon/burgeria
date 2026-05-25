@@ -1,6 +1,7 @@
 import rules from "./rules.js";
 import Word from "./word.js";
 import { customers } from "./main.js";
+import { sfx } from "./sound.js";
 
 export default class Customer {
     static initial_r_scale = 2;
@@ -15,8 +16,6 @@ export default class Customer {
         this.r_scale = Customer.initial_r_scale;
         this.r = Word.char_width * this.r_scale;
         this.spawn();
-        this.say("can i have a " + this.order + " ?");
-        this.dialogue = ["..."];
         this.served_amount = 0;
     }
 
@@ -98,12 +97,21 @@ export default class Customer {
                 // make noise
             }
         })
+
+        sfx("chime");
+
+        setTimeout(() => {
+            this.say("can i have a " + this.order + " ?");
+            this.dialogue = ["..."];
+        }, 300);
     }
 
     say(text) {
         const width = Word.char_width * text.length;
         const height = Word.char_height;
-        Word.spawn_string(this.x - width/2, this.y - height * 2, text);
+        Word.spawn_string(this.x - width/2, this.y - height * 2, text, undefined, () => {
+            sfx("talk")
+        });
 
         switch (this.state) {
             case "waiting":
