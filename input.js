@@ -53,7 +53,7 @@ export default class InputManager {
     }
 
     useLetter(letter) {
-        if (!ABC.includes(letter)) return;
+        if (!ABC.includes(letter)) return false;
         let count = inventory[letter];
         if (count > 0) {
             inventory_remove(letter);
@@ -107,17 +107,19 @@ export default class InputManager {
 
         let output = prevtext;
         let charsDeleted = "";
-        for (let char of deleted) {
-            const letter = char.toLowerCase();
-            if (ABC.includes(letter)) {
-                this.unuseLetter(letter);
-                charsDeleted += letter;
+        if (deleted) {
+            for (let char of deleted) {
+                const letter = char.toLowerCase();
+                if (ABC.includes(letter)) {
+                    this.unuseLetter(letter);
+                    charsDeleted += letter;
+                }
             }
-        }
-        if (selWidth == 0) {
-            output = output.substring(0, caretPosition) + output.substring(deletedIndex);
-        } else {
-            output = output.substring(0, addedIndex) + output.substring(deletedIndex);
+            if (selWidth == 0) {
+                output = output.substring(0, caretPosition) + output.substring(deletedIndex);
+            } else {
+                output = output.substring(0, addedIndex) + output.substring(deletedIndex);
+            }
         }
 
         let addable = "";
@@ -138,11 +140,7 @@ export default class InputManager {
                 // }
             }
 
-            if (selWidth == 0) {
-                output = output.substring(0, addedIndex) + addable + output.substring(addedIndex + 1);
-            } else {
-                output = output.substring(0, addedIndex) + addable + output.substring(addedIndex);
-            }
+            output = output.substring(0, addedIndex) + addable + output.substring(addedIndex);
 
             if (letterRejected) {
                 element.classList.remove("rejected");
@@ -233,6 +231,7 @@ export default class InputManager {
     }
 
     burn() {
+        this.element.value = "";
         this.history = [];
         this.newState();
         if (this.oninput) this.oninput();

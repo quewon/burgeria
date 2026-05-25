@@ -38,7 +38,8 @@ function inventory_add(text) {
 }
 
 function inventory_remove(text) {
-    for (const letter of text) {
+    for (const char of text) {
+        const letter = char.toLowerCase();
         if (letter in inventory) {
             inventory[letter]--;
             setTimeout(() => {
@@ -61,7 +62,9 @@ function add_letter_element(letter) {
 function remove_letter_element(letter) {
     const letters = eat_zone.querySelectorAll(`.consumable.letter-${letter}`);
     const random_letter = letters[Math.floor(Math.random() * letters.length)];
-    random_letter.remove();
+    if (random_letter) {
+        random_letter.remove();
+    }
 }
 
 async function update_inventory_size() {

@@ -88,7 +88,6 @@ export default class Customer {
         element.style.top = this.y + "%";
         element.style.left = this.x + "%";
         element.style.width = (this.r * 2) + "%";
-        element.dataset.id = this.id;
         kitchen_zone.appendChild(element);
         this.element = element;
 

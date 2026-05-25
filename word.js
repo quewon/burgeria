@@ -789,17 +789,21 @@ document.addEventListener("mousedown", e => {
     }
     document.body.classList.add("selecting");
 
-    for (let word of words) {
-        if (word.grabbed) {
-            word.ungrab();
+    if (!e.shiftKey) {
+        for (let word of words) {
+            if (word.grabbed) {
+                word.ungrab();
+            }
         }
     }
 
     drag({
         ondrag: e => {
-            for (let word of words) {
-                if (word.grabbed) {
-                    word.ungrab();
+            if (!e.shiftKey) {
+                for (let word of words) {
+                    if (word.grabbed) {
+                        word.ungrab();
+                    }
                 }
             }
 
