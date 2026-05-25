@@ -533,6 +533,7 @@ export default class Word {
     }
 
     interact(point) {
+        if (!point) return;
         if (point.type == "customer") {
             point.customer.serve(this);
         } else if (point.type == "insert") {

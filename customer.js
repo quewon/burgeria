@@ -5,13 +5,13 @@ import { customers } from "./main.js";
 export default class Customer {
     static initial_r_scale = 2;
 
-    constructor() {
+    constructor(x, y) {
         const menu_items = Object.keys(rules.recipes);
         this.face = ":)";
         this.state = "waiting";
         this.order = menu_items[Math.floor(Math.random() * menu_items.length)];
-        this.x = Math.random() * 80 + 10;
-        this.y = Math.random() * 80 + 10;
+        this.x = x ?? Math.random() * 80 + 10;
+        this.y = y ?? Math.random() * 80 + 10;
         this.r_scale = Customer.initial_r_scale;
         this.r = Word.char_width * this.r_scale;
         this.spawn();

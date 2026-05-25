@@ -50,7 +50,14 @@ async function init() {
         mouse.y -= Word.char_height;
     })
 
-    start_day();
+    Word.spawn_string(5, Word.char_height * 1, "eat words by dragging them off", 10);
+    Word.spawn_string(5, Word.char_height * 2, "type anywhere to make words", 10);
+    Word.spawn_string(5 + Word.char_width * 8, Word.char_height * 4, "to build burgers", 10);
+
+    words.push(new Word(5, Word.char_height * 3, "stack"))
+    const word = new Word(5 + Word.char_width * 2, Word.char_height * 4, "words");
+    words.push(word);
+    word.interact(word.get_active_word_interaction_point());
 }
 
 function create_input() {
@@ -77,10 +84,7 @@ function create_input() {
                 }
                 const word = new Word(x, y, text);
                 words.push(word);
-                const active_point = word.get_active_word_interaction_point();
-                if (active_point) {
-                    word.interact(active_point);
-                }
+                word.interact(word.get_active_word_interaction_point());
                 x += (text.length + 1) * Word.char_width;
             }
         }
@@ -105,9 +109,11 @@ function create_input() {
 }
 
 function start_day() {
-    customers.push(new Customer());
+    setTimeout(() => {
+        customers.push(new Customer(50, 50));
+    }, 1000);
 }
 
 window.addEventListener("load", init);
 
-export { words, customers };
+export { words, customers, start_day };

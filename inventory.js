@@ -1,3 +1,5 @@
+import { start_day } from "./main.js";
+
 var inventory = {};
 
 for (let letter of "abcdefghijklmnopqrstuvwxyz") {
@@ -8,12 +10,14 @@ for (let letter of "abcdefghijklmnopqrstuvwxyz") {
 }
 
 // setup
-let abc = "";
-for (let letter of "abcdefghijklmnopqrstuvwxyz") {
-    for (let i=0; i<2; i++)
-        abc += letter;
-}
-inventory_add(abc);
+// let abc = "";
+// for (let letter of "abcdefghijklmnopqrstuvwxyz") {
+//     for (let i=0; i<2; i++)
+//         abc += letter;
+// }
+// inventory_add(abc);
+
+var game_start_flag = true;
 
 function inventory_add(text) {
     for (const char of text) {
@@ -25,6 +29,11 @@ function inventory_add(text) {
                 update_inventory_size();
             }, Math.random() * 100);
         }
+    }
+
+    if (game_start_flag) {
+        start_day();
+        game_start_flag = false;
     }
 }
 
