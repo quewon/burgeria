@@ -34,8 +34,7 @@ export default class Word {
 
     constructor(x = 0, y = 0, text = "") {
         this.layer = kitchen_zone;
-        this.above = null;
-        this.below = null;
+        this.group = null;
         this.width = text.length * Word.char_width;
         this.height = Word.char_height;
         this.text = text;
@@ -43,76 +42,94 @@ export default class Word {
         this.set_position(x, y);
     }
 
-    get_bounding_box() {
-        let min = { x: this.x, y: this.y };
-        let max = { x: this.x + this.width, y: this.y + this.height };
-        let below = this.below;
-        while (below) {
-            min.x = Math.min(below.x, min.x);
-            min.y = Math.min(below.y, min.y);
-            max.x = Math.max(below.x + below.width, max.x);
-            max.y = Math.max(below.y + below.height, max.y);
-            below = below.below;
+    spawn_element() {
+        var element = document.createElement("div");
+        element.textContent = this.text;
+        element.className = "word new";
+        element.onanimationend = () => {
+            element.onanimationend = null;
+            element.classList.remove("new");
         }
-        return { x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y }
+        kitchen_zone.appendChild(element);
+        this.element = element;
+
+        element.addEventListener("mouseover", this.hover.bind(this))
+        element.addEventListener("mouseleave", this.unhover.bind(this))
+        element.addEventListener("mousedown", e => {
+            if (e.button == 2) {
+                this.add_to_inventory();
+                return;
+            }
+
+            if (this.grabbed) {
+                this.grabbed_before_drag = true;
+                for (let word of words) {
+                    if (word.is_head() && word.grabbed) {
+                        word.grabbed_before_drag = true;
+                        word.start_dragging(e);
+                    }
+                }
+            } else {
+                for (let word of words) {
+                    if (word.is_head())
+                        word.ungrab();
+                }
+                this.grab();
+                this.start_dragging(e);
+            }
+        })
     }
 
-    push_down_colliding_words() {
-        if (this.top() != this) return;
-        const box = this.get_bounding_box();
-        for (let word of words) {
-            if (
-                word.layer != this.layer || 
-                word.is_attached_to(this) || 
-                word.top() != word
-            ) continue;
-            const w_box = word.get_bounding_box();
-            if (aabb(
-                box.x, box.width, box.y, box.height,
-                w_box.x, w_box.width, w_box.y, w_box.height
-            )) {
-                word.set_position(word.x, box.y + box.height);
-                word.push_down_colliding_words();
+    is_head() {
+        if (this.group) {
+            return this.group.indexOf(this) == 0;
+        }
+        return true;
+    }
+
+    push_colliding_words() {
+        if (!this.is_head()) return;
+        const heads = words.filter(word => (
+            word.layer == this.layer &&
+            !word.is_attached_to(this) &&
+            aabb(
+                this.x, this.width, this.y, this.height,
+                word.x, word.width, word.y, word.height
+            )
+        ));
+        heads.sort((a, b) => {
+            return a.y + a.height/2 < b.y + b.height/2
+        })
+        for (let word of heads) {
+            if (word.y + word.height/2 < this.y + this.height/2) {
+                word.set_position(word.x, this.y - word.height);
+                word.push_colliding_words();
+            } else {
+                word.set_position(word.x, this.y + this.height);
+                word.push_colliding_words();
             }
         }
     }
 
-    push_up_colliding_words() {
-        if (this.top() != this) return;
-        const box = this.get_bounding_box();
-        for (let word of words) {
-            if (
-                word.layer != this.layer || 
-                word.is_attached_to(this) || 
-                word.top() != word
-            ) continue;
-            const w_box = word.get_bounding_box();
-            if (aabb(
-                box.x, box.width, box.y, box.height,
-                w_box.x, w_box.width, w_box.y, w_box.height
-            )) {
-                word.set_position(word.x, box.y - w_box.height);
-                word.push_up_colliding_words();
+    set_group_position(x, y) {
+        const box = this.get_group_bounds()
+        for (let word of this.group) {
+            const rel = {
+                x: word.x - box.x,
+                y: word.y - box.y
             }
+            word.set_position(x + rel.x, y + rel.y);
         }
     }
 
     set_position(x, y) {
-        if (
-            this.below &&
-            this.below.x !== undefined && this.below.y !== undefined
-        ) {
-            let delta = {
-                x: x - this.x,
-                y: y - this.y
-            }
-            this.below.set_position(this.below.x + delta.x, this.below.y + delta.y);
-        }
         this.x = x;
         this.y = y;
         this.element.style.left = x + "%";
         this.element.style.top = y + "%";
-        if (this.group_element) this.update_group_element();
+        if (this.group) {
+            this.group[0].update_group_element();
+        }
     }
 
     get_active_word_interaction_point() {
@@ -173,44 +190,6 @@ export default class Word {
         return null;
     }
 
-    spawn_element() {
-        var element = document.createElement("div");
-        element.textContent = this.text;
-        element.className = "word new";
-        element.onanimationend = () => {
-            element.onanimationend = null;
-            element.classList.remove("new");
-        }
-        kitchen_zone.appendChild(element);
-        this.element = element;
-
-        element.addEventListener("mouseover", this.hover.bind(this))
-        element.addEventListener("mouseleave", this.unhover.bind(this))
-        element.addEventListener("mousedown", e => {
-            if (e.button == 2) {
-                this.add_to_inventory();
-                return;
-            }
-
-            if (this.grabbed) {
-                this.grabbed_before_drag = true;
-                for (let word of words) {
-                    if (word.grabbed) {
-                        word.grabbed_before_drag = true;
-                        if (word.top() != word) continue;
-                        word.start_dragging(e);
-                    }
-                }
-            } else {
-                for (let word of words) {
-                    word.ungrab();
-                }
-                this.grab();
-                this.start_dragging(e);
-            }
-        })
-    }
-
     start_dragging(e) {
         const down_state = {
             mouse: { x: e.pageX, y: e.pageY },
@@ -218,11 +197,6 @@ export default class Word {
                 x: this.x / 100 * Word.textzone.width,
                 y: this.y / 100 * Word.textzone.height
             }
-        }
-
-        if (this.above) {
-            sfx("grab");
-            this.detach_above();
         }
 
         const interaction_field = document.createElement("div");
@@ -235,10 +209,18 @@ export default class Word {
                 x: e.pageX - down_state.mouse.x,
                 y: e.pageY - down_state.mouse.y
             }
-            this.set_position(
-                (down_state.element.x + mouse_delta.x) / Word.textzone.width * 100,
-                (down_state.element.y + mouse_delta.y) / Word.textzone.height * 100
-            );
+            const x = (down_state.element.x + mouse_delta.x) / Word.textzone.width * 100;
+            const y = (down_state.element.y + mouse_delta.y) / Word.textzone.height * 100;
+            if (this.group) {
+                const box = this.get_group_bounds();
+                const rel = {
+                    x: box.x - this.x,
+                    y: box.y - this.y
+                }
+                this.set_group_position(x + rel.x, y + rel.y);
+            } else {
+                this.set_position(x, y);
+            }
             if (
                 e.pageX < Word.textzone.x ||
                 e.pageX > Word.textzone.x + Word.textzone.width ||
@@ -248,116 +230,6 @@ export default class Word {
                 document.body.classList.add("might-eat");
             } else {
                 document.body.classList.remove("might-eat");
-            }
-
-            const interaction_points = this.get_interaction_points();
-
-            for (let point of interaction_points) {
-                if (point.type == "customer") {
-                    point.customer.element.textContent = point.customer.face;
-                    point.customer.element.classList.remove("might-serve");
-                } else {
-                    var unattached = [point.word];
-                    if (point.type == "insert") {
-                        var cycle = point.word.below;
-                        while (cycle) {
-                            unattached.push(cycle);
-                            cycle = cycle.below;
-                        }
-                    }
-                    for (let unattached_word of unattached) {
-                        let word_that_might_attach = null;
-                        for (let word of words) {
-                            if (word.grabbed) {
-                                if (word.active_interaction_point?.word == unattached_word) {
-                                    word_that_might_attach = word;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!word_that_might_attach) {
-                            unattached_word.element.classList.remove("might-attach");
-                        }
-                    }
-                }
-            }
-
-            const mouse = {
-                x: e.pageX - Word.textzone.x,
-                y: e.pageY - Word.textzone.y,
-            }
-            
-            const active_customer_points = interaction_points.filter(point => {
-                if (point.type == "customer") {
-                    return (point_in_circle(
-                        mouse.x, mouse.y,
-                        point.customer.element.offsetLeft,
-                        point.customer.element.offsetTop,
-                        point.customer.element.clientWidth/2
-                    ))
-                }
-            })
-            const active_customers_sorted = active_customer_points.sort((a, b) => {
-                if (a.type == "customer" && b.type == "customer") {
-                    return (
-                        distance(
-                            e.pageX, e.pageY,
-                            a.customer.x / 100 * Word.textzone.width,
-                            a.customer.y / 100 * Word.textzone.height
-                        )
-                        - distance(
-                            e.pageX, e.pageY,
-                            b.customer.x / 100 * Word.textzone.width,
-                            b.customer.y / 100 * Word.textzone.height
-                        )
-                    )
-                } else {
-                    if (a.type == "customer") return -1;
-                    return 1;
-                }
-            })
-            if (active_customers_sorted.length > 0) {
-                this.active_interaction_point = active_customers_sorted[0];
-            } else {
-                this.active_interaction_point = this.get_active_word_interaction_point();
-            }
-            if (this.active_interaction_point) {
-                const point = this.active_interaction_point;
-                if (point.type == "customer") {
-                    interaction_field.remove();
-                    point.customer.element.textContent = ":O";
-                    point.customer.element.classList.add("might-serve");
-                } else if (point.type == "insert") {
-                    let word = point.word;
-                    while (word) {
-                        word.element.classList.add("might-attach");
-                        word = word.below;
-                    }
-                    interaction_field.style.left = point.x + "%";
-                    interaction_field.style.top = point.y + "%";
-                    interaction_field.style.width = point.width + "%";
-                    interaction_field.style.height = point.height + "%";
-                    this.layer.appendChild(interaction_field);
-                } else {
-                    point.word.element.classList.add("might-attach");
-                    const box = this.get_bounding_box();
-                    const p_box = point.word.top().get_bounding_box();
-                    const min = {
-                        x: Math.min(box.x, p_box.x),
-                        y: Math.min(box.y, p_box.y)
-                    }
-                    const max = {
-                        x: Math.max(box.x + box.width, p_box.x + p_box.width),
-                        y: Math.max(box.y + box.height, p_box.y + p_box.height)
-                    }
-                    interaction_field.style.left = min.x + "%";
-                    interaction_field.style.top = min.y + "%";
-                    interaction_field.style.width = (max.x - min.x) + "%";
-                    interaction_field.style.height = (max.y - min.y) + "%";
-                    this.layer.appendChild(interaction_field);
-                }
-            } else {
-                interaction_field.remove();
             }
         }
         ondrag(e);
@@ -369,6 +241,7 @@ export default class Word {
                 if (!this.grabbed_before_drag) {
                     this.ungrab();
                 }
+
                 document.body.classList.remove("might-eat");
                 for (let element of document.querySelectorAll(".might-attach"))
                     element.classList.remove("might-attach");
@@ -382,159 +255,159 @@ export default class Word {
                     e.pageY > Word.textzone.y + Word.textzone.height
                 ) {
                     this.add_to_inventory();
-                    return;
-                }
-
-                if (this.active_interaction_point) {
-                    this.interact(this.active_interaction_point);
                 }
             }
         })
     }
 
     hide() {
-        this.element.style.display = "none";
-        if (this.group_element)
+        if (this.group && this.is_head()) {
+            for (let word of this.group) {
+                word.element.style.display = "none";
+            }
             this.group_element.style.display = "none";
-        if (this.below)
-            this.below.hide()
+        } else {
+            this.element.style.display = "none";
+        }
     }
 
     show() {
-        this.element.style.display = "block";
-        if (this.below)
-            this.below.show()
-        if (this.group_element) {
+        if (this.group && this.is_head()) {
+            for (let word of this.group) {
+                word.element.style.display = "block";
+            }
             this.group_element.style.display = "block";
-            this.update_group_element();
+        } else {
+            this.element.style.display = "block";
         }
     }
 
     remove() {
-        this.element.remove();
-        if (this.above) {
-            this.detach_above();
+        if (this.group && this.is_head()) {
+            for (let word of this.group) {
+                word.element.remove();
+                words.splice(words.indexOf(word), 1);
+            }
+            this.group_element.remove();
+        } else {
+            this.element.remove();
+            words.splice(words.indexOf(this), 1);
         }
-        if (this.below) {
-            this.below.remove();
-        }
-        words.splice(words.indexOf(this), 1);
     }
 
     add_to_inventory() {
-        let word = this;
-        while (word) {
-            inventory_add(word.text);
-            word = word.below;
+        if (this.group && this.is_head()) {
+            for (let word of this.group) {
+                inventory_add(word.text);
+            }
+        } else {
+            inventory_add(this.text);
         }
         this.remove();
     }
 
-    grab() {
-        this.grabbed = true;
-        this.element.classList.add("grab");
-        if (this.below) {
-            this.below.grab();
+    grab(only_self) {
+        if (!only_self && this.group) {
+            for (let word of this.group) {
+                word.grabbed = true;
+                word.element.classList.add("grab");
+            }
+        } else {
+            this.grabbed = true;
+            this.element.classList.add("grab");
         }
     }
 
-    ungrab() {
-        this.grabbed = false;
-        this.grabbed_before_drag = false;
-        this.element.classList.remove("grab");
-        if (this.below) {
-            this.below.ungrab();
+    ungrab(only_self) {
+        if (!only_self && this.group) {
+            this.grabbed_before_drag = false;
+            for (let word of this.group) {
+                word.grabbed = false;
+                word.element.classList.remove("grab");
+            }
+        } else {
+            this.grabbed = false;
+            this.grabbed_before_drag = false;
+            this.element.classList.remove("grab");
         }
     }
 
     hover() {
-        this.element.classList.add("hover");
-        if (this.below) {
-            this.below.hover();
+        if (this.group) {
+            for (let word of this.group) {
+                word.element.classList.add("hover");
+            }
+        } else {
+            this.element.classList.add("hover");
         }
     }
 
     unhover() {
-        this.element.classList.remove("hover");
-        if (this.below) {
-            this.below.unhover();
-        }
-    }
-
-    attach_below(word) {
-        if (this.below && this.below != word) {
-            this.below.detach_above();
-            this.detach_below();
-        }
-        this.below = word;
-        if (word.above != this)
-            word.attach_above(this)
-        if (!this.above) {
-            this.spawn_group_element();
+        if (this.group) {
+            for (let word of this.group) {
+                word.element.classList.remove("hover");
+            }
         } else {
-            let top = this.above;
-            while (top.above)
-                top = top.above;
-            top.update_group_element();
+            this.element.classList.remove("hover");
         }
     }
 
-    attach_above(word) {
-        if (this.above && this.above != word) {
-            this.above.detach_below();
-            this.detach_above();
+    add_to_group(group) {
+        if (this.group) {
+            this.group.splice(this.group.indexOf(this), 1);
+            if (this.group_element)
+                this.group_element.remove();
+            if (this.group.length <= 1) {
+                const word = this.group[0];
+                word.group = null;
+                if (word.group_element)
+                    word.group_element.remove();
+            } else {
+                if (!this.group[0].group_element)
+                    this.group[0].spawn_group_element();
+                this.group[0].update_group_element();
+            }
         }
-        this.above = word;
-        if (word.below != this)
-            word.attach_below(this)
-        if (this.group_element) {
-            this.group_element.remove();
-            this.group_element = null;
+        group.push(this);
+        if (group.length == 1) {
+            this.spawn_group_element();
         }
+        this.group = group;
+        group[0].update_group_element();
+    }
+
+    is_attached_to(word) {
+        if (word == this) return true;
+        if (!word.group || !this.group) return false;
+        return word.group.indexOf(this) != -1;
+    }
+
+    get_group_bounds() {
+        let min = { x: this.x, y: this.y }
+        let max = { x: this.x + this.width, y: this.y + this.height }
+        for (let word of this.group) {
+            min.x = Math.min(min.x, word.x);
+            min.y = Math.min(min.y, word.y);
+            max.x = Math.max(max.x, word.x + word.width);
+            max.y = Math.max(max.y, word.y + word.height);
+        }
+        return { x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y }
     }
 
     spawn_group_element() {
-        if (this.group_element)
-            this.group_element.remove();
+        if (this.group_element) this.group_element.remove();
         const element = document.createElement("div");
         element.className = "word-group";
         this.layer.appendChild(element);
         this.group_element = element;
-        this.update_group_element();
     }
 
     update_group_element() {
-        const { x, y, width, height } = this.get_bounding_box();
+        const { x, y, width, height } = this.get_group_bounds();
         this.group_element.style.left = x + "%";
         this.group_element.style.top = y + "%";
         this.group_element.style.width = width + "%";
         this.group_element.style.height = height + "%";
-    }
-
-    detach_below() {
-        const prev_below = this.below;
-        this.below = null;
-        if (prev_below?.above == this)
-            prev_below.detach_above()
-        if (this.above) {
-            let top = this.above;
-            while (top.above)
-                top = top.above;
-            top.update_group_element();
-        } else if (this.group_element) {
-            this.group_element.remove();
-            this.group_element = null;
-        }
-    }
-
-    detach_above() {
-        const prev_above = this.above;
-        this.above = null;
-        if (prev_above?.below == this)
-            prev_above.detach_below()
-        if (this.below) {
-            this.spawn_group_element();
-        }
     }
 
     interact(point) {
@@ -543,108 +416,26 @@ export default class Word {
             point.customer.serve(this);
             sfx("burgerpoints");
         } else if (point.type == "insert") {
-            let insert_after = point.word.bottom();
-            while (this.y < insert_after?.y) {
-                insert_after = insert_after.above;
-            }
-            if (!insert_after) {
-                this.set_position(this.x, point.y - Word.char_height);
-                this.attach_below(point.word);
-            } else {
-                this.set_position(this.x, insert_after.y + Word.char_height);
-                if (insert_after.below) {
-                    let bottom = this.bottom();
-                    insert_after.below.set_position(insert_after.below.x, bottom.y + Word.char_height);
-                    bottom.attach_below(insert_after.below);
-                }
-                this.attach_above(insert_after);
-            }
-            sfx("drop");
-        } else {
-            if (point.type == "below") {
-                this.set_position(this.x, point.y);
-                this.attach_above(point.word);
-            } else {
-                let tiers = 0;
-                let bottom = this;
-                while (bottom.below) {
-                    tiers++;
-                    bottom = bottom.below;
-                }
-                this.set_position(this.x, point.y - tiers * Word.char_height);
-                bottom.attach_below(point.word);
-            }
+            this.add_to_group(point.word.group);
             sfx("drop");
         }
-    }
-
-    bottom() {
-        let bottom = this;
-        while (bottom.below)
-            bottom = bottom.below;
-        return bottom;
-    }
-
-    top() {
-        let top = this;
-        while (top.above)
-            top = top.above;
-        return top;
-    }
-
-    is_attached_to(word) {
-        let check = this.top();
-        while (check) {
-            if (check == word) return true;
-            check = check.below;
-        }
-        return false;
-    }
-
-    attached_words() {
-        let words = [];
-        let word = this.top();
-        while (word) {
-            words.push(word);
-            word = word.below;
-        }
-        return words;
     }
 
     get_interaction_points() {
         var points = [];
         search: for (let word of words) {
-            if (word.layer != this.layer) continue;
-            if (word == this || word.is_attached_to(this)) continue;
-            if (word.grabbed) continue;
-            if (word.bottom() == word) {
+            if (
+                word.layer == this.layer &&
+                word.is_head() &&
+                !word.is_attached_to(this) &&
+                word.group
+            ) {
+                const { x, y, width, height } = word.get_group_bounds();
                 points.push({
-                    type: "below",
+                    type: "insert",
                     word,
-                    x: word.x,
-                    y: word.y + Word.char_height,
-                    width: word.width,
-                    height: Word.char_height
+                    x, y, width, height
                 })
-            }
-            if (word.top() == word) {
-                points.push({
-                    type: "above",
-                    word,
-                    x: word.x,
-                    y: word.y - Word.char_height,
-                    width: word.width,
-                    height: Word.char_height
-                })
-
-                if (word.group_element) {
-                    const { x, y, width, height } = word.get_bounding_box();
-                    points.push({
-                        type: "insert",
-                        word,
-                        x, y, width, height
-                    })
-                }
             }
         }
         for (let customer of customers) {
@@ -660,7 +451,7 @@ export default class Word {
     }
 
     copy_to_gallery() {
-        const { x, y, width, height } = this.get_bounding_box();
+        const { x, y, width, height } = this.get_group_bounds();
 
         const padding = Word.char_width;
         var pos_x = 0;
@@ -670,11 +461,17 @@ export default class Word {
         var ys = [padding];
         var gallery_boxes = [];
         for (let word of words) {
-            if (word.layer == gallery_zone && word.top() == word) {
-                const w_box = word.get_bounding_box();
-                gallery_boxes.push(w_box);
-                xs.push(w_box.x + w_box.width);
-                ys.push(w_box.y + w_box.height);
+            if (word.layer == gallery_zone && word.is_head()) {
+                if (word.group) {
+                    const w_box = word.get_group_bounds();
+                    gallery_boxes.push(w_box);
+                    xs.push(w_box.x + w_box.width + padding);
+                    ys.push(w_box.y + w_box.height + padding);
+                } else {
+                    gallery_boxes.push(word);
+                    xs.push(word.x + word.width + padding);
+                    ys.push(word.y + word.height + padding);
+                }
             }
         }
         xs = xs.sort((a, b) => a - b);
@@ -695,40 +492,36 @@ export default class Word {
             }
         }
 
-        // const gallery_was_hidden = gallery_zone.classList.contains("hidden");
-        // kitchen_zone.classList.add("hidden");
-        // gallery_zone.classList.remove("hidden");
-
-        var word = this;
-        var previous_copy;
-        while (word) {
-            const copy = new Word(
-                word.x - x + pos_x, 
-                word.y - y + pos_y, 
-                word.text
-            );
+        if (this.group) {
+            var group;
+            for (let word of this.group) {
+                const copy = new Word(
+                    word.x - x + pos_x,
+                    word.y - y + pos_y,
+                    word.text
+                )
+                copy.layer = gallery_zone;
+                words.push(copy);
+                if (!group) {
+                    copy.group = [copy];
+                } else {
+                    group.push(copy);
+                    copy.group = group;
+                }
+            }
+        } else {
+            const copy = new Word(pos_x, pos_y, this.text);
             copy.layer = gallery_zone;
             words.push(copy);
-            if (previous_copy) {
-                previous_copy.attach_below(copy);
-            }
-            gallery_zone.appendChild(copy.element);
-            word = word.below;
-            previous_copy = copy;
         }
-
-        // if (gallery_was_hidden) {
-        //     kitchen_zone.classList.remove("hidden");
-        //     gallery_zone.classList.add("hidden");
-        // }
 
         gallery_button.classList.remove("hidden");
     }
 
-    static async spawn_string(x = 0, y = 0, string = "", delay = 30, onspawn) {
+    static async spawn_string(x = 0, y = 0, string = "", delay = 0, onspawn) {
         for (let text of string.split(" ")) {
             const word = new Word(x, y, text);
-            word.push_up_colliding_words();
+            word.push_colliding_words();
             words.push(word);
             x += (text.length + 1) * Word.char_width;
             if (onspawn) onspawn();
@@ -798,22 +591,15 @@ document.addEventListener("mousedown", e => {
     }
     document.body.classList.add("selecting");
 
-    if (!e.shiftKey) {
-        for (let word of words) {
-            if (word.grabbed) {
-                word.ungrab();
-            }
-        }
+    for (let word of words) {
+        if (word.is_head())
+            word.ungrab();
     }
 
     drag({
         ondrag: e => {
-            if (!e.shiftKey) {
-                for (let word of words) {
-                    if (word.grabbed) {
-                        word.ungrab();
-                    }
-                }
+            for (let word of words) {
+                word.ungrab(true);
             }
 
             let min = {
@@ -842,17 +628,23 @@ document.addEventListener("mousedown", e => {
                     !kitchen_zone.classList.contains("hidden") && word.layer == gallery_zone ||
                     !gallery_zone.classList.contains("hidden") && word.layer == kitchen_zone
                 ) continue;
-                if (word.top() != word) continue;
-                let { x, y, width, height } = word.get_bounding_box();
                 if (aabb(
                     min.x, max.x - min.x, min.y, max.y - min.y,
-                    x, width, y, height
+                    word.x, word.width, word.y, word.height
                 )) {
-                    word.grab();
+                    word.grab(true);
                 }
             }
         },
         ondragend: e => {
+            const selected_words = words.filter(word => word.grabbed);
+            if (selected_words.length > 1) {
+                const group = [];
+                for (let word of selected_words) {
+                    word.add_to_group(group);
+                }
+            }
+
             document.body.classList.remove("selecting");
             selection_area.remove();
         }

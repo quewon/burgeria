@@ -1,6 +1,6 @@
 import rules from "./rules.js";
-import Customer from "./customer.js";
-import Word from "./word.js";
+import Customer from "./Customer.js";
+import Word from "./Word.js";
 import { inventory, inventory_remove, update_inventory_size } from "./inventory.js";
 import InputManager from "./lib/input.js";
 import { sfx } from "./sound.js";
@@ -8,6 +8,7 @@ import { sfx } from "./sound.js";
 var customers = [];
 var words = [];
 var input_manager;
+var mouse = { x:0, y:0 };
 
 async function init() {
     await Word.onresize();
@@ -16,6 +17,7 @@ async function init() {
     input_manager = new InputManager(input, "", () => {
         input.size = Math.max(input.value.length, 1);
     });
+    input.size = 1;
     input.addEventListener("keydown", e => {
         if (e.key === " " || e.key === "Enter") {
             const len = input.value.trim().length;
@@ -58,15 +60,20 @@ async function init() {
             if (word.grabbed)
                 return;
         }
-        set_input_position(
-            (e.pageX - Word.textzone.x) / Word.textzone.width * 100,
-            (e.pageY - Word.textzone.y) / Word.textzone.height * 100
-        );
+        update_input_position();
         input.focus();
     })
+    document.addEventListener("mousemove", e => {
+        mouse = {
+            x: (e.pageX - Word.textzone.x) / Word.textzone.width * 100,
+            y: (e.pageY - Word.textzone.y) / Word.textzone.height * 100
+        };
+    })
+    document.addEventListener("keydown", e => {
+        if (e.target == input) return;
 
-    document.addEventListener("keydown", async e => {
-        if (e.target == input && input.value != "") return;
+        update_input_position();
+        input.focus();
 
         if (e.key == "Delete" || e.key == "Backspace") {
             var to_remove = [];
@@ -81,125 +88,31 @@ async function init() {
             input.blur();
             return;
         }
-        if (e.ctrlKey || e.metaKey) {
-            if (e.code == "KeyA") {
-                for (let word of words) {
-                    if (
-                        kitchen_zone.classList.contains("hidden") && word.layer == kitchen_zone ||
-                        gallery_zone.classList.contains("hidden") && word.layer == gallery_zone
-                    ) {
-                        continue;
-                    }
-                    word.grab();
-                }
-            } else if (e.code == "KeyC") {
-                e.preventDefault();
-
-                var selected = [];
-                var x = Infinity;
-                var y = Infinity;
-                for (let word of words) {
-                    if (word.grabbed) {
-                        selected.push({
-                            text: word.text,
-                            x: word.x,
-                            y: word.y
-                        })
-                        x = Math.min(x, word.x);
-                        y = Math.min(y, word.y);
-                    }
-                }
-                for (let selection of selected) {
-                    selection.line_index = Math.floor((selection.y - y) / (Word.char_height * 0.99));
-                    selection.char_index = Math.floor((selection.x - x) / (Word.char_width * 0.99));
-                }
-                selected.sort((a, b) => {
-                    if (a.line_index != b.line_index) {
-                        return a.line_index - b.line_index;
-                    } else {
-                        return a.char_index - b.char_index;
-                    }
-                })
-
-                var text = "";
-                var char_index = 0;
-                var previous_line = selected[0].line_index;
-                for (let selection of selected) {
-                    if (selection.line_index > previous_line) {
-                        previous_line = selection.line_index;
-                        text += "\n";
-                        char_index = 0;
-                    }
-                    for (let i=char_index; i<selection.char_index; i++) {
-                        text += " ";
-                    }
-                    text += selection.text;
-                    char_index = selection.char_index + selection.text.length;
-                }
-                
-                navigator.clipboard.writeText(text);
-            } else if (e.code == "KeyV") {
-                e.preventDefault();
-
-                var text = await navigator.clipboard.readText();
-                for (let i=0; i<text.length; i++) {
-                    if (text[i] == " " || text[i] == "\n") continue;
-                    const letter = text[i].toLowerCase();
-                    if (letter in inventory && inventory[letter] > 0) {
-                        inventory_remove(text[i]);
-                        continue;
-                    }
-                    text = text.substring(0, i) + " " + text.substring(i + 1);
-                }
-                if (text.trim() == "") {
-                    sfx("error");
-                    document.body.classList.add("letter-rejected");
-                    setTimeout(() => {
-                        document.body.classList.remove("letter-rejected");
-                    }, 100);
-                    return;
-                }
-
-                const input_x = parseFloat(input.style.left) || 0;
-                let x = input_x;
-                let y = parseFloat(input.style.top) || 0;
-                let lines = text.split("\n");
-                for (let i=0; i<lines.length; i++) {
-                    let line = lines[i];
-                    let linewords = line.split(" ");
-                    for (let j=0; j<linewords.length; j++) {
-                        let lineword = linewords[j];
-                        if (lineword == "") {
-                            x += Word.char_width;
-                            continue;
-                        }
-                        const word = new Word(x, y, linewords[j]);
-                        words.push(word);
-                        x += Word.char_width * word.text.length;
-                        if (j < linewords.length - 1) {
-                            x += Word.char_width;
-                        }
-                    }
-                    if (i < lines.length - 1) {
-                        y += Word.char_height;
-                        x = input_x;
-                    }
-                }
-                set_input_position(x, y);
-            }
-            input.blur();
-            return;
-        }
     })
 
-    Word.spawn_string(5, Word.char_height * 1, "eat words by dragging them off", 0);
-    Word.spawn_string(5, Word.char_height * 2, "click and type to make words", 0);
-    Word.spawn_string(5 + Word.char_width * 8, Word.char_height * 4, "to build burgers", 0);
+    Word.spawn_string(5, Word.char_height * 1, "eat words by dragging them off");
+    Word.spawn_string(5, Word.char_height * 2, "type to make new words");
+    Word.spawn_string(5, Word.char_height * 3, "drag + select 2 or more words to");
 
-    words.push(new Word(5, Word.char_height * 3, "stack"))
-    const word = new Word(5 + Word.char_width * 2, Word.char_height * 4, "words", 0);
-    words.push(word);
-    word.interact(word.get_active_word_interaction_point());
+    const g_make_groups = [];
+    const w_make = new Word(5 + Word.char_width * 33, Word.char_height * 3, "make");
+    const w_groups = new Word(5 + Word.char_width * 38, Word.char_height * 3, "groups");
+
+    words.push(w_make);
+    words.push(w_groups);
+    w_make.add_to_group(g_make_groups);
+    w_groups.add_to_group(g_make_groups);
+
+    Word.spawn_string(5 + Word.char_width * 8, Word.char_height * 5, "to build burgers");
+
+    const g_stack_words = [];
+    const w_stack = new Word(5, Word.char_height * 4, "stack");
+    const w_words = new Word(5 + Word.char_width * 2, Word.char_height * 5, "words");
+
+    words.push(w_stack);
+    words.push(w_words);
+    w_stack.add_to_group(g_stack_words);
+    w_words.add_to_group(g_stack_words);
 }
 
 function create_word_at_input() {
@@ -211,10 +124,13 @@ function create_word_at_input() {
             text
         );
         words.push(word);
-        // word.interact(word.get_active_word_interaction_point());
         sfx("type");
     }
     input_manager.burn();
+}
+
+function update_input_position() {
+    set_input_position(mouse.x, mouse.y);
 }
 
 function set_input_position(x, y) {
@@ -222,12 +138,12 @@ function set_input_position(x, y) {
     input.style.top = y + "%";
 }
 
-function start_day() {
+function start_game() {
     setTimeout(() => {
-        customers.push(new Customer(50, 50));
+        customers.push(new Customer(50, 50, "burger"));
     }, 1000);
 }
 
 window.addEventListener("load", init);
 
-export { words, customers, start_day };
+export { words, customers, start_game };

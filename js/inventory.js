@@ -1,4 +1,4 @@
-import { start_day } from "./main.js";
+import { start_game } from "./main.js";
 import { sfx } from "./sound.js";
 
 var inventory = {};
@@ -34,7 +34,7 @@ function inventory_add(text) {
     }
 
     if (game_start_flag) {
-        start_day();
+        start_game();
         game_start_flag = false;
     }
 }

@@ -1,16 +1,16 @@
 import rules from "./rules.js";
-import Word from "./word.js";
+import Word from "./Word.js";
 import { customers } from "./main.js";
 import { sfx } from "./sound.js";
 
 export default class Customer {
     static initial_r_scale = 2;
 
-    constructor(x, y) {
+    constructor(x, y, order) {
         const menu_items = Object.keys(rules.recipes);
         this.face = ":)";
         this.state = "waiting";
-        this.order = menu_items[Math.floor(Math.random() * menu_items.length)];
+        this.order = order || menu_items[Math.floor(Math.random() * menu_items.length)];
         this.x = x ?? Math.random() * 80 + 10;
         this.y = y ?? Math.random() * 80 + 10;
         this.r_scale = Customer.initial_r_scale;
@@ -61,7 +61,7 @@ export default class Customer {
             this.served_amount++;
             setTimeout(() => {
                 word.set_position(this.x - word.width/2, this.y + Word.char_height);
-                word.push_down_colliding_words();
+                word.push_colliding_words();
                 word.show(); 
             }, 500);
             // if (this.served_amount == 5) {
@@ -110,7 +110,7 @@ export default class Customer {
     say(text) {
         const width = Word.char_width * text.length;
         const height = Word.char_height;
-        Word.spawn_string(this.x - width/2, this.y - height * 2, text, undefined, () => {
+        Word.spawn_string(this.x - width/2, this.y - height * 2, text, 30, () => {
             sfx("talk");
             if (this.face != ":D") {
                 this.element.textContent = ":O";
